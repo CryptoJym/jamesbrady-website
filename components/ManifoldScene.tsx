@@ -9,8 +9,9 @@ import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocess
 export function ManifoldScene() {
     return (
         <div className="absolute inset-0 w-screen h-screen z-0 bg-black">
+            {/* Camera Y position moved up (from 0 to 2) to shift view downwards, effectively moving manifold up */}
             <Canvas
-                camera={{ position: [0, 0, 10], fov: 45 }}
+                camera={{ position: [0, 2, 10], fov: 45 }}
                 gl={{ antialias: false }}
                 style={{ width: '100%', height: '100%' }}
             >

@@ -9,7 +9,8 @@ export default function Home() {
         <ManifoldScene />
       </div>
 
-      <div className="relative z-10 w-full h-full flex flex-col justify-between pointer-events-none">
+      {/* UI Layer - Components handle their own positioning */}
+      <div className="relative z-10 w-full h-full pointer-events-none">
         <DashboardOverlay />
         <ChatPanel />
       </div>

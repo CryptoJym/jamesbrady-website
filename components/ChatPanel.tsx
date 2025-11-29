@@ -66,72 +66,71 @@ export function ChatPanel() {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-6 pointer-events-auto flex flex-col justify-end h-[50vh]">
+        <div
+            className="fixed bottom-0 left-0 right-0 z-50 flex justify-center p-6 pointer-events-none"
+            style={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}
+        >
+            <div className="w-full max-w-3xl bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden pointer-events-auto flex flex-col max-h-[40vh]">
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto space-y-6 pr-2 scrollbar-none mask-gradient-to-t mb-6" ref={scrollRef}>
-                {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-white/20 space-y-4">
-                        <div className="p-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-                            <div className="w-3 h-3 bg-white/50 rounded-full animate-pulse shadow-[0_0_15px_white]" />
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent" ref={scrollRef}>
+                    {messages.length === 0 && (
+                        <div className="text-center text-white/20 py-4">
+                            <p className="text-xs font-mono tracking-[0.2em] uppercase">System Ready</p>
                         </div>
-                        <p className="text-xs font-light tracking-[0.3em] uppercase opacity-50">Manifold Online</p>
-                    </div>
-                )}
-                {messages.map((m, i) => (
-                    <div
-                        key={i}
-                        className={cn(
-                            "flex flex-col gap-2 max-w-[85%] animate-in fade-in slide-in-from-bottom-4 duration-500",
-                            m.role === 'user' ? "ml-auto items-end" : "mr-auto items-start"
-                        )}
-                    >
-                        <div
-                            className={cn(
-                                "p-5 rounded-2xl text-lg font-light leading-relaxed backdrop-blur-xl shadow-lg border",
-                                m.role === 'user'
-                                    ? "bg-white/10 text-white border-white/10 rounded-br-sm"
-                                    : "bg-black/40 text-blue-50 border-white/5 rounded-bl-sm shadow-[0_0_30px_rgba(0,0,0,0.3)]"
-                            )}
+                    )}
+                    {messages.map((m, i) => (
+                        <div key={i} className="flex flex-col gap-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center gap-2 opacity-50">
+                                <span className={cn(
+                                    "text-[10px] uppercase tracking-widest font-mono",
+                                    m.role === 'user' ? "text-blue-400" : "text-purple-400"
+                                )}>
+                                    {m.role === 'user' ? 'USER' : 'GPT-5.1'}
+                                </span>
+                            </div>
+                            <div
+                                className={cn(
+                                    "text-sm leading-relaxed",
+                                    m.role === 'user' ? "text-white/90" : "text-white/80"
+                                )}
+                            >
+                                {m.content}
+                            </div>
+                        </div>
+                    ))}
+
+                    {isLoading && (
+                        <div className="flex items-center gap-2 opacity-50">
+                            <span className="text-[10px] uppercase tracking-widest font-mono text-purple-400">PROCESSING</span>
+                            <div className="flex gap-1">
+                                <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce" />
+                                <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce delay-75" />
+                                <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce delay-150" />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Input Area */}
+                <div className="p-4 bg-white/5 border-t border-white/10">
+                    <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder="Enter sequence..."
+                            className="flex-1 bg-transparent border-none py-2 px-2 text-white placeholder:text-white/20 focus:outline-none font-mono text-sm"
+                        />
+                        <button
+                            type="submit"
+                            disabled={isLoading || !input.trim()}
+                            className="p-2 text-white/50 hover:text-white disabled:opacity-30 transition-all"
                         >
-                            {m.content}
-                        </div>
-                        <span className="text-[10px] uppercase tracking-widest opacity-30 px-2">
-                            {m.role === 'user' ? 'You' : 'Intelligence'}
-                        </span>
-                    </div>
-                ))}
-
-                {isLoading && (
-                    <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-md rounded-2xl border border-white/5 w-fit animate-pulse">
-                        <div className="flex gap-1.5">
-                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" />
-                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce delay-75" />
-                            <div className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce delay-150" />
-                        </div>
-                        <span className="text-xs text-white/40 font-light tracking-widest uppercase">Synthesizing</span>
-                    </div>
-                )}
-            </div>
-
-            {/* Input Area */}
-            <div className="w-full max-w-2xl mx-auto">
-                <form onSubmit={handleSubmit} className="relative flex items-center bg-white/5 border border-white/10 rounded-full px-2 shadow-2xl backdrop-blur-md transition-all focus-within:bg-white/10 focus-within:border-white/20">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Enter sequence..."
-                        className="flex-1 bg-transparent border-none py-4 px-6 text-lg text-white placeholder:text-white/20 focus:outline-none font-light tracking-wide"
-                    />
-                    <button
-                        type="submit"
-                        disabled={isLoading || !input.trim()}
-                        className="p-3 text-white/50 hover:text-white disabled:opacity-30 transition-all"
-                    >
-                        <Send className="w-5 h-5" />
-                    </button>
-                </form>
+                            <Send className="w-4 h-4" />
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
