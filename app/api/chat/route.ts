@@ -151,7 +151,7 @@ export async function POST(req: Request) {
 
     // 2. Generate AI Response + Analysis
     const completion = await openai.chat.completions.create({
-      model: "grok-3", // Verified via error message
+      model: "grok-4-1-fast-reasoning", // Updated to latest model
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
