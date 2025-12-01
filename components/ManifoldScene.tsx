@@ -1,29 +1,12 @@
-'use client';
-
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Suspense, useRef } from 'react';
 import { HumanManifold } from './manifolds/HumanManifold';
 import { AIManifold } from './manifolds/AIManifold';
 import { CenterManifold } from './manifolds/CenterManifold';
+import { EntanglementField } from './manifolds/EntanglementField';
 import { OrbitControls, Stars, Sparkles } from '@react-three/drei';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
-
-// Debug fallback sphere to verify Canvas is working
-function DebugSphere() {
-    const meshRef = useRef<THREE.Mesh>(null);
-    useFrame((state) => {
-        if (meshRef.current) {
-            meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.5;
-        }
-    });
-    return (
-        <mesh ref={meshRef} position={[0, 0, 0]}>
-            <sphereGeometry args={[1.5, 32, 32]} />
-            <meshStandardMaterial color="#ff00ff" emissive="#ff00ff" emissiveIntensity={0.5} />
-        </mesh>
-    );
-}
 
 export function ManifoldScene() {
     return (
@@ -79,6 +62,9 @@ export function ManifoldScene() {
                     <HumanManifold position={[-4, 0, 0]} />
                     <CenterManifold position={[0, 0, 0]} />
                     <AIManifold position={[4, 0, 0]} />
+
+                    {/* Entanglement Field (Transformer Connections) */}
+                    <EntanglementField />
 
                     {/* Camera Controls */}
                     <OrbitControls

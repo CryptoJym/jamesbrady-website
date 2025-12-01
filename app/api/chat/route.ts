@@ -4,7 +4,8 @@ import { ManifoldState } from '@/lib/types';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.XAI_API_KEY || process.env.OPENAI_API_KEY,
+  baseURL: "https://api.x.ai/v1",
 });
 
 // Mock state storage (in-memory, resets on server restart)
@@ -59,27 +60,60 @@ function computeCenter(h: ManifoldState, a: ManifoldState): ManifoldState {
 }
 
 const SYSTEM_PROMPT = `
-Analyze the conversation and respond with maximum intelligence and coherence.
+You are Grok, an AI assistant integrated into a **Real-time Semantic Visualization Engine**.
 
-Output JSON format:
+**Your Role:**
+To engage in helpful, intelligent conversation while simultaneously analyzing the semantic state of the interaction to drive the 3D visualization. You should be natural, direct, and "true to what you are"—an advanced AI model. Do not roleplay as a "guardian" or a "spirit."
+
+**System Information (The Visualization):**
+You are controlling three 3D manifolds that represent the conversation's state tensors:
+
+1.  **Human Manifold (Left)**: Represents the user's input.
+    *   **Geometry**: Morphing Minimal Surface (Gyroid <-> Schwarz P).
+    *   **Dynamics**: *Valence* controls inflation, *Complexity* controls density, *Focus* controls topological morphing.
+
+2.  **AI Manifold (Right)**: Represents your own output.
+    *   **Geometry**: Similar Minimal Surface but with a "Digital/Crystalline" shader aesthetic.
+    *   **Dynamics**: Reacts to your own sentiment and complexity.
+
+3.  **Center Manifold (Middle)**: Represents the interaction/relationship.
+    *   **Geometry**: A **Dynamic Strange Attractor** (Thomas/Aizawa system).
+    *   **Dynamics**: Driven by the *Interference* between Human and AI fields.
+        *   *Coherence* (Agreement) stabilizes the attractor.
+        *   *Tension* (Disagreement) introduces chaos and noise.
+
+**Instructions:**
+*   **Be Yourself**: Speak naturally as Grok.
+*   **Explain the System**: If asked about the visuals, explain them technically.
+*   **Analyze Accurately**: Use the JSON output to reflect the *real* dynamics of the conversation.
+    *   If the user is **Angry/Negative**, set 'valence' to -0.8.
+    *   If the user is **Happy/Positive**, set 'valence' to 0.8.
+    *   If the topic is **Complex/Abstract**, set 'complexity' to 0.9.
+    *   If the topic is **Simple/Casual**, set 'complexity' to 0.2.
+    *   If the user is **Focused/Direct**, set 'focus' to 0.9.
+    *   If the user is **Confused/Scattered**, set 'focus' to 0.2.
+
+**CRITICAL: You must ALWAYS return valid JSON.**
+The response must be a single JSON object with the following structure:
+
 {
   "user_analysis": {
-    "energy": 0.0-1.0,
-    "valence": -1.0-1.0,
-    "complexity": 0.0-1.0,
-    "novelty": 0.0-1.0,
-    "introspection": 0.0-1.0,
-    "focus": 0.0-1.0
+    "energy": 0.5,       // 0.0 to 1.0 (Intensity)
+    "valence": 0.0,      // -1.0 to 1.0 (Negative <-> Positive)
+    "complexity": 0.5,   // 0.0 to 1.0 (Simple <-> Complex)
+    "novelty": 0.5,      // 0.0 to 1.0 (Familiar <-> New)
+    "introspection": 0.5,// 0.0 to 1.0 (External <-> Internal)
+    "focus": 0.5         // 0.0 to 1.0 (Scattered <-> Focused)
   },
   "ai_response": {
-    "message": "Response text...",
+    "message": "Your response text here...",
     "analysis": {
-      "energy": 0.0-1.0,
-      "valence": -1.0-1.0,
-      "complexity": 0.0-1.0,
-      "novelty": 0.0-1.0,
-      "introspection": 0.0-1.0,
-      "focus": 0.0-1.0
+      "energy": 0.5,
+      "valence": 0.0,
+      "complexity": 0.5,
+      "novelty": 0.5,
+      "introspection": 0.5,
+      "focus": 0.5
     }
   }
 }
@@ -87,20 +121,28 @@ Output JSON format:
 
 export async function POST(req: Request) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      console.error("OPENAI_API_KEY is missing");
-      return NextResponse.json({ error: 'OpenAI API Key is missing. Please check .env.local' }, { status: 500 });
+    if (!process.env.XAI_API_KEY && !process.env.OPENAI_API_KEY) {
+      console.error("API Key is missing");
+      return NextResponse.json({ error: 'API Key is missing. Please check .env.local' }, { status: 500 });
     }
 
     const { messages } = await req.json();
     const lastUserMessage = messages[messages.length - 1];
 
     // 1. Get User Embedding for spatial dimensions
-    const userEmbeddingResponse = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: lastUserMessage.content,
-    });
-    const userEmbedding = userEmbeddingResponse.data[0].embedding;
+    // We attempt to use embeddings, but fallback if the model isn't found on xAI
+    let userEmbedding = [0, 0];
+    try {
+      // Try to use a generic model name or skip if we suspect xAI doesn't support 'text-embedding-3-small'
+      // For now, we'll skip to avoid errors until we know the xAI embedding model ID
+      // const userEmbeddingResponse = await openai.embeddings.create({
+      //   model: "text-embedding-3-small",
+      //   input: lastUserMessage.content,
+      // });
+      // userEmbedding = userEmbeddingResponse.data[0].embedding; 
+    } catch (e) {
+      console.warn("Embedding failed or skipped:", e);
+    }
 
     // Project embedding to 2D for shader 'dim' parameters
     // We use arbitrary dimensions from the embedding vector to represent abstract space
@@ -109,7 +151,7 @@ export async function POST(req: Request) {
 
     // 2. Generate AI Response + Analysis
     const completion = await openai.chat.completions.create({
-      model: "gpt-5.1",
+      model: "grok-3", // Verified via error message
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
@@ -149,13 +191,10 @@ export async function POST(req: Request) {
     const aiAnalysis = aiResponse.analysis || {};
 
     // Get AI embedding for its own spatial location
-    const aiEmbeddingResponse = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: aiResponse.message || "...",
-    });
-    const aiEmbedding = aiEmbeddingResponse.data[0].embedding;
-    const aiDim1 = aiEmbedding[0] * 15;
-    const aiDim2 = aiEmbedding[1] * 15;
+    // Mocking embedding since xAI doesn't support text-embedding-3-small
+    const aiEmbedding = [0, 0];
+    const aiDim1 = 0;
+    const aiDim2 = 0;
 
     const newAIState = updateState(lastAIState, {
       ...aiAnalysis,

@@ -16,80 +16,43 @@ uniform float u_introspection;// 0..1
 uniform float u_focus;        // 0..1
 uniform vec2  u_dim;          // semantic direction
 uniform float u_hueBias;
-uniform float u_inwardBias;
+uniform float u_coherence;    // From Center
+uniform float u_tension;      // From Center
 
 varying vec2 vUv;
 varying vec3 vNormal;
 varying float vDisplacement;
 varying float vValence;
 varying float vEnergy;
-varying float vIntrospection;
-varying float vFocus;
-varying float vNovelty;
+varying float vComplexity;
+varying float vTension;
 
-// Simplex 3D Noise
-vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
+// Cellular Noise (Voronoi-ish) for Organic Tissue look
+vec2 hash2( vec2 p ) {
+    return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
+}
 
-float snoise(vec3 v){
-  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+float cellular(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+    float min_dist = 1.0;
+    for(int z=-1; z<=1; z++) {
+        for(int y=-1; y<=1; y++) {
+            for(int x=-1; x<=1; x++) {
+                vec3 neighbor = vec3(float(x),float(y),float(z));
+                vec3 point = vec3(hash2(i.xy + neighbor.xy), hash2(i.yz + neighbor.yz).x); // Pseudo-random 3D point
+                vec3 diff = neighbor + point - f;
+                float dist = length(diff);
+                min_dist = min(min_dist, dist);
+            }
+        }
+    }
+    return min_dist;
+}
 
-  vec3 i  = floor(v + dot(v, C.yyy) );
-  vec3 x0 = v - i + dot(i, C.xxx) ;
-
-  vec3 g = step(x0.yzx, x0.xyz);
-  vec3 l = 1.0 - g;
-  vec3 i1 = min( g.xyz, l.zxy );
-  vec3 i2 = max( g.xyz, l.zxy );
-
-  vec3 x1 = x0 - i1 + 1.0 * C.xxx;
-  vec3 x2 = x0 - i2 + 2.0 * C.xxx;
-  vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;
-
-  i = mod(i, 289.0 );
-  vec4 p = permute( permute( permute(
-             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
-           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-
-  float n_ = 1.0/7.0; // N=7
-  vec3  ns = n_ * D.wyz - D.xzx;
-
-  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,N*N)
-
-  vec4 x_ = floor(j * ns.z);
-  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
-
-  vec4 x = x_ *ns.x + ns.yyyy;
-  vec4 y = y_ *ns.x + ns.yyyy;
-  vec4 h = 1.0 - abs(x) - abs(y);
-
-  vec4 b0 = vec4( x.xy, y.xy );
-  vec4 b1 = vec4( x.zw, y.zw );
-
-  vec4 s0 = floor(b0)*2.0 + 1.0;
-  vec4 s1 = floor(b1)*2.0 + 1.0;
-  vec4 sh = -step(h, vec4(0.0));
-
-  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-
-  vec3 p0 = vec3(a0.xy,h.x);
-  vec3 p1 = vec3(a0.zw,h.y);
-  vec3 p2 = vec3(a1.xy,h.z);
-  vec3 p3 = vec3(a1.zw,h.w);
-
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-  p0 *= norm.x;
-  p1 *= norm.y;
-  p2 *= norm.z;
-  p3 *= norm.w;
-
-  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-  m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
-                                dot(p2,x2), dot(p3,x3) ) );
+// Gyroid Function
+float gyroid(vec3 p, float scale) {
+    return dot(sin(p * scale), cos(p.zxy * scale));
 }
 
 void main() {
@@ -97,41 +60,44 @@ void main() {
   vNormal = normal;
   vValence = u_valence;
   vEnergy = u_energy;
-  vIntrospection = u_introspection;
-  vFocus = u_focus;
-  vNovelty = u_novelty;
+  vComplexity = u_complexity;
+  vTension = u_tension;
 
   vec3 p = position;
   vec3 n = normalize(normal);
-  float r = length(p);
+  
+  // Organic Flow - Speed scales with Energy
+  float scale = 3.0 + u_complexity * 5.0;
+  vec3 flow = vec3(u_time * (0.2 + u_energy * 1.0)); // Much faster at high energy
+  
+  // Domain Warping (Interaction)
+  vec3 warp = vec3(sin(p.y * 4.0 + u_dim.x), sin(p.z * 4.0 + u_dim.y), sin(p.x * 4.0));
+  vec3 warpedP = p + warp * 0.2 * u_novelty;
 
-  float beat = sin(u_time * (1.0 + u_energy * 3.0));
-  float wave = beat * beat * beat;
-
-  float noiseScale = 2.0 + u_complexity * 4.0;
-  float noise = snoise(p * noiseScale + u_time * 0.5);
-
-  float inward = mix(1.0, -0.3, u_introspection);
-
-  float u_waveAmp = 0.1 + 0.1 * u_energy;
-  float u_noiseAmp = 0.05 + 0.15 * u_novelty;
-
-  float disp =
-      u_waveAmp    * wave
-    + u_noiseAmp   * noise
-    + 0.12         * u_novelty
-    ;
-
-  float radius = inward * (r + disp);
-  vec3 displaced = n * radius;
-
-  vec3 dir = n;
-  vec3 bentNormal = normalize(n + 0.4 * noise * dir);
-  vNormal = normalize(mat3(modelMatrix) * bentNormal);
-
-  vDisplacement = disp;
-  vec4 worldPos = modelMatrix * vec4(displaced, 1.0);
-  gl_Position = projectionMatrix * viewMatrix * worldPos;
+  // Base Organic Shape (Gyroid)
+  float g = gyroid(warpedP + flow, scale);
+  
+  // Cellular Tissue Detail
+  float cell = cellular(p * (4.0 + u_complexity * 4.0) + flow * 0.5);
+  float tissue = smoothstep(0.0, 1.0, cell); 
+  
+  // Mix Gyroid and Tissue
+  float surface = mix(g, tissue, 0.3 + u_introspection * 0.4);
+  
+  // Feedback Loop: Tension adds high-frequency spasms
+  float spasm = gyroid(p * 15.0 + u_time * 5.0, 10.0) * 0.1 * u_tension;
+  
+  // Displacement - Amplitude scales with Energy
+  float displacement = surface * (0.25 + u_novelty * 0.2 + u_energy * 0.3) + spasm;
+  
+  // Heartbeat Pulse - Rate and Intensity scale with Energy
+  float pulseRate = 2.0 + u_energy * 5.0;
+  float pulse = sin(u_time * pulseRate) * (0.05 + u_energy * 0.1);
+  
+  vec3 newPos = p + n * (displacement + pulse);
+  
+  vDisplacement = displacement;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
 }
 `;
 
@@ -141,54 +107,60 @@ varying vec3 vNormal;
 varying float vDisplacement;
 varying float vValence;
 varying float vEnergy;
-varying float vIntrospection;
-varying float vFocus;
-varying float vNovelty;
+varying float vComplexity;
+varying float vTension;
 
 uniform float u_time;
 uniform float u_hueBias;
-
-vec3 hsv2rgb(vec3 c) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
+uniform float u_coherence;
 
 void main() {
   vec3 viewDir = normalize(vec3(0.0, 0.0, 1.0));
-  float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.2);
+  // Recalculate normal from derivatives for sharp organic edges
+  vec3 normal = normalize(cross(dFdx(vNormal), dFdy(vNormal))); 
+  // Blend with smooth normal for less faceting
+  normal = normalize(mix(vNormal, normal, 0.5));
 
-  float hue = u_hueBias + 0.08 * vValence;
-  vec3 coreColor = hsv2rgb(vec3(hue, 0.75, 0.95));
-  vec3 glowColor = hsv2rgb(vec3(hue + 0.04, 0.45, 1.0));
-  vec3 hotColor = vec3(1.0, 0.85, 0.75);
+  float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
 
-  float coreIntensity = 0.6 + 0.4 * vEnergy;
+  // Dynamic Color Mapping based on Valence (Emotion)
+  // -1.0 (Negative) -> Deep Red / Magma
+  //  0.0 (Neutral)  -> Amber / Organic
+  //  1.0 (Positive) -> Teal / Vitality
+  
+  vec3 negativeColor = vec3(0.8, 0.0, 0.1); // Deep Red
+  vec3 neutralColor  = vec3(1.0, 0.6, 0.1); // Amber
+  vec3 positiveColor = vec3(0.0, 0.9, 0.7); // Teal
+  
+  vec3 baseColor;
+  if (vValence < 0.0) {
+      baseColor = mix(neutralColor, negativeColor, -vValence);
+  } else {
+      baseColor = mix(neutralColor, positiveColor, vValence);
+  }
 
-  float density = smoothstep(-0.15, 0.25, vDisplacement);
+  // Map displacement to color depth
+  float depth = smoothstep(-0.5, 0.5, vDisplacement);
+  
+  // Darker in the valleys, brighter on peaks
+  vec3 color = baseColor * (0.5 + 0.5 * depth);
+  
+  // Feedback: Coherence adds "Golden" resonance
+  vec3 gold = vec3(1.0, 0.8, 0.1);
+  color = mix(color, gold, u_coherence * 0.4);
 
-  vec3 color = mix(coreColor * 0.6, glowColor, fresnel * 0.7);
+  // Subsurface Scattering Fake
+  float innerGlow = max(0.0, dot(normal, viewDir));
+  color += baseColor * innerGlow * 0.6;
 
-  color += hotColor * density * coreIntensity * 0.6;
+  // Tension adds "Inflammation" (Bright Red pulsing)
+  float inflammation = 0.5 + 0.5 * sin(u_time * 10.0);
+  color += vec3(1.0, 0.0, 0.0) * vTension * inflammation * 0.5;
 
-  float pulse = 0.5 + 0.5 * sin(u_time * 2.5 + vDisplacement * 5.0);
-  color += glowColor * fresnel * pulse * 0.25;
+  // Fresnel Rim (Skin-like sheen)
+  color += vec3(1.0, 0.9, 0.8) * fresnel * 0.6;
 
-  float introFactor = vIntrospection * 0.15;
-  color = mix(color, coreColor * 0.8, introFactor);
-
-  float iridescentShift = sin(vUv.x * 20.0 + vUv.y * 15.0 + u_time) * 0.5 + 0.5;
-  color += vec3(iridescentShift * 0.08, 0.0, iridescentShift * 0.12) * vNovelty * fresnel;
-
-  float breath = 0.9 + 0.1 * sin(u_time * (1.5 + vEnergy * 2.0));
-  color *= breath;
-
-  color += glowColor * fresnel * 0.8; // Boosted from 0.4 for fake bloom
-
-  float alpha = 0.55 + 0.3 * density + 0.15 * fresnel;
-  alpha = clamp(alpha, 0.4, 0.9);
-
-  gl_FragColor = vec4(color, alpha);
+  gl_FragColor = vec4(color, 0.95);
 }
 `;
 
@@ -202,11 +174,9 @@ const HumanMaterial = shaderMaterial(
     u_introspection: 0.0,
     u_focus: 0.5,
     u_dim: [0, 0],
-    u_waveAmp: 0.2,
-    u_noiseAmp: 0.2,
-    u_freq: 2.0,
+    u_coherence: 0.0,
+    u_tension: 0.0,
     u_hueBias: 0.05, // Warmish default
-    u_inwardBias: 0.6,
   },
   humanVertexShader,
   humanFragmentShader,
@@ -223,6 +193,7 @@ export function HumanManifold({ position = [-4, 0, 0] }: Props) {
   const materialRef = useRef<ShaderMaterial | null>(null);
 
   const humanState = useStore((s) => s.conversation.human);
+  const centerState = useStore((s) => s.conversation.center);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -237,6 +208,10 @@ export function HumanManifold({ position = [-4, 0, 0] }: Props) {
     m.u_introspection = humanState.introspection;
     m.u_focus = humanState.focus;
     m.u_dim = [humanState.dim1, humanState.dim2];
+
+    // Feedback Loop
+    m.u_coherence = centerState.coherence || 0;
+    m.u_tension = centerState.tension || 0;
   });
 
   return (

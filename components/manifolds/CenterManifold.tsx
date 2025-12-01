@@ -15,86 +15,34 @@ uniform float u_complexity;  // 0..1
 uniform float u_valence;     // -1..1
 uniform float u_coherence;   // 0..1
 uniform float u_tension;     // 0..1
-uniform vec4 u_params;       // a, b, c, d for Clifford
+uniform vec4 u_params;       // a, b, c, d for Attractor
 
 varying vec2 vUv;
 varying vec3 vNormal;
 varying float vDisplacement;
 varying float vCoherence;
 varying float vTension;
+varying vec3 vViewPosition;
 
-// Simplex 3D Noise
-vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
-
-float snoise(vec3 v){
-  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-  vec3 i  = floor(v + dot(v, C.yyy) );
-  vec3 x0 = v - i + dot(i, C.xxx) ;
-  vec3 g = step(x0.yzx, x0.xyz);
-  vec3 l = 1.0 - g;
-  vec3 i1 = min( g.xyz, l.zxy );
-  vec3 i2 = max( g.xyz, l.zxy );
-  vec3 x1 = x0 - i1 + 1.0 * C.xxx;
-  vec3 x2 = x0 - i2 + 2.0 * C.xxx;
-  vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;
-  i = mod(i, 289.0 );
-  vec4 p = permute( permute( permute( 
-             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-           + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
-           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-  float n_ = 1.0/7.0; // N=7
-  vec3  ns = n_ * D.wyz - D.xzx;
-  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,N*N)
-  vec4 x_ = floor(j * ns.z);
-  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
-  vec4 x = x_ *ns.x + ns.yyyy;
-  vec4 y = y_ *ns.x + ns.yyyy;
-  vec4 h = 1.0 - abs(x) - abs(y);
-  vec4 b0 = vec4( x.xy, y.xy );
-  vec4 b1 = vec4( x.zw, y.zw );
-  vec4 s0 = floor(b0)*2.0 + 1.0;
-  vec4 s1 = floor(b1)*2.0 + 1.0;
-  vec4 sh = -step(h, vec4(0.0));
-  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-  vec3 p0 = vec3(a0.xy,h.x);
-  vec3 p1 = vec3(a0.zw,h.y);
-  vec3 p2 = vec3(a1.xy,h.z);
-  vec3 p3 = vec3(a1.zw,h.w);
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-  p0 *= norm.x;
-  p1 *= norm.y;
-  p2 *= norm.z;
-  p3 *= norm.w;
-  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-  m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
-                                dot(p2,x2), dot(p3,x3) ) );
+// Gyroid Function (for Interference)
+float gyroid(vec3 p, float scale) {
+    return dot(sin(p * scale), cos(p.zxy * scale));
 }
 
-// Clifford Attractor Iteration
-vec3 cliffordWarp(vec3 p, vec4 params) {
-    float a = params.x;
-    float b = params.y;
-    float c = params.z;
-    float d = params.w;
-
+// Dynamic Strange Attractor (Modified Thomas/Aizawa)
+vec3 strangeAttractor(vec3 p, float t, float coherence, float tension) {
+    float b = 0.19 + tension * 0.1; 
+    float dt = 0.05 + u_energy * 0.05; 
+    
     float x = p.x;
     float y = p.y;
     float z = p.z;
-
-    // Reduced iterations for vertex shader performance, but enough for shape
-    for(int i=0; i<2; i++) {
-        float xn = sin(a * y) + c * cos(a * x);
-        float yn = sin(b * x) + d * cos(b * y);
-        float zn = sin(c * z) + d * cos(c * x);
-        x = xn;
-        y = yn;
-        z = zn;
-    }
-    return vec3(x, y, z);
+    
+    float dx = sin(y) - b * x;
+    float dy = sin(z) - b * y;
+    float dz = sin(x) - b * z;
+    
+    return vec3(dx, dy, dz) * dt;
 }
 
 void main() {
@@ -104,38 +52,49 @@ void main() {
   vTension = u_tension;
 
   vec3 p = position;
-  vec3 normalDir = normalize(normal);
+  vec3 n = normalize(normal);
 
-  // Base breathing
-  float breath = sin(u_time * (1.0 + u_energy)) * 0.05;
+  // 1. Calculate Interference Field (Ripple Effect)
+  // High frequency ripples for "Singularity" look
+  float scale = 8.0 + u_complexity * 10.0;
+  float g1 = gyroid(p + vec3(u_time * 0.2), scale);
+  float g2 = gyroid(p - vec3(u_time * 0.15), scale * 1.1);
+  float interference = g1 + g2; 
   
-  // Attractor influence
-  // When coherence is high, the shape becomes more defined by the attractor
-  // When tension is high, it becomes more chaotic noise
+  // 2. Calculate Attractor Flow
+  vec3 flow = strangeAttractor(p, u_time, u_coherence, u_tension);
   
-  vec3 attractorPos = cliffordWarp(p * 0.8, u_params);
+  // 3. Combine: Attractor flows along the Interference Gradient
+  float strength = 1.0 + u_tension * 3.0; // Higher tension = more chaos
+  vec3 targetPos = p + flow * strength;
   
-  // Noise for tension/instability
-  float noiseAmp = u_tension * 0.4;
-  float noiseVal = snoise(p * 3.0 + u_time * 0.5);
+  // Modulate displacement by interference (Ripple)
+  // Shockwave effect from energy and tension
+  float shockwave = sin(length(p) * 10.0 - u_time * 5.0) * (u_energy + u_tension) * 0.3;
   
-  // Blend between sphere (stable base) and attractor (complex relation)
-  // High coherence -> More Attractor structure
-  // Low coherence -> More amorphous sphere
-  float mixFactor = smoothstep(0.2, 0.8, u_coherence);
-  
-  vec3 targetPos = mix(p, attractorPos, mixFactor * 0.6);
-  
-  // Apply tension noise
-  targetPos += normalDir * noiseVal * noiseAmp;
-  
-  // Apply breathing
-  targetPos += normalDir * breath;
+  targetPos += n * (interference * 0.1 + shockwave);
 
-  float disp = length(targetPos - p);
-  vDisplacement = disp;
-
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(targetPos, 1.0);
+  // Recalculate normal approximation
+  vec3 tangent = normalize(cross(n, vec3(0, 1, 0)));
+  vec3 bitangent = normalize(cross(n, tangent));
+  vec3 p1 = p + tangent * 0.01;
+  vec3 p2 = p + bitangent * 0.01;
+  
+  // Re-evaluate interference for neighbors to get gradient
+  float i1 = gyroid(p1 + vec3(u_time * 0.2), scale) + gyroid(p1 - vec3(u_time * 0.15), scale * 1.1);
+  float i2 = gyroid(p2 + vec3(u_time * 0.2), scale) + gyroid(p2 - vec3(u_time * 0.15), scale * 1.1);
+  
+  vec3 pos1 = p1 + flow * strength + n * i1 * 0.1;
+  vec3 pos2 = p2 + flow * strength + n * i2 * 0.1;
+  
+  vec3 newNormal = normalize(cross(pos1 - targetPos, pos2 - targetPos));
+  
+  vNormal = newNormal;
+  vDisplacement = length(targetPos - p);
+  
+  vec4 mvPosition = modelViewMatrix * vec4(targetPos, 1.0);
+  vViewPosition = -mvPosition.xyz;
+  gl_Position = projectionMatrix * mvPosition;
 }
 `;
 
@@ -145,50 +104,63 @@ varying vec3 vNormal;
 varying float vDisplacement;
 varying float vCoherence;
 varying float vTension;
+varying vec3 vViewPosition;
 
 uniform float u_time;
 uniform float u_valence;
 uniform float u_energy;
 
+// Cosine based palette (Rainbow/Prismatic)
+vec3 palette( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d ) {
+    return a + b*cos( 6.28318*(c*t+d) );
+}
+
 void main() {
-  vec3 viewDir = normalize(vec3(0.0, 0.0, 1.0));
-  float fresnel = pow(1.0 - max(0.0, dot(viewDir, vNormal)), 2.0);
+  vec3 viewDir = normalize(vViewPosition);
+  vec3 normal = normalize(vNormal);
+  
+  // Iridescence (Prismatic Effect)
+  float fresnel = pow(1.0 - max(0.0, dot(viewDir, normal)), 2.0);
+  
+  // Rainbow palette for diffraction
+  vec3 a = vec3(0.5, 0.5, 0.5);
+  vec3 b = vec3(0.5, 0.5, 0.5);
+  vec3 c = vec3(1.0, 1.0, 1.0);
+  vec3 d = vec3(0.0, 0.33, 0.67);
+  
+  vec3 iridescent = palette(fresnel + vDisplacement * 0.5, a, b, c, d);
+  
+  // Dynamic Color Mapping based on Coherence (Harmony)
+  // 0.0 (Chaos) -> Dark Grey / Noise
+  // 1.0 (Order) -> Prismatic / White
+  
+  vec3 chaosColor = vec3(0.1, 0.1, 0.1); // Dark Grey
+  vec3 orderColor = vec3(0.95, 0.95, 1.0); // Pearl White
+  
+  vec3 baseColor = mix(chaosColor, orderColor, vCoherence);
+  
+  // Mix Iridescence into Base
+  // More iridescent when coherent
+  vec3 color = mix(baseColor, iridescent, 0.3 + vCoherence * 0.5);
+  
+  // Core Glow (Singularity)
+  vec3 coreColor = vec3(1.0, 0.9, 0.6); 
+  float coreIntensity = smoothstep(0.0, 1.0, 1.0 - fresnel);
+  color = mix(color, coreColor, coreIntensity * vCoherence);
 
-  // Colors representing the "Field"
-  // Stable/Coherent = Gold/Cyan/White
-  // Unstable/Tense = Red/Purple/Dark
-  
-  vec3 stableColor = vec3(0.0, 0.9, 1.0); // Cyan
-  vec3 coreColor = vec3(1.0, 0.9, 0.5);   // Gold
-  vec3 tenseColor = vec3(0.8, 0.1, 0.3);  // Reddish
-  
-  // Base mix based on coherence
-  vec3 baseColor = mix(tenseColor, stableColor, vCoherence);
-  
-  // Add core glow
-  baseColor = mix(baseColor, coreColor, 0.3 * (1.0 - vTension));
-
-  // Pulse effect from energy
-  float pulse = sin(u_time * 2.0 + vDisplacement * 10.0) * 0.5 + 0.5;
-  baseColor += coreColor * pulse * u_energy * 0.8; // Boosted pulse
-  
-  // Fresnel rim
-  vec3 rimColor = vec3(1.0, 0.9, 0.5); // Gold rim
-  baseColor += rimColor * fresnel * 0.8; // Reduced from 2.0 to 0.8 for better contrast
-  
-  // Tension adds "static" or noise to the color
+  // Tension adds "Dark Matter" cracks
   if (vTension > 0.3) {
-      float staticNoise = fract(sin(dot(vUv, vec2(12.9898, 78.233))) * 43758.5453);
-      baseColor += vec3(staticNoise) * (vTension - 0.3) * 0.5;
+      float crack = smoothstep(0.4, 0.5, abs(sin(vDisplacement * 20.0)));
+      color = mix(color, vec3(0.0, 0.0, 0.0), crack * (vTension - 0.3));
   }
 
   // Transparency
-  // Boost alpha significantly for visibility without Bloom
-  float alpha = 0.6 + 0.4 * vCoherence + 0.4 * fresnel;
-  alpha = clamp(alpha, 0.5, 1.0);
+  float alpha = 0.4 + 0.6 * fresnel;
   
-  // Make it glow
-  gl_FragColor = vec4(baseColor * 1.1, alpha); // Reduced boost from 1.5 to 1.1
+  // Additive highlight
+  color += vec3(1.0) * pow(fresnel, 4.0) * 0.5;
+
+  gl_FragColor = vec4(color, alpha); 
 }
 `;
 
