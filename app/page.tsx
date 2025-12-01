@@ -1,19 +1,22 @@
-import { ManifoldScene } from '@/components/ManifoldScene';
+import { SceneWrapper } from '@/components/SceneWrapper';
 import { ChatPanel } from '@/components/ChatPanel';
 import { DashboardOverlay } from '@/components/DashboardOverlay';
 
 export default function Home() {
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-[#02030b] text-white selection:bg-blue-500/30">
+    <main className="relative h-screen w-full bg-black overflow-hidden font-sans text-white selection:bg-cyan-500/30">
+      {/* Full-bleed 3D Canvas */}
       <div className="absolute inset-0 z-0">
-        <ManifoldScene />
+        <SceneWrapper />
       </div>
 
-      {/* UI Layer - Components handle their own positioning */}
-      <div className="relative z-10 w-full h-full pointer-events-none">
+      {/* Dashboard HUD overlay */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
         <DashboardOverlay />
-        <ChatPanel />
       </div>
+
+      {/* Chat Interface - floats at bottom */}
+      <ChatPanel />
     </main>
   );
 }

@@ -9,14 +9,14 @@ type Store = {
 };
 
 const defaultManifoldState = (): ManifoldState => ({
-    energy: 0.1,
-    valence: 0,
-    complexity: 0.1,
-    novelty: 0,
-    introspection: 0,
+    energy: 0.6,
+    valence: 0.3,
+    complexity: 0.5,
+    novelty: 0.4,
+    introspection: 0.3,
     focus: 0.5,
-    dim1: 0,
-    dim2: 0,
+    dim1: 0.2,
+    dim2: 0.1,
 });
 
 export const useStore = create<Store>((set) => ({

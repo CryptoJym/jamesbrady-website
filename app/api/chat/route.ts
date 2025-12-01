@@ -87,6 +87,11 @@ Output JSON format:
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("OPENAI_API_KEY is missing");
+      return NextResponse.json({ error: 'OpenAI API Key is missing. Please check .env.local' }, { status: 500 });
+    }
+
     const { messages } = await req.json();
     const lastUserMessage = messages[messages.length - 1];
 
@@ -169,9 +174,10 @@ export async function POST(req: Request) {
       centerState,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in chat route:", error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    const errorMessage = error.message || 'Internal Server Error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
