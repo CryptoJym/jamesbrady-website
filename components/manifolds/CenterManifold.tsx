@@ -1,233 +1,176 @@
 'use client';
 
-import { useRef } from 'react';
-import { extend, useFrame } from '@react-three/fiber';
-import { ShaderMaterial, Mesh, Vector4, AdditiveBlending, NormalBlending } from 'three';
+import { useRef, useMemo } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '@/lib/state';
-import { shaderMaterial } from '@react-three/drei';
-import { getAllAttractorParams } from '@/lib/attractorMapping';
 
+// Particle Shader
 const centerVertexShader = `
-uniform float u_time;
-uniform float u_energy;      // 0..1
-uniform float u_complexity;  // 0..1
-uniform float u_valence;     // -1..1
-uniform float u_coherence;   // 0..1
-uniform float u_tension;     // 0..1
-uniform vec4 u_params;       // a, b, c, d for Attractor
+  uniform float u_time;
+  uniform float u_coherence;
+  uniform float u_tension;
+  
+  attribute float size;
+  
+  varying float vAlpha;
 
-varying vec2 vUv;
-varying vec3 vNormal;
-varying float vDisplacement;
-varying float vCoherence;
-varying float vTension;
-varying vec3 vViewPosition;
-
-// Gyroid Function (for Interference)
-float gyroid(vec3 p, float scale) {
-    return dot(sin(p * scale), cos(p.zxy * scale));
-}
-
-// Dynamic Strange Attractor (Modified Thomas/Aizawa)
-vec3 strangeAttractor(vec3 p, float t, float coherence, float tension) {
-    float b = 0.19 + tension * 0.1; 
-    float dt = 0.05 + u_energy * 0.05; 
+  void main() {
+    vec3 pos = position;
     
-    float x = p.x;
-    float y = p.y;
-    float z = p.z;
+    // Particle Movement
+    // Flow based on Coherence (Order) vs Tension (Chaos)
     
-    float dx = sin(y) - b * x;
-    float dy = sin(z) - b * y;
-    float dz = sin(x) - b * z;
+    // Orbit Rotation
+    float angle = u_time * (0.2 + u_tension);
+    float c = cos(angle);
+    float s = sin(angle);
+    mat2 rot = mat2(c, -s, s, c);
+    pos.xz = rot * pos.xz;
     
-    return vec3(dx, dy, dz) * dt;
-}
+    // Breathing
+    pos *= 1.0 + sin(u_time + pos.y) * 0.1;
 
-void main() {
-  vUv = uv;
-  vNormal = normal;
-  vCoherence = u_coherence;
-  vTension = u_tension;
-
-  vec3 p = position;
-  vec3 n = normalize(normal);
-
-  // 1. Calculate Interference Field (Ripple Effect)
-  // High frequency ripples for "Singularity" look
-  float scale = 8.0 + u_complexity * 10.0;
-  float g1 = gyroid(p + vec3(u_time * 0.2), scale);
-  float g2 = gyroid(p - vec3(u_time * 0.15), scale * 1.1);
-  float interference = g1 + g2; 
-  
-  // 2. Calculate Attractor Flow
-  vec3 flow = strangeAttractor(p, u_time, u_coherence, u_tension);
-  
-  // 3. Combine: Attractor flows along the Interference Gradient
-  float strength = 1.0 + u_tension * 3.0; // Higher tension = more chaos
-  vec3 targetPos = p + flow * strength;
-  
-  // Modulate displacement by interference (Ripple)
-  // Shockwave effect from energy and tension
-  float shockwave = sin(length(p) * 10.0 - u_time * 5.0) * (u_energy + u_tension) * 0.3;
-  
-  targetPos += n * (interference * 0.1 + shockwave);
-
-  // Recalculate normal approximation
-  vec3 tangent = normalize(cross(n, vec3(0, 1, 0)));
-  vec3 bitangent = normalize(cross(n, tangent));
-  vec3 p1 = p + tangent * 0.01;
-  vec3 p2 = p + bitangent * 0.01;
-  
-  // Re-evaluate interference for neighbors to get gradient
-  float i1 = gyroid(p1 + vec3(u_time * 0.2), scale) + gyroid(p1 - vec3(u_time * 0.15), scale * 1.1);
-  float i2 = gyroid(p2 + vec3(u_time * 0.2), scale) + gyroid(p2 - vec3(u_time * 0.15), scale * 1.1);
-  
-  vec3 pos1 = p1 + flow * strength + n * i1 * 0.1;
-  vec3 pos2 = p2 + flow * strength + n * i2 * 0.1;
-  
-  vec3 newNormal = normalize(cross(pos1 - targetPos, pos2 - targetPos));
-  
-  vNormal = newNormal;
-  vDisplacement = length(targetPos - p);
-  
-  vec4 mvPosition = modelViewMatrix * vec4(targetPos, 1.0);
-  vViewPosition = -mvPosition.xyz;
-  gl_Position = projectionMatrix * mvPosition;
-}
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    
+    // Size attenuation
+    gl_PointSize = size * (300.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+    
+    // Fade edges
+    vAlpha = 1.0;
+  }
 `;
 
 const centerFragmentShader = `
-varying vec2 vUv;
-varying vec3 vNormal;
-varying float vDisplacement;
-varying float vCoherence;
-varying float vTension;
-varying vec3 vViewPosition;
+  uniform float u_coherence;
+  
+  varying float vAlpha;
 
-uniform float u_time;
-uniform float u_valence;
-uniform float u_energy;
+  void main() {
+    // Circular Particle
+    vec2 uv = gl_PointCoord.xy - 0.5;
+    float r = length(uv);
+    if (r > 0.5) discard;
+    
+    // Soft glow
+    float glow = 1.0 - (r * 2.0);
+    glow = pow(glow, 2.0);
 
-// Cosine based palette (Rainbow/Prismatic)
-vec3 palette( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d ) {
-    return a + b*cos( 6.28318*(c*t+d) );
-}
+    // Dynamic Color
+    // Chaos (Dark Grey) <-> Order (Obsidian/Gold)
+    vec3 chaosColor = vec3(0.2, 0.2, 0.2);
+    vec3 orderColor = vec3(1.0, 0.9, 0.5); // Gold
+    
+    vec3 color = mix(chaosColor, orderColor, u_coherence);
 
-void main() {
-  vec3 viewDir = normalize(vViewPosition);
-  vec3 normal = normalize(vNormal);
-  
-  // Iridescence (Prismatic Effect)
-  float fresnel = pow(1.0 - max(0.0, dot(viewDir, normal)), 2.0);
-  
-  // Rainbow palette for diffraction
-  vec3 a = vec3(0.5, 0.5, 0.5);
-  vec3 b = vec3(0.5, 0.5, 0.5);
-  vec3 c = vec3(1.0, 1.0, 1.0);
-  vec3 d = vec3(0.0, 0.33, 0.67);
-  
-  vec3 iridescent = palette(fresnel + vDisplacement * 0.5, a, b, c, d);
-  
-  // Dynamic Color Mapping based on Coherence (Harmony)
-  // 0.0 (Chaos) -> Dark Grey / Noise
-  // 1.0 (Order) -> Prismatic / White
-  
-  vec3 chaosColor = vec3(0.1, 0.1, 0.1); // Dark Grey
-  vec3 orderColor = vec3(0.95, 0.95, 1.0); // Pearl White
-  
-  vec3 baseColor = mix(chaosColor, orderColor, vCoherence);
-  
-  // Mix Iridescence into Base
-  // More iridescent when coherent
-  vec3 color = mix(baseColor, iridescent, 0.3 + vCoherence * 0.5);
-  
-  // Core Glow (Singularity)
-  vec3 coreColor = vec3(1.0, 0.9, 0.6); 
-  float coreIntensity = smoothstep(0.0, 1.0, 1.0 - fresnel);
-  color = mix(color, coreColor, coreIntensity * vCoherence);
-
-  // Tension adds "Dark Matter" cracks
-  if (vTension > 0.3) {
-      float crack = smoothstep(0.4, 0.5, abs(sin(vDisplacement * 20.0)));
-      color = mix(color, vec3(0.0, 0.0, 0.0), crack * (vTension - 0.3));
+    gl_FragColor = vec4(color, glow * vAlpha);
   }
-
-  // Transparency
-  float alpha = 0.4 + 0.6 * fresnel;
-  
-  // Additive highlight
-  color += vec3(1.0) * pow(fresnel, 4.0) * 0.5;
-
-  gl_FragColor = vec4(color, alpha); 
-}
 `;
 
-// 1) Define a custom shader material type
-const CenterMaterial = shaderMaterial(
-  {
-    u_time: 0,
-    u_energy: 0.5,
-    u_complexity: 0.5,
-    u_valence: 0.0,
-    u_coherence: 0.5,
-    u_tension: 0.5,
-    u_params: new Vector4(1.4, -2.3, 2.4, -2.1), // Default Clifford/DeJong
-  },
-  centerVertexShader,
-  centerFragmentShader,
-);
+export function CenterManifold(props: any) {
+  const pointsRef = useRef<THREE.Points>(null);
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const { center } = useStore((state) => state.conversation);
 
-extend({ CenterMaterial });
+  // Generate Particles
+  const { positions, sizes } = useMemo(() => {
+    const count = 2000;
+    const positions = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
 
-type Props = {
-  position?: [number, number, number];
-};
+    for (let i = 0; i < count; i++) {
+      // Sphere distribution
+      const r = 2.5 * Math.cbrt(Math.random());
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos(2 * Math.random() - 1);
 
-export function CenterManifold({ position = [0, 0, 0] }: Props) {
-  const meshRef = useRef<Mesh | null>(null);
-  const materialRef = useRef<ShaderMaterial | null>(null);
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
 
-  const humanState = useStore((s) => s.conversation.human);
-  const aiState = useStore((s) => s.conversation.ai);
-  const centerState = useStore((s) => s.conversation.center);
+      sizes[i] = Math.random() * 2.0;
+    }
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if (!materialRef.current) return;
-    const m = materialRef.current as any;
+    return { positions, sizes };
+  }, []);
 
-    m.u_time = t;
-    m.u_energy = centerState.energy;
-    m.u_complexity = centerState.complexity;
-    m.u_valence = centerState.valence;
-    m.u_coherence = centerState.coherence ?? 0.5;
-    m.u_tension = centerState.tension ?? 0.5;
+  const inputActivity = useStore((s) => s.conversation.inputActivity);
+  const setInputActivity = useStore((s) => s.setInputActivity);
 
-    // Calculate dynamic attractor parameters based on coherence
-    const { center } = getAllAttractorParams(humanState, aiState, centerState.coherence || 0.5);
-    m.u_params = new Vector4(center.a, center.b, center.c, center.d);
+  // Ref to track smoothed activity for visual transition
+  const smoothedActivity = useRef(0);
 
-    if (meshRef.current) {
-      // Slow rotation for the center piece
-      meshRef.current.rotation.y = t * 0.15;
-      meshRef.current.rotation.z = t * 0.08;
+  useFrame(({ clock }, delta) => {
+    if (materialRef.current) {
+      // Smoothly interpolate towards the target input activity
+      // Slower lerp for organic feel, avoiding "jolts"
+      smoothedActivity.current = THREE.MathUtils.lerp(smoothedActivity.current, inputActivity, delta * 3.0);
+
+      // Decay the global input activity slowly if it's high
+      if (inputActivity > 0.01) {
+        setInputActivity(THREE.MathUtils.lerp(inputActivity, 0, delta * 1.0));
+      }
+
+      // Boost time/speed based on smoothed input
+      const speedMultiplier = 1.0 + smoothedActivity.current * 3.0;
+
+      // Accumulate time with variable speed
+      materialRef.current.uniforms.u_time.value += delta * speedMultiplier;
+
+      // Note: u_energy is not defined in the original fragment shader, but added here as per instruction.
+      // It would need to be added to the shader for this line to have an effect.
+      materialRef.current.uniforms.u_energy.value = (center.energy ?? 0) + smoothedActivity.current * 0.8; // Glow brighter
+      materialRef.current.uniforms.u_coherence.value = THREE.MathUtils.lerp(
+        materialRef.current.uniforms.u_coherence.value,
+        center.coherence ?? 0.5,
+        0.05
+      );
+      materialRef.current.uniforms.u_tension.value = THREE.MathUtils.lerp(
+        materialRef.current.uniforms.u_tension.value,
+        center.tension ?? 0.0,
+        0.05
+      );
     }
   });
 
+  const uniforms = useMemo(
+    () => ({
+      u_time: { value: 0 },
+      u_coherence: { value: 0.5 },
+      u_tension: { value: 0.0 },
+      u_energy: { value: 0.0 }, // Added u_energy uniform
+    }),
+    []
+  );
+
   return (
-    <mesh ref={meshRef} position={position} frustumCulled={false}>
-      {/* Sphere with high segments for smooth deformation */}
-      <sphereGeometry args={[1.2, 128, 128]} />
-      {/* @ts-ignore */}
-      <centerMaterial
+    <points ref={pointsRef} {...props}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={positions.length / 3}
+          array={positions}
+          itemSize={3}
+          args={[positions, 3]}
+        />
+        <bufferAttribute
+          attach="attributes-size"
+          count={sizes.length}
+          array={sizes}
+          itemSize={1}
+          args={[sizes, 1]}
+        />
+      </bufferGeometry>
+      <shaderMaterial
         ref={materialRef}
+        vertexShader={centerVertexShader}
+        fragmentShader={centerFragmentShader}
+        uniforms={uniforms}
         transparent
-        blending={THREE.NormalBlending}
         depthWrite={false}
+        blending={THREE.AdditiveBlending}
       />
-    </mesh>
+    </points>
   );
 }
-

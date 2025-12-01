@@ -6,6 +6,7 @@ type Store = {
     setHuman: (m: ManifoldState) => void;
     setAI: (m: ManifoldState) => void;
     setCenter: (m: ManifoldState) => void;
+    setInputActivity: (activity: number) => void;
 };
 
 const defaultManifoldState = (): ManifoldState => ({
@@ -24,8 +25,10 @@ export const useStore = create<Store>((set) => ({
         human: defaultManifoldState(),
         ai: defaultManifoldState(),
         center: defaultManifoldState(),
+        inputActivity: 0, // 0 to 1, decays over time
     },
     setHuman: (m) => set((s) => ({ conversation: { ...s.conversation, human: m } })),
     setAI: (m) => set((s) => ({ conversation: { ...s.conversation, ai: m } })),
     setCenter: (m) => set((s) => ({ conversation: { ...s.conversation, center: m } })),
+    setInputActivity: (activity) => set((s) => ({ conversation: { ...s.conversation, inputActivity: activity } })),
 }));

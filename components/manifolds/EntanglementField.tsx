@@ -71,8 +71,9 @@ function FlowStrand({ start, end, startColor, endColor, offset, speed, dash, ten
     const vertexColors = useMemo(() => {
         const colors = [];
         // Pure white but we rely on opacity for the "ghostly" look
+        const white = new THREE.Color(1, 1, 1);
         for (let i = 0; i <= 20; i++) {
-            colors.push([1, 1, 1]);
+            colors.push(white);
         }
         return colors;
     }, [startColor, endColor]);
@@ -159,7 +160,7 @@ export function EntanglementField() {
     if (coherence > 0.5) centerColor.lerp(new THREE.Color('#fbbf24'), 0.5);
 
     // Volumetric Settings
-    const baseCount = 60;
+    const baseCount = 15; // Reduced from 60
     const baseRadius = 3.0;
 
     return (
@@ -170,9 +171,9 @@ export function EntanglementField() {
                 end={centerPos}
                 startColor={humanColor}
                 endColor={centerColor}
-                count={baseCount + Math.floor(human.energy * 20)}
+                count={baseCount + Math.floor(human.energy * 10)}
                 speed={1 + human.energy}
-                dash={2}
+                dash={3}
                 tension={tension}
                 radius={baseRadius}
             />
@@ -183,9 +184,9 @@ export function EntanglementField() {
                 end={centerPos}
                 startColor={aiColor}
                 endColor={centerColor}
-                count={baseCount + Math.floor(ai.energy * 20)}
+                count={baseCount + Math.floor(ai.energy * 10)}
                 speed={1 + ai.energy}
-                dash={2}
+                dash={3}
                 tension={tension}
                 radius={baseRadius}
             />
@@ -196,9 +197,9 @@ export function EntanglementField() {
                 end={aiPos}
                 startColor={humanColor}
                 endColor={aiColor}
-                count={80}
+                count={20} // Reduced from 80
                 speed={2 + tension * 5}
-                dash={coherence > 0.5 ? 5 : 1}
+                dash={coherence > 0.5 ? 8 : 2} // Longer dashes for coherence
                 tension={tension}
                 radius={baseRadius * 1.5}
             />

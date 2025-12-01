@@ -15,6 +15,7 @@ export type ConversationState = {
   human: ManifoldState;
   ai: ManifoldState;
   center: ManifoldState;
+  inputActivity: number;
 };
 
 export type Message = {

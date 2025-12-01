@@ -68,8 +68,10 @@ export function ManifoldScene() {
 
                     {/* Camera Controls */}
                     <OrbitControls
-                        enableZoom={false}
+                        enableZoom={true}
                         enablePan={false}
+                        maxDistance={20}
+                        minDistance={5}
                         maxPolarAngle={Math.PI / 1.6}
                         minPolarAngle={Math.PI / 3.5}
                         rotateSpeed={0.3}
@@ -78,16 +80,17 @@ export function ManifoldScene() {
                     />
 
                     {/* Post Processing */}
-                    {/* Post Processing - Disabled again to fix flashing regression */}
-                    {/* <EffectComposer>
+                    <EffectComposer enableNormalPass={false}>
                         <Bloom
-                            luminanceThreshold={0.15}
-                            luminanceSmoothing={0.9}
+                            luminanceThreshold={0.5}
+                            luminanceSmoothing={0.7}
                             mipmapBlur
-                            intensity={0.8}
-                            radius={0.6}
+                            intensity={0.4}
+                            radius={0.4}
                         />
-                    </EffectComposer> */}
+                        <Noise opacity={0.03} />
+                        <Vignette eskil={false} offset={0.1} darkness={1.1} />
+                    </EffectComposer>
                 </Suspense>
             </Canvas>
         </div>
