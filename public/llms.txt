@@ -22,4 +22,4 @@ This site covers: AI agents, MCP (Model Context Protocol), Claude Code, skills (
 
 ## Contact
 
-James Brady — hello@jamesbrady.org
+James Brady — james@utlyze.com

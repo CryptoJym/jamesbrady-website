@@ -22,20 +22,20 @@ export const metadata: Metadata = {
 
 const socialLinks = [
   {
-    label: "GitHub",
-    href: "https://github.com/jamesbrady",
+    label: "github.com/CryptoJym",
+    href: "https://github.com/CryptoJym",
     icon: GithubLogo,
     external: true,
   },
   {
-    label: "x.com/jamesbrady",
-    href: "https://x.com/jamesbrady",
+    label: "x.com/h3roai",
+    href: "https://x.com/h3roai",
     icon: XLogo,
     external: true,
   },
   {
-    label: "hello@jamesbrady.org",
-    href: "mailto:hello@jamesbrady.org",
+    label: "james@utlyze.com",
+    href: "mailto:james@utlyze.com",
     icon: Envelope,
     external: false,
   },
@@ -91,9 +91,10 @@ export default function AboutPage() {
               description:
                 "Mixing AI systems, protocols, and programs on a mathematical substrate.",
               sameAs: [
-                "https://github.com/jamesbrady",
-                "https://x.com/jamesbrady",
+                "https://github.com/CryptoJym",
+                "https://x.com/h3roai",
               ],
+              email: "james@utlyze.com",
             },
           }),
         }}
@@ -444,7 +445,7 @@ export default function AboutPage() {
 
                 <div className="md:col-span-4 flex md:justify-end">
                   <a
-                    href="mailto:hello@jamesbrady.org"
+                    href="mailto:james@utlyze.com"
                     className="group inline-flex items-center gap-3 px-6 py-3 border border-[#D4A853]/30 rounded-lg text-[#D4A853] hover:bg-[#D4A853]/10 hover:border-[#D4A853]/50 transition-premium"
                   >
                     <Envelope
