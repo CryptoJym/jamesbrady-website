@@ -136,26 +136,73 @@ export default function Home() {
               What is AI Alchemy?
             </h2>
             <p className="text-neutral-400 leading-relaxed max-w-[42ch]">
-              A James-voiced walkthrough of the actual system: models, tools,
-              memory, skills, and workflows compounding into leverage.
+              The system-story overview: models, tools, memory, skills, and
+              workflows compounding into leverage.
             </p>
+
+            <div className="mt-8 flex flex-col gap-3 items-start">
+              <Link
+                href="/watch#ai-alchemy"
+                className="group inline-flex items-center gap-3 text-sm text-[#D4A853] hover:text-[#E5C87A] transition-all duration-500 ease-out-expo"
+              >
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-[#D4A853]/20 group-hover:border-[#D4A853]/40 group-hover:bg-[#D4A853]/10 transition-all duration-500 ease-out-expo">
+                  <ArrowUpRight size={14} weight="bold" />
+                </span>
+                <span className="tracking-wide uppercase text-xs font-medium">
+                  Watch on dedicated page
+                </span>
+              </Link>
+
+              <a
+                href="/videos/james-what-is-ai-alchemy.mp4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-3 text-sm text-neutral-500 hover:text-[#E5C87A] transition-all duration-500 ease-out-expo"
+              >
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-neutral-700 group-hover:border-[#D4A853]/40 group-hover:bg-[#D4A853]/10 transition-all duration-500 ease-out-expo">
+                  <ArrowUpRight size={14} weight="bold" />
+                </span>
+                <span className="tracking-wide uppercase text-xs font-medium">
+                  Open MP4 directly
+                </span>
+              </a>
+            </div>
           </ScrollReveal>
 
           <ScrollReveal delay={120} className="md:col-span-8">
-            <div className="rounded-[28px] overflow-hidden border border-[#1E1E1E] bg-[#101010] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
-              <video
-                controls
-                preload="metadata"
-                playsInline
-                className="w-full bg-black"
-                poster="/images/hero-alchemy.jpg"
-              >
-                <source
-                  src="/videos/james-what-is-ai-alchemy.mp4"
-                  type="video/mp4"
-                />
-              </video>
-            </div>
+            <Link href="/watch#ai-alchemy" className="group block">
+              <div className="rounded-[28px] overflow-hidden border border-[#1E1E1E] bg-[#101010] shadow-[0_24px_80px_rgba(0,0,0,0.35)] hover:border-[#D4A853]/25 transition-premium">
+                <div className="relative aspect-[16/9] bg-black">
+                  <Image
+                    src="/images/hero-alchemy.jpg"
+                    alt="What is AI Alchemy video preview"
+                    fill
+                    className="object-cover opacity-80 group-hover:scale-[1.01] transition-premium"
+                    sizes="(min-width: 768px) 66vw, 100vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-full border border-[#D4A853]/40 bg-[#0A0A0A]/75 backdrop-blur-sm flex items-center justify-center text-[#D4A853] group-hover:scale-105 group-hover:border-[#D4A853]/60 transition-premium">
+                      <ArrowUpRight size={28} weight="bold" />
+                    </div>
+                  </div>
+                </div>
+                <div className="px-5 md:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] tracking-[0.22em] uppercase text-[#D4A853] mb-2">
+                      Better playback path
+                    </p>
+                    <p className="text-sm md:text-[15px] text-neutral-400 max-w-[64ch] leading-relaxed">
+                      Open the dedicated watch page for the clean player,
+                      transcript preview, and direct MP4 fallback.
+                    </p>
+                  </div>
+                  <span className="text-xs uppercase tracking-[0.2em] text-neutral-500 group-hover:text-[#D4A853] transition-premium">
+                    /watch
+                  </span>
+                </div>
+              </div>
+            </Link>
           </ScrollReveal>
         </div>
       </section>

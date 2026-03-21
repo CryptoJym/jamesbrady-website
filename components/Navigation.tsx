@@ -11,6 +11,7 @@ const links = [
   { href: '/workshop', label: 'Workshop' },
   { href: '/about', label: 'About' },
   { href: '/links', label: 'Links' },
+  { href: '/watch', label: 'Watch' },
 ];
 
 export function Navigation() {

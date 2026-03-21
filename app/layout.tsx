@@ -89,6 +89,12 @@ export default function RootLayout({
                   >
                     Links
                   </a>
+                  <a
+                    href="/watch"
+                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
+                  >
+                    Watch
+                  </a>
                 </div>
               </div>
               <div className="md:col-span-2">
