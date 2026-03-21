@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import {
+  RssSimple,
+  FileText,
+  Code,
+  ArrowUpRight,
+} from "@phosphor-icons/react/dist/ssr";
 import { Navigation } from "@/components/Navigation";
+import SectionDivider from "@/components/SectionDivider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -34,7 +41,10 @@ export default function RootLayout({
       <body className="antialiased bg-[#0A0A0A] text-[#E8E4DD] font-sans noise-overlay">
         <Navigation />
         <main className="pt-20">{children}</main>
-        <footer className="border-t border-[#1E1E1E] mt-32">
+
+        <SectionDivider variant="wave" className="mt-32 mb-0" />
+
+        <footer className="border-t border-[#1E1E1E]">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 md:py-24">
               <div className="md:col-span-5">
@@ -42,13 +52,12 @@ export default function RootLayout({
                   James Brady
                 </p>
                 <p className="text-neutral-500 text-sm leading-relaxed max-w-[35ch]">
-                  AI systems, protocols, and programs on a mathematical substrate.
+                  AI systems, protocols, and programs on a mathematical
+                  substrate.
                 </p>
               </div>
               <div className="md:col-span-3 md:col-start-8">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-600 mb-4 font-medium">
-                  Navigate
-                </p>
+                <p className="eyebrow mb-4">Navigate</p>
                 <div className="flex flex-col gap-2.5">
                   <a
                     href="/primer"
@@ -77,34 +86,37 @@ export default function RootLayout({
                 </div>
               </div>
               <div className="md:col-span-2">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-600 mb-4 font-medium">
-                  Meta
-                </p>
-                <div className="flex flex-col gap-2.5">
+                <p className="eyebrow mb-4">Meta</p>
+                <div className="flex flex-col gap-3">
                   <a
                     href="/feed.xml"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
+                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
                   >
+                    <RssSimple size={14} weight="light" />
                     RSS
                   </a>
                   <a
                     href="/llms.txt"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
+                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
                   >
+                    <FileText size={14} weight="light" />
                     llms.txt
                   </a>
                   <a
                     href="/api/catalog"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
+                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
                   >
+                    <Code size={14} weight="light" />
                     API
+                    <ArrowUpRight size={10} weight="bold" className="opacity-40" />
                   </a>
                 </div>
               </div>
             </div>
             <div className="border-t border-[#1E1E1E] py-6 flex flex-col md:flex-row justify-between items-center gap-3">
               <span className="text-xs text-neutral-600">
-                &copy; 2025 James Brady. All rights reserved.
+                &copy; {new Date().getFullYear()} James Brady. All rights
+                reserved.
               </span>
               <span className="text-xs text-neutral-700 font-mono">
                 Built with AI agents
