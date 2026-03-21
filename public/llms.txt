@@ -1,0 +1,25 @@
+# jamesbrady.org — AI Alchemist
+
+> James Brady's personal site. AI systems, protocols, and programs on a mathematical substrate. Tools that work.
+
+## Pages
+
+- / — Home. Hero + 3 cards linking to Primer, Manuscript, Workshop.
+- /primer — The Primer. How coding systems work: what code is, the stack, AI agents, skills, MCP.
+- /manuscript — The Manuscript. Curated catalog of 36 tools across 9 categories: Document Processing, Design & UI, Development Tools, Marketing & Analytics, Agent Frameworks, Local AI, Automation, Memory & Knowledge, MCP Servers.
+- /workshop — The Workshop. Three practical guides: set up an AI agent (Claude Code), install and use skills, connect MCP servers.
+- /about — About James Brady. Bio, philosophy, links.
+
+## Machine-Readable Endpoints
+
+- /api/catalog — JSON catalog of all tools with name, description, install command, and GitHub URL.
+- /feed.xml — RSS feed.
+- /.well-known/ai-manifest.json — AI manifest with site structure and capabilities.
+
+## Key Topics
+
+This site covers: AI agents, MCP (Model Context Protocol), Claude Code, skills (agent extensions), developer tools, document processing, vector databases, workflow automation, local LLMs, and the modern AI development stack.
+
+## Contact
+
+James Brady — hello@jamesbrady.org
