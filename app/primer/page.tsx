@@ -1,4 +1,13 @@
 import type { Metadata } from "next";
+import {
+  CaretRight,
+  Cpu,
+  DesktopTower,
+  Terminal,
+  Stack,
+  Cube,
+  Cloud,
+} from "@phosphor-icons/react/dist/ssr";
 
 export const metadata: Metadata = {
   title: "The Primer",
@@ -10,26 +19,32 @@ const stackLayers = [
   {
     layer: "Hardware",
     desc: "CPUs, GPUs, memory, storage. The physical machines that compute.",
+    icon: Cpu,
   },
   {
     layer: "Operating System",
     desc: "Linux, macOS, Windows. Manages hardware and provides a stable platform.",
+    icon: DesktopTower,
   },
   {
     layer: "Runtime",
     desc: "Node.js, Python, JVM. Executes your code in the OS environment.",
+    icon: Terminal,
   },
   {
     layer: "Framework",
     desc: "Next.js, Django, Rails. Provides structure, conventions, and pre-built patterns.",
+    icon: Stack,
   },
   {
     layer: "Application",
     desc: "Your program. The logic, the interface, the APIs — the thing people actually use.",
+    icon: Cube,
   },
   {
     layer: "Infrastructure",
     desc: "AWS, Vercel, Cloudflare. Cloud services that host and scale everything.",
+    icon: Cloud,
   },
 ];
 
@@ -57,6 +72,14 @@ const mcpConcepts = [
   },
 ];
 
+const tocItems = [
+  { id: "code", label: "What Is Code?", num: "01" },
+  { id: "stack", label: "The Stack", num: "02" },
+  { id: "agents", label: "AI Agents", num: "03" },
+  { id: "skills", label: "Skills", num: "04" },
+  { id: "mcp", label: "MCP — Model Context Protocol", num: "05" },
+];
+
 export default function PrimerPage() {
   return (
     <>
@@ -76,78 +99,70 @@ export default function PrimerPage() {
         }}
       />
 
-      <article className="px-6 py-16 md:py-24">
-        <div className="max-w-3xl mx-auto">
-          {/* Header */}
-          <header className="mb-16">
-            <p className="text-[#D4A853] text-sm tracking-[0.3em] uppercase mb-4">
-              The Primer
-            </p>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-              How Coding Systems Work
-            </h1>
-            <p className="text-neutral-400 text-lg leading-relaxed">
-              Everything you need to understand modern software — from raw code
-              to AI agents. No jargon gates. No prerequisites.
-            </p>
-            <div className="w-16 h-px bg-[#D4A853] mt-8" />
+      <article className="px-6 md:px-12 py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto">
+          {/* Header — asymmetric editorial */}
+          <header className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-24 animate-fade-up">
+            <div className="md:col-span-7">
+              <span className="rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium border border-[#D4A853]/30 text-[#D4A853] inline-block mb-8">
+                The Primer
+              </span>
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-none mb-6">
+                How Coding
+                <br />
+                Systems Work
+              </h1>
+              <div className="w-20 h-px bg-[#D4A853] animate-gold-line" />
+            </div>
+            <div className="md:col-span-4 md:col-start-9 flex items-end">
+              <p className="text-neutral-400 text-base leading-relaxed">
+                Everything you need to understand modern software — from raw code
+                to AI agents. No jargon gates. No prerequisites.
+              </p>
+            </div>
           </header>
 
           {/* Table of Contents */}
-          <nav className="mb-16 p-6 border border-[#1E1E1E] rounded-lg bg-[#141414]">
-            <p className="text-sm text-neutral-500 uppercase tracking-wide mb-3">
-              Contents
-            </p>
-            <ol className="space-y-2 text-sm">
-              <li>
-                <a
-                  href="#code"
-                  className="text-neutral-300 hover:text-[#D4A853] transition-colors"
-                >
-                  1. What Is Code?
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#stack"
-                  className="text-neutral-300 hover:text-[#D4A853] transition-colors"
-                >
-                  2. The Stack
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#agents"
-                  className="text-neutral-300 hover:text-[#D4A853] transition-colors"
-                >
-                  3. AI Agents
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#skills"
-                  className="text-neutral-300 hover:text-[#D4A853] transition-colors"
-                >
-                  4. Skills
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#mcp"
-                  className="text-neutral-300 hover:text-[#D4A853] transition-colors"
-                >
-                  5. MCP — Model Context Protocol
-                </a>
-              </li>
-            </ol>
+          <nav className="mb-24 animate-fade-up stagger-2">
+            <div className="border border-[#1E1E1E] rounded-2xl bg-[#141414] p-8 md:p-10 max-w-2xl">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-600 font-medium mb-6">
+                Contents
+              </p>
+              <div className="space-y-0 divide-y divide-[#1E1E1E]">
+                {tocItems.map((item) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    className="group flex items-center gap-4 py-3 first:pt-0 last:pb-0 transition-all duration-500 ease-out-expo"
+                  >
+                    <span className="font-mono text-xs text-neutral-600 group-hover:text-[#D4A853] transition-colors duration-500 ease-out-expo w-6">
+                      {item.num}
+                    </span>
+                    <span className="text-sm text-neutral-300 group-hover:text-[#D4A853] transition-colors duration-500 ease-out-expo">
+                      {item.label}
+                    </span>
+                    <CaretRight
+                      size={12}
+                      weight="bold"
+                      className="ml-auto text-neutral-700 group-hover:text-[#D4A853] group-hover:translate-x-0.5 transition-all duration-500 ease-out-expo"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
           </nav>
 
-          {/* Sections */}
-          <div className="space-y-16">
+          {/* Sections — editorial article layout */}
+          <div className="max-w-3xl space-y-32">
             {/* 1. What Is Code? */}
-            <section id="code">
-              <h2 className="text-2xl font-semibold mb-6">1. What Is Code?</h2>
-              <div className="space-y-4 text-neutral-300 leading-relaxed">
+            <section id="code" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-8">
+                <span className="font-mono text-xs text-[#D4A853]">01</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+                  What Is Code?
+                </h2>
+              </div>
+              <div className="space-y-5 text-neutral-300 leading-relaxed">
                 <p>
                   Code is a set of precise instructions that tells a computer
                   what to do. Every app you use, every website you visit, every
@@ -168,7 +183,7 @@ export default function PrimerPage() {
                   instructions. The programming language is the bridge between
                   your intent and the machine&apos;s execution.
                 </p>
-                <div className="border-l-2 border-[#D4A853]/40 pl-6 my-6 text-neutral-400 italic">
+                <div className="border-l-2 border-[#D4A853] pl-6 my-10 text-neutral-400 italic">
                   Think of code like a recipe. The programming language is the
                   language the recipe is written in. The computer is the kitchen.
                   The runtime is the cook.
@@ -183,28 +198,45 @@ export default function PrimerPage() {
             </section>
 
             {/* 2. The Stack */}
-            <section id="stack">
-              <h2 className="text-2xl font-semibold mb-6">2. The Stack</h2>
-              <div className="space-y-4 text-neutral-300 leading-relaxed">
+            <section id="stack" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-8">
+                <span className="font-mono text-xs text-[#D4A853]">02</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+                  The Stack
+                </h2>
+              </div>
+              <div className="space-y-5 text-neutral-300 leading-relaxed">
                 <p>
                   Modern software is built in layers. Developers call this
                   &ldquo;the stack&rdquo; — each layer handles a different level
                   of abstraction.
                 </p>
-                <div className="grid gap-3 my-6">
-                  {stackLayers.map((item) => (
-                    <div
-                      key={item.layer}
-                      className="flex flex-col sm:flex-row gap-2 sm:gap-4 p-4 border border-[#1E1E1E] rounded bg-[#141414]"
-                    >
-                      <span className="text-[#D4A853] font-mono text-sm whitespace-nowrap sm:min-w-[140px]">
-                        {item.layer}
-                      </span>
-                      <span className="text-neutral-400 text-sm">
-                        {item.desc}
-                      </span>
-                    </div>
-                  ))}
+                <div className="grid gap-3 my-10">
+                  {stackLayers.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div
+                        key={item.layer}
+                        className="group flex items-start gap-4 p-4 border border-[#1E1E1E] rounded-xl bg-[#141414] hover:border-[#D4A853]/20 transition-all duration-500 ease-out-expo"
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#D4A853]/8 flex items-center justify-center mt-0.5">
+                          <Icon
+                            size={16}
+                            weight="light"
+                            className="text-[#D4A853]/60 group-hover:text-[#D4A853] transition-colors duration-500 ease-out-expo"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[#E8E4DD] font-medium text-sm block mb-1">
+                            {item.layer}
+                          </span>
+                          <span className="text-neutral-500 text-sm leading-relaxed">
+                            {item.desc}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
                 <p>
                   Each layer abstracts away the complexity below it. A web
@@ -223,9 +255,14 @@ export default function PrimerPage() {
             </section>
 
             {/* 3. AI Agents */}
-            <section id="agents">
-              <h2 className="text-2xl font-semibold mb-6">3. AI Agents</h2>
-              <div className="space-y-4 text-neutral-300 leading-relaxed">
+            <section id="agents" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-8">
+                <span className="font-mono text-xs text-[#D4A853]">03</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+                  AI Agents
+                </h2>
+              </div>
+              <div className="space-y-5 text-neutral-300 leading-relaxed">
                 <p>
                   An AI agent is a program that uses a large language model (LLM)
                   to reason, plan, and take actions. It&apos;s the difference
@@ -238,14 +275,18 @@ export default function PrimerPage() {
                   results. It operates in a loop: observe the situation, decide
                   what to do, take an action, evaluate the result, repeat.
                 </p>
-                <p>What makes agents powerful:</p>
-                <ul className="list-none space-y-2 my-4">
+                <p className="text-[#E8E4DD] font-medium">
+                  What makes agents powerful:
+                </p>
+                <ul className="list-none space-y-3 my-6">
                   {agentCapabilities.map((item) => (
                     <li key={item} className="flex gap-3 items-start">
-                      <span className="text-[#D4A853] mt-1.5 text-xs">
-                        &#9656;
-                      </span>
-                      <span>{item}</span>
+                      <CaretRight
+                        size={14}
+                        weight="bold"
+                        className="text-[#D4A853] mt-1 flex-shrink-0"
+                      />
+                      <span className="text-neutral-300">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -255,7 +296,7 @@ export default function PrimerPage() {
                   terminal, understand your project&apos;s context, and write
                   real code that ships.
                 </p>
-                <div className="border-l-2 border-[#D4A853]/40 pl-6 my-6 text-neutral-400 italic">
+                <div className="border-l-2 border-[#D4A853] pl-6 my-10 text-neutral-400 italic">
                   An agent without tools is just a chatbot with ambition. The
                   tools are what make it useful.
                 </div>
@@ -263,9 +304,14 @@ export default function PrimerPage() {
             </section>
 
             {/* 4. Skills */}
-            <section id="skills">
-              <h2 className="text-2xl font-semibold mb-6">4. Skills</h2>
-              <div className="space-y-4 text-neutral-300 leading-relaxed">
+            <section id="skills" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-8">
+                <span className="font-mono text-xs text-[#D4A853]">04</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+                  Skills
+                </h2>
+              </div>
+              <div className="space-y-5 text-neutral-300 leading-relaxed">
                 <p>
                   Skills are packaged capabilities that extend what an agent can
                   do. Instead of one agent knowing everything about everything,
@@ -284,8 +330,8 @@ export default function PrimerPage() {
                   it does, and how it should behave. They&apos;re lightweight,
                   composable, and shareable.
                 </p>
-                <div className="bg-[#141414] border border-[#1E1E1E] rounded-lg p-6 my-6 font-mono text-sm">
-                  <p className="text-neutral-500 mb-2">
+                <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] p-6 md:p-8 my-10 font-mono text-sm overflow-x-auto">
+                  <p className="text-neutral-600 mb-3">
                     # Example skill structure
                   </p>
                   <p className="text-[#D4A853]">---</p>
@@ -304,7 +350,7 @@ export default function PrimerPage() {
                     </span>
                   </p>
                   <p className="text-[#D4A853]">---</p>
-                  <p className="text-neutral-400 mt-2">
+                  <p className="text-neutral-500 mt-3">
                     Instructions for the agent...
                   </p>
                 </div>
@@ -318,11 +364,14 @@ export default function PrimerPage() {
             </section>
 
             {/* 5. MCP */}
-            <section id="mcp">
-              <h2 className="text-2xl font-semibold mb-6">
-                5. MCP — Model Context Protocol
-              </h2>
-              <div className="space-y-4 text-neutral-300 leading-relaxed">
+            <section id="mcp" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-8">
+                <span className="font-mono text-xs text-[#D4A853]">05</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+                  MCP — Model Context Protocol
+                </h2>
+              </div>
+              <div className="space-y-5 text-neutral-300 leading-relaxed">
                 <p>
                   MCP is a standard protocol that connects AI agents to external
                   tools and data sources. Think of it as USB for AI — a
@@ -335,17 +384,21 @@ export default function PrimerPage() {
                   Another one. Notion? Another. MCP standardizes all of this
                   into one protocol.
                 </p>
-                <p>The architecture is simple:</p>
-                <div className="grid gap-3 my-6">
+                <p className="text-[#E8E4DD] font-medium">
+                  The architecture is simple:
+                </p>
+                <div className="grid gap-4 my-10">
                   {mcpConcepts.map((item) => (
                     <div
                       key={item.term}
-                      className="p-4 border border-[#1E1E1E] rounded bg-[#141414]"
+                      className="p-5 border border-[#1E1E1E] rounded-xl bg-[#141414] hover:border-[#D4A853]/20 transition-all duration-500 ease-out-expo"
                     >
-                      <p className="text-[#D4A853] font-mono text-sm mb-1">
+                      <p className="text-[#D4A853] font-mono text-sm mb-2 font-medium">
                         {item.term}
                       </p>
-                      <p className="text-neutral-400 text-sm">{item.desc}</p>
+                      <p className="text-neutral-400 text-sm leading-relaxed">
+                        {item.desc}
+                      </p>
                     </div>
                   ))}
                 </div>
