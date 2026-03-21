@@ -216,6 +216,42 @@ export default function AboutPage() {
 
       <SectionDivider variant="wave" className="my-4" />
 
+      {/* ── Video essay ── */}
+      <section className="px-6 md:px-12 py-20 md:py-28">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12 items-start">
+          <ScrollReveal className="md:col-span-4">
+            <span className="eyebrow text-[#D4A853] mb-4 inline-block">
+              Video Essay
+            </span>
+            <h2 className="section-header mb-6">
+              From prompts to operating systems
+            </h2>
+            <p className="text-neutral-400 leading-relaxed max-w-[42ch]">
+              A James-voiced explanation of the shift from one-off prompting to
+              real AI systems with continuity, skills, routing, and momentum.
+            </p>
+          </ScrollReveal>
+
+          <ScrollReveal delay={120} className="md:col-span-8">
+            <div className="rounded-[28px] overflow-hidden border border-[#1E1E1E] bg-[#101010] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+              <video
+                controls
+                preload="metadata"
+                playsInline
+                className="w-full bg-black"
+              >
+                <source
+                  src="/videos/james-prompts-to-operating-systems.mp4"
+                  type="video/mp4"
+                />
+              </video>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <SectionDivider variant="vesica" className="my-4" />
+
       {/* ── Disciplines ── */}
       <section className="px-6 md:px-12 py-20 md:py-28">
         <div className="max-w-[1400px] mx-auto">
