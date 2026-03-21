@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { catalog } from "@/lib/catalog";
 import { ArrowUpRight, Copy } from "@phosphor-icons/react/dist/ssr";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -37,29 +38,43 @@ export default function ManuscriptPage() {
       />
 
       <div className="min-h-screen bg-[#0A0A0A]">
-        <div className="px-6 md:px-12 lg:px-16 py-24 md:py-32">
-          <div className="max-w-[1400px] mx-auto">
-            {/* Header */}
-            <ScrollReveal>
-              <header className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-16">
-                <div className="md:col-span-7">
-                  <span className="eyebrow mb-6 block">The Manuscript</span>
-                  <h1 className="section-header mb-6">
-                    Curated Tools
-                    <br />
-                    <span className="text-neutral-500">&amp; Servers</span>
-                  </h1>
-                  <div className="w-20 h-px bg-[#D4A853] animate-gold-line" />
-                </div>
-                <div className="md:col-span-4 md:col-start-9 flex items-end">
-                  <p className="text-neutral-400 text-base leading-relaxed">
-                    Every tool here is real, maintained, and worth your time.
-                    Organized by what you&apos;re trying to do, not by hype
-                    cycle. Install commands included.
-                  </p>
-                </div>
-              </header>
-            </ScrollReveal>
+        {/* ── Header Background Image ── */}
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 h-[50vh] md:h-[60vh]">
+            <Image
+              src="/images/manuscript-book.jpg"
+              alt=""
+              fill
+              priority
+              className="object-cover opacity-25"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/50 via-[#0A0A0A]/70 to-[#0A0A0A]" />
+          </div>
+
+          <div className="relative px-6 md:px-12 lg:px-16 py-24 md:py-32">
+            <div className="max-w-[1400px] mx-auto">
+              {/* Header */}
+              <ScrollReveal>
+                <header className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-16">
+                  <div className="md:col-span-7">
+                    <span className="eyebrow mb-6 block">The Manuscript</span>
+                    <h1 className="section-header mb-6">
+                      Curated Tools
+                      <br />
+                      <span className="text-neutral-500">&amp; Servers</span>
+                    </h1>
+                    <div className="w-20 h-px bg-[#D4A853] animate-gold-line" />
+                  </div>
+                  <div className="md:col-span-4 md:col-start-9 flex items-end">
+                    <p className="text-neutral-400 text-base leading-relaxed">
+                      Every tool here is real, maintained, and worth your time.
+                      Organized by what you&apos;re trying to do, not by hype
+                      cycle. Install commands included.
+                    </p>
+                  </div>
+                </header>
+              </ScrollReveal>
 
             {/* Category quick nav */}
             <ScrollReveal delay={100}>
@@ -183,6 +198,7 @@ export default function ManuscriptPage() {
             </ScrollReveal>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

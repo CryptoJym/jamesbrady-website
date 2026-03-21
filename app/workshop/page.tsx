@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
+import Image from "next/image";
 import {
   Terminal,
   Plug,
@@ -79,53 +80,67 @@ export default function WorkshopPage() {
 
       <div className="min-h-screen bg-[#0A0A0A]">
         {/* ========== HERO ========== */}
-        <div className="px-6 md:px-12 pt-28 pb-20 md:pt-36 md:pb-28">
-          <div className="max-w-[1400px] mx-auto">
-            <header className="grid grid-cols-1 md:grid-cols-12 gap-8 animate-fade-up">
-              <div className="md:col-span-7">
-                <span className="eyebrow text-[#D4A853] mb-8 block">
-                  The Workshop
-                </span>
-                <h1 className="section-header text-[#E8E4DD] leading-[1.05] mb-6">
-                  Build
-                  <br />
-                  Something
-                </h1>
-                <div className="w-24 h-px bg-gradient-to-r from-[#D4A853] to-transparent" />
-              </div>
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 h-[50vh] md:h-[60vh]">
+            <Image
+              src="/images/workshop-build.jpg"
+              alt=""
+              fill
+              priority
+              className="object-cover opacity-25"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/50 via-[#0A0A0A]/70 to-[#0A0A0A]" />
+          </div>
 
-              <div className="md:col-span-4 md:col-start-9 flex items-end">
-                <p className="text-neutral-400 text-base leading-relaxed">
-                  Three guides. Real commands. Working results. Start at the top
-                  and work down, or jump to what you need.
-                </p>
-              </div>
-            </header>
+          <div className="relative px-6 md:px-12 pt-28 pb-20 md:pt-36 md:pb-28">
+            <div className="max-w-[1400px] mx-auto">
+              <header className="grid grid-cols-1 md:grid-cols-12 gap-8 animate-fade-up">
+                <div className="md:col-span-7">
+                  <span className="eyebrow text-[#D4A853] mb-8 block">
+                    The Workshop
+                  </span>
+                  <h1 className="section-header text-[#E8E4DD] leading-[1.05] mb-6">
+                    Build
+                    <br />
+                    Something
+                  </h1>
+                  <div className="w-24 h-px bg-gradient-to-r from-[#D4A853] to-transparent" />
+                </div>
 
-            {/* ---- Quick Nav ---- */}
-            <nav className="mt-16 animate-fade-up" style={{ animationDelay: "150ms" }}>
-              <div className="flex flex-wrap gap-3">
-                {guides.map((g) => {
-                  const Icon = g.icon;
-                  return (
-                    <a
-                      key={g.id}
-                      href={`#${g.id}`}
-                      className="group flex items-center gap-3 px-5 py-3 rounded-full border border-[#1E1E1E] hover:border-[#D4A853]/40 bg-[#0F0F0F] transition-premium"
-                    >
-                      <Icon
-                        size={16}
-                        weight="duotone"
-                        className="text-neutral-600 group-hover:text-[#D4A853] transition-premium"
-                      />
-                      <span className="text-sm text-neutral-400 group-hover:text-[#E8E4DD] transition-premium">
-                        {g.title}
-                      </span>
-                    </a>
-                  );
-                })}
-              </div>
-            </nav>
+                <div className="md:col-span-4 md:col-start-9 flex items-end">
+                  <p className="text-neutral-400 text-base leading-relaxed">
+                    Three guides. Real commands. Working results. Start at the top
+                    and work down, or jump to what you need.
+                  </p>
+                </div>
+              </header>
+
+              {/* ---- Quick Nav ---- */}
+              <nav className="mt-16 animate-fade-up" style={{ animationDelay: "150ms" }}>
+                <div className="flex flex-wrap gap-3">
+                  {guides.map((g) => {
+                    const Icon = g.icon;
+                    return (
+                      <a
+                        key={g.id}
+                        href={`#${g.id}`}
+                        className="group flex items-center gap-3 px-5 py-3 rounded-full border border-[#1E1E1E] hover:border-[#D4A853]/40 bg-[#0F0F0F] transition-premium"
+                      >
+                        <Icon
+                          size={16}
+                          weight="duotone"
+                          className="text-neutral-600 group-hover:text-[#D4A853] transition-premium"
+                        />
+                        <span className="text-sm text-neutral-400 group-hover:text-[#E8E4DD] transition-premium">
+                          {g.title}
+                        </span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </nav>
+            </div>
           </div>
         </div>
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import {
   CaretRight,
   Cpu,
@@ -111,6 +112,19 @@ export default function PrimerPage() {
           }),
         }}
       />
+
+      {/* ── Section Hero Image ── */}
+      <div className="relative w-full h-[40vh] md:h-[50vh] overflow-hidden">
+        <Image
+          src="/images/primer-stack.jpg"
+          alt="Technology stack visualization"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/40 via-[#0A0A0A]/20 to-[#0A0A0A]" />
+      </div>
 
       <article className="px-6 md:px-12 py-24 md:py-32">
         <div className="max-w-[1400px] mx-auto">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   BookOpen,
@@ -61,6 +62,14 @@ export default function Home() {
 
       {/* Hero with Algorithmic Art Canvas */}
       <section className="relative min-h-[100dvh] flex items-end overflow-hidden">
+        <Image
+          src="/images/hero-alchemy.jpg"
+          alt=""
+          fill
+          priority
+          className="object-cover opacity-30 mix-blend-luminosity"
+          sizes="100vw"
+        />
         <AlchemyCanvas />
 
         <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12 pb-24 md:pb-32">
