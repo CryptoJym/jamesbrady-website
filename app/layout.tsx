@@ -83,6 +83,12 @@ export default function RootLayout({
                   >
                     About
                   </a>
+                  <a
+                    href="/links"
+                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
+                  >
+                    Links
+                  </a>
                 </div>
               </div>
               <div className="md:col-span-2">

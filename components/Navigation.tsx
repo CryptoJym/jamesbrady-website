@@ -10,6 +10,7 @@ const links = [
   { href: '/manuscript', label: 'Manuscript' },
   { href: '/workshop', label: 'Workshop' },
   { href: '/about', label: 'About' },
+  { href: '/links', label: 'Links' },
 ];
 
 export function Navigation() {
