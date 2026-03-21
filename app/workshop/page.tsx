@@ -236,6 +236,40 @@ export default function WorkshopPage() {
                 </p>
               </ScrollReveal>
 
+              <ScrollReveal delay={110}>
+                <div className="mb-10 rounded-[28px] overflow-hidden border border-[#1E1E1E] bg-[#0F0F0F] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+                  <div className="px-5 md:px-6 py-4 border-b border-[#1E1E1E] flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div>
+                      <p className="text-[11px] tracking-[0.22em] uppercase text-[#D4A853]">
+                        James walkthrough
+                      </p>
+                      <h2 className="text-[#E8E4DD] text-lg md:text-xl mt-1">
+                        Install your first skill
+                      </h2>
+                    </div>
+                    <p className="text-sm text-neutral-500 max-w-md">
+                      A voiced Remotion walkthrough using James&apos;s ElevenLabs
+                      clone — one outcome, one skill, one live operator loop.
+                    </p>
+                  </div>
+
+                  <div className="p-3 md:p-4">
+                    <video
+                      controls
+                      preload="metadata"
+                      playsInline
+                      className="w-full rounded-[20px] bg-black"
+                      poster="/images/workshop-build-md.jpg"
+                    >
+                      <source
+                        src="/videos/james-install-first-skill.mp4"
+                        type="video/mp4"
+                      />
+                    </video>
+                  </div>
+                </div>
+              </ScrollReveal>
+
               <div className="space-y-4 mb-10">
                 <ScrollReveal delay={120}>
                   <InfoBlock title="Step 1 — Understand where skills live">
