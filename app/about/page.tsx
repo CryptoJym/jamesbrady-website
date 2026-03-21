@@ -3,6 +3,10 @@ import {
   ArrowUpRight,
   GithubLogo,
   XLogo,
+  LinkedinLogo,
+  TiktokLogo,
+  YoutubeLogo,
+  Butterfly,
   Envelope,
   Lightning,
   Brain,
@@ -22,15 +26,39 @@ export const metadata: Metadata = {
 
 const socialLinks = [
   {
-    label: "github.com/CryptoJym",
-    href: "https://github.com/CryptoJym",
-    icon: GithubLogo,
+    label: "LinkedIn /in/jamesbrady1",
+    href: "https://www.linkedin.com/in/jamesbrady1/",
+    icon: LinkedinLogo,
     external: true,
   },
   {
     label: "x.com/h3roai",
     href: "https://x.com/h3roai",
     icon: XLogo,
+    external: true,
+  },
+  {
+    label: "TikTok @h3ro.ai",
+    href: "https://www.tiktok.com/@h3ro.ai",
+    icon: TiktokLogo,
+    external: true,
+  },
+  {
+    label: "Bluesky utlyzeit.bsky.social",
+    href: "https://bsky.app/profile/utlyzeit.bsky.social",
+    icon: Butterfly,
+    external: true,
+  },
+  {
+    label: "github.com/CryptoJym",
+    href: "https://github.com/CryptoJym",
+    icon: GithubLogo,
+    external: true,
+  },
+  {
+    label: "YouTube channel",
+    href: "https://www.youtube.com/channel/UCA_9udyLWeGoJy12vc5TmfA",
+    icon: YoutubeLogo,
     external: true,
   },
   {
@@ -91,8 +119,12 @@ export default function AboutPage() {
               description:
                 "Mixing AI systems, protocols, and programs on a mathematical substrate.",
               sameAs: [
-                "https://github.com/CryptoJym",
+                "https://www.linkedin.com/in/jamesbrady1/",
                 "https://x.com/h3roai",
+                "https://www.tiktok.com/@h3ro.ai",
+                "https://bsky.app/profile/utlyzeit.bsky.social",
+                "https://github.com/CryptoJym",
+                "https://www.youtube.com/channel/UCA_9udyLWeGoJy12vc5TmfA",
               ],
               email: "james@utlyze.com",
             },
