@@ -127,6 +127,39 @@ export default function Home() {
       {/* Geometric Divider */}
       <SectionDivider variant="metatron" className="my-8" />
 
+      {/* Featured video */}
+      <section className="relative z-10 px-6 md:px-12 py-16 md:py-24">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12 items-start">
+          <ScrollReveal className="md:col-span-4">
+            <p className="eyebrow mb-4">Watch</p>
+            <h2 className="section-header mb-6 max-w-md">
+              What is AI Alchemy?
+            </h2>
+            <p className="text-neutral-400 leading-relaxed max-w-[42ch]">
+              A James-voiced walkthrough of the actual system: models, tools,
+              memory, skills, and workflows compounding into leverage.
+            </p>
+          </ScrollReveal>
+
+          <ScrollReveal delay={120} className="md:col-span-8">
+            <div className="rounded-[28px] overflow-hidden border border-[#1E1E1E] bg-[#101010] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+              <video
+                controls
+                preload="metadata"
+                playsInline
+                className="w-full bg-black"
+                poster="/images/hero-alchemy.jpg"
+              >
+                <source
+                  src="/videos/james-what-is-ai-alchemy.mp4"
+                  type="video/mp4"
+                />
+              </video>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* Volumes — asymmetric card grid */}
       <section className="relative z-10 px-6 md:px-12 py-24 md:py-32">
         <div className="max-w-[1400px] mx-auto">
