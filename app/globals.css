@@ -6,11 +6,13 @@
   --background: #0A0A0A;
   --foreground: #E8E4DD;
   --gold: #D4A853;
-  --gold-muted: #D4A853CC;
+  --gold-muted: rgba(212, 168, 83, 0.65);
+  --gold-faint: rgba(212, 168, 83, 0.12);
   --surface: #141414;
   --border: #1E1E1E;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-premium: cubic-bezier(0.32, 0.72, 0, 1);
   --duration-base: 500ms;
   --duration-slow: 800ms;
 }
@@ -29,7 +31,7 @@ body {
   color: #fff;
 }
 
-/* Subtle scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -44,27 +46,30 @@ body {
   background: #2A2A2A;
 }
 
-/* Editorial text styles */
+/* Balanced text */
 .text-balance {
   text-wrap: balance;
 }
 
-/* Stagger animation delays */
+/* Stagger delays */
 .stagger-1 { animation-delay: 100ms; }
 .stagger-2 { animation-delay: 200ms; }
 .stagger-3 { animation-delay: 300ms; }
 .stagger-4 { animation-delay: 400ms; }
 .stagger-5 { animation-delay: 500ms; }
+.stagger-6 { animation-delay: 600ms; }
 
-/* Fade up animation for scroll reveals */
+/* Animations */
 @keyframes fade-up {
   from {
     opacity: 0;
     transform: translateY(24px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 }
 
@@ -89,6 +94,16 @@ body {
   to { transform: scaleX(1); }
 }
 
+@keyframes gold-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 168, 83, 0); }
+  50% { box-shadow: 0 0 20px 2px rgba(212, 168, 83, 0.08); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 .animate-fade-up {
   animation: fade-up var(--duration-slow) var(--ease-out-expo) both;
 }
@@ -109,9 +124,36 @@ body {
 
 /* Premium transition utility */
 .transition-premium {
-  transition-property: color, background-color, border-color, opacity, transform;
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
   transition-duration: 500ms;
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Gold glow card effect */
+.card-glow {
+  transition: border-color 600ms cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 600ms cubic-bezier(0.32, 0.72, 0, 1),
+              transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-glow:hover {
+  border-color: rgba(212, 168, 83, 0.25);
+  box-shadow: 0 0 30px -5px rgba(212, 168, 83, 0.08),
+              inset 0 1px 0 rgba(212, 168, 83, 0.06);
+}
+.card-glow:active {
+  transform: scale(0.985);
+}
+
+/* Tool card hover */
+.tool-card {
+  transition: border-color 500ms cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 500ms cubic-bezier(0.32, 0.72, 0, 1),
+              background-color 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.tool-card:hover {
+  border-color: rgba(212, 168, 83, 0.18);
+  box-shadow: 0 0 24px -8px rgba(212, 168, 83, 0.06);
+  background-color: #171717;
 }
 
 /* Noise texture overlay */
@@ -121,13 +163,13 @@ body {
   inset: 0;
   z-index: 50;
   pointer-events: none;
-  opacity: 0.02;
+  opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
 }
 
-/* Blockquote editorial style */
+/* Editorial blockquote */
 blockquote,
 .editorial-quote {
   position: relative;
@@ -143,4 +185,30 @@ blockquote,
   border: 1px solid var(--border);
   border-radius: 8px;
   font-family: var(--font-geist-mono);
+}
+
+/* Eyebrow label */
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--gold);
+}
+
+/* Section header */
+.section-header {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* Link with gold underline on hover */
+.link-gold {
+  text-decoration: none;
+  transition: color 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.link-gold:hover {
+  color: var(--gold);
 }

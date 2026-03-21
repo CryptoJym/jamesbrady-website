@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CaretRight } from "@phosphor-icons/react/dist/ssr";
 
 export const metadata: Metadata = {
   title: "The Workshop",
@@ -24,29 +25,59 @@ export default function WorkshopPage() {
         }}
       />
 
-      <div className="px-6 py-16 md:py-24">
-        <div className="max-w-3xl mx-auto">
-          {/* Header */}
-          <header className="mb-16">
-            <p className="text-[#D4A853] text-sm tracking-[0.3em] uppercase mb-4">
-              The Workshop
-            </p>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-              Build Something
-            </h1>
-            <p className="text-neutral-400 text-lg leading-relaxed">
-              Three guides. Real commands. Working results. Start at the top and
-              work down, or jump to what you need.
-            </p>
-            <div className="w-16 h-px bg-[#D4A853] mt-8" />
+      <div className="px-6 md:px-12 py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto">
+          {/* Header — asymmetric editorial */}
+          <header className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-24 animate-fade-up">
+            <div className="md:col-span-7">
+              <span className="rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium border border-[#D4A853]/30 text-[#D4A853] inline-block mb-8">
+                The Workshop
+              </span>
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-none mb-6">
+                Build
+                <br />
+                Something
+              </h1>
+              <div className="w-20 h-px bg-[#D4A853] animate-gold-line" />
+            </div>
+            <div className="md:col-span-4 md:col-start-9 flex items-end">
+              <p className="text-neutral-400 text-base leading-relaxed">
+                Three guides. Real commands. Working results. Start at the top and
+                work down, or jump to what you need.
+              </p>
+            </div>
           </header>
 
-          <div className="space-y-24">
+          {/* Quick nav */}
+          <nav className="mb-24 animate-fade-up stagger-2">
+            <div className="flex flex-wrap gap-3">
+              {[
+                { id: "agent-setup", label: "Agent Setup", num: "01" },
+                { id: "install-skills", label: "Install Skills", num: "02" },
+                { id: "connect-mcp", label: "Connect MCP", num: "03" },
+              ].map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="group flex items-center gap-3 px-4 py-2.5 rounded-full border border-[#1E1E1E] hover:border-[#D4A853]/30 transition-all duration-500 ease-out-expo"
+                >
+                  <span className="font-mono text-xs text-neutral-600 group-hover:text-[#D4A853] transition-colors duration-500 ease-out-expo">
+                    {item.num}
+                  </span>
+                  <span className="text-sm text-neutral-400 group-hover:text-[#E8E4DD] transition-colors duration-500 ease-out-expo">
+                    {item.label}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </nav>
+
+          <div className="max-w-3xl space-y-32">
             {/* Guide 1: Set Up Your AI Agent */}
-            <section id="agent-setup">
-              <div className="flex items-baseline gap-4 mb-8">
-                <span className="text-[#D4A853] font-mono text-sm">01</span>
-                <h2 className="text-2xl font-semibold">
+            <section id="agent-setup" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-10">
+                <span className="font-mono text-xs text-[#D4A853]">01</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
                   Set Up Your AI Agent
                 </h2>
               </div>
@@ -59,83 +90,34 @@ export default function WorkshopPage() {
                   Anthropic API key.
                 </p>
 
-                <div className="space-y-4">
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 1 — Install Node.js if you don&apos;t have it
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        brew install node
-                      </code>
-                      <p className="text-neutral-500 text-xs mt-2">
-                        On macOS with Homebrew. For other systems, visit
-                        nodejs.org.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 2 — Install Claude Code globally
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        npm install -g @anthropic-ai/claude-code
-                      </code>
-                    </div>
-                  </div>
-
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 3 — Set your API key
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        export ANTHROPIC_API_KEY=sk-ant-your-key-here
-                      </code>
-                      <p className="text-neutral-500 text-xs mt-2">
-                        Get your key from console.anthropic.com. Add this to
-                        your shell profile (~/.zshrc or ~/.bashrc) to persist it.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 4 — Run it in a project
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        cd your-project && claude
-                      </code>
-                      <p className="text-neutral-500 text-xs mt-2">
-                        That&apos;s it. The agent starts, reads your project,
-                        and waits for instructions.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 5 — Give it a task
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        &quot;Read the README and summarize what this project
-                        does&quot;
-                      </code>
-                      <p className="text-neutral-500 text-xs mt-2">
-                        Start simple. As you build trust, give it bigger tasks:
-                        &quot;Add a dark mode toggle&quot;, &quot;Write tests for
-                        the auth module&quot;, &quot;Refactor this component to
-                        use hooks&quot;.
-                      </p>
-                    </div>
-                  </div>
+                <div className="space-y-4 my-10">
+                  <StepBlock
+                    label="Step 1 — Install Node.js if you don't have it"
+                    command="brew install node"
+                    note="On macOS with Homebrew. For other systems, visit nodejs.org."
+                  />
+                  <StepBlock
+                    label="Step 2 — Install Claude Code globally"
+                    command="npm install -g @anthropic-ai/claude-code"
+                  />
+                  <StepBlock
+                    label="Step 3 — Set your API key"
+                    command="export ANTHROPIC_API_KEY=sk-ant-your-key-here"
+                    note="Get your key from console.anthropic.com. Add this to your shell profile (~/.zshrc or ~/.bashrc) to persist it."
+                  />
+                  <StepBlock
+                    label="Step 4 — Run it in a project"
+                    command="cd your-project && claude"
+                    note="That's it. The agent starts, reads your project, and waits for instructions."
+                  />
+                  <StepBlock
+                    label="Step 5 — Give it a task"
+                    command={`"Read the README and summarize what this project does"`}
+                    note={`Start simple. As you build trust, give it bigger tasks: "Add a dark mode toggle", "Write tests for the auth module", "Refactor this component to use hooks".`}
+                  />
                 </div>
 
-                <div className="border-l-2 border-[#D4A853]/40 pl-6 text-neutral-400 italic">
+                <div className="border-l-2 border-[#D4A853] pl-6 my-10 text-neutral-400 italic">
                   The agent learns your codebase as it works. It reads files,
                   checks types, runs tests. It&apos;s not generating code in a
                   vacuum — it&apos;s working inside your project.
@@ -144,10 +126,10 @@ export default function WorkshopPage() {
             </section>
 
             {/* Guide 2: Install Skills */}
-            <section id="install-skills">
-              <div className="flex items-baseline gap-4 mb-8">
-                <span className="text-[#D4A853] font-mono text-sm">02</span>
-                <h2 className="text-2xl font-semibold">
+            <section id="install-skills" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-10">
+                <span className="font-mono text-xs text-[#D4A853]">02</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
                   Install &amp; Use Skills
                 </h2>
               </div>
@@ -160,13 +142,15 @@ export default function WorkshopPage() {
                   don&apos;t bloat your agent when unused.
                 </p>
 
-                <div className="space-y-4">
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 1 — Understand where skills live
+                <div className="space-y-4 my-10">
+                  <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] overflow-hidden">
+                    <div className="px-5 py-3 border-b border-[#1E1E1E]">
+                      <span className="text-xs text-neutral-500">
+                        Step 1 — Understand where skills live
+                      </span>
                     </div>
-                    <div className="p-4">
-                      <div className="text-sm font-mono space-y-1">
+                    <div className="p-5">
+                      <div className="text-sm font-mono space-y-2">
                         <p className="text-neutral-400">
                           <span className="text-[#D4A853]/80">
                             ~/.claude/skills/
@@ -183,12 +167,14 @@ export default function WorkshopPage() {
                     </div>
                   </div>
 
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 2 — Create a skill file
+                  <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] overflow-hidden">
+                    <div className="px-5 py-3 border-b border-[#1E1E1E]">
+                      <span className="text-xs text-neutral-500">
+                        Step 2 — Create a skill file
+                      </span>
                     </div>
-                    <div className="p-4 font-mono text-sm">
-                      <p className="text-neutral-500 mb-2">
+                    <div className="p-5 font-mono text-sm">
+                      <p className="text-neutral-600 mb-3">
                         # ~/.claude/skills/deploy.md
                       </p>
                       <p className="text-[#D4A853]">---</p>
@@ -199,41 +185,32 @@ export default function WorkshopPage() {
                         description: Deploy the current project to Vercel
                       </p>
                       <p className="text-[#D4A853]">---</p>
-                      <p className="text-neutral-400 mt-2">
+                      <p className="text-neutral-500 mt-3">
                         When asked to deploy, run `npx vercel --prod`.
                       </p>
-                      <p className="text-neutral-400">
+                      <p className="text-neutral-500">
                         Confirm the deployment URL with the user.
                       </p>
-                      <p className="text-neutral-400">
+                      <p className="text-neutral-500">
                         If it fails, check for build errors first.
                       </p>
                     </div>
                   </div>
 
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 3 — Use the skill
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        /deploy
-                      </code>
-                      <p className="text-neutral-500 text-xs mt-2">
-                        Type the slash command in Claude Code. The agent loads
-                        the skill and follows its instructions. You can also just
-                        say &quot;deploy this project&quot; and the skill
-                        activates by matching the trigger.
-                      </p>
-                    </div>
-                  </div>
+                  <StepBlock
+                    label="Step 3 — Use the skill"
+                    command="/deploy"
+                    note={`Type the slash command in Claude Code. The agent loads the skill and follows its instructions. You can also just say "deploy this project" and the skill activates by matching the trigger.`}
+                  />
 
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 4 — Install community skills
+                  <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] overflow-hidden">
+                    <div className="px-5 py-3 border-b border-[#1E1E1E]">
+                      <span className="text-xs text-neutral-500">
+                        Step 4 — Install community skills
+                      </span>
                     </div>
-                    <div className="p-4">
-                      <p className="text-neutral-400 text-sm">
+                    <div className="p-5">
+                      <p className="text-neutral-400 text-sm leading-relaxed">
                         Community skills are markdown files you download and drop
                         into your skills directory. Browse curated collections,
                         copy the file, and the capability is available
@@ -243,7 +220,7 @@ export default function WorkshopPage() {
                   </div>
                 </div>
 
-                <div className="border-l-2 border-[#D4A853]/40 pl-6 text-neutral-400 italic">
+                <div className="border-l-2 border-[#D4A853] pl-6 my-10 text-neutral-400 italic">
                   Good skills are specific and opinionated. &quot;Deploy to
                   Vercel&quot; is better than &quot;deploy anywhere&quot;. The
                   specificity is what makes the agent reliable.
@@ -252,10 +229,10 @@ export default function WorkshopPage() {
             </section>
 
             {/* Guide 3: Connect MCP Servers */}
-            <section id="connect-mcp">
-              <div className="flex items-baseline gap-4 mb-8">
-                <span className="text-[#D4A853] font-mono text-sm">03</span>
-                <h2 className="text-2xl font-semibold">
+            <section id="connect-mcp" className="scroll-mt-24">
+              <div className="flex items-baseline gap-4 mb-10">
+                <span className="font-mono text-xs text-[#D4A853]">03</span>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
                   Connect MCP Servers
                 </h2>
               </div>
@@ -267,26 +244,20 @@ export default function WorkshopPage() {
                   these tools as naturally as reading a file.
                 </p>
 
-                <div className="space-y-4">
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 1 — Open your Claude Code settings
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        claude config
-                      </code>
-                      <p className="text-neutral-500 text-xs mt-2">
-                        Or edit ~/.claude/settings.json directly.
-                      </p>
-                    </div>
-                  </div>
+                <div className="space-y-4 my-10">
+                  <StepBlock
+                    label="Step 1 — Open your Claude Code settings"
+                    command="claude config"
+                    note="Or edit ~/.claude/settings.json directly."
+                  />
 
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 2 — Add an MCP server (example: GitHub)
+                  <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] overflow-hidden">
+                    <div className="px-5 py-3 border-b border-[#1E1E1E]">
+                      <span className="text-xs text-neutral-500">
+                        Step 2 — Add an MCP server (example: GitHub)
+                      </span>
                     </div>
-                    <div className="p-4 font-mono text-sm">
+                    <div className="p-5 font-mono text-sm overflow-x-auto">
                       <pre className="text-neutral-300 whitespace-pre-wrap">{`{
   "mcpServers": {
     "github": {
@@ -303,12 +274,14 @@ export default function WorkshopPage() {
                     </div>
                   </div>
 
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 3 — Restart Claude Code
+                  <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] overflow-hidden">
+                    <div className="px-5 py-3 border-b border-[#1E1E1E]">
+                      <span className="text-xs text-neutral-500">
+                        Step 3 — Restart Claude Code
+                      </span>
                     </div>
-                    <div className="p-4">
-                      <p className="text-neutral-400 text-sm">
+                    <div className="p-5">
+                      <p className="text-neutral-400 text-sm leading-relaxed">
                         Exit and re-launch Claude Code. It discovers MCP servers
                         on startup. You&apos;ll see the server&apos;s tools
                         listed in the available tools.
@@ -316,65 +289,64 @@ export default function WorkshopPage() {
                     </div>
                   </div>
 
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 4 — Use the tools
-                    </div>
-                    <div className="p-4">
-                      <code className="text-sm font-mono text-[#D4A853]/80">
-                        &quot;List my open pull requests on this repo&quot;
-                      </code>
-                      <p className="text-neutral-500 text-xs mt-2">
-                        The agent calls the GitHub MCP server&apos;s tools
-                        automatically. No special syntax needed — just describe
-                        what you want.
-                      </p>
-                    </div>
-                  </div>
+                  <StepBlock
+                    label="Step 4 — Use the tools"
+                    command={`"List my open pull requests on this repo"`}
+                    note="The agent calls the GitHub MCP server's tools automatically. No special syntax needed — just describe what you want."
+                  />
 
-                  <div className="border border-[#1E1E1E] rounded-lg bg-[#141414] overflow-hidden">
-                    <div className="px-4 py-2 border-b border-[#1E1E1E] text-xs text-neutral-500">
-                      Step 5 — Add more servers
+                  <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] overflow-hidden">
+                    <div className="px-5 py-3 border-b border-[#1E1E1E]">
+                      <span className="text-xs text-neutral-500">
+                        Step 5 — Add more servers
+                      </span>
                     </div>
-                    <div className="p-4">
-                      <p className="text-neutral-400 text-sm mb-3">
+                    <div className="p-5">
+                      <p className="text-neutral-500 text-sm mb-4">
                         Popular MCP servers to add:
                       </p>
-                      <div className="space-y-2 text-sm font-mono">
-                        <p>
-                          <span className="text-[#D4A853]/80">filesystem</span>
-                          <span className="text-neutral-500">
-                            {" "}
-                            — Read/write files outside the project
-                          </span>
-                        </p>
-                        <p>
-                          <span className="text-[#D4A853]/80">postgres</span>
-                          <span className="text-neutral-500">
-                            {" "}
-                            — Query and manage databases
-                          </span>
-                        </p>
-                        <p>
-                          <span className="text-[#D4A853]/80">supabase</span>
-                          <span className="text-neutral-500">
-                            {" "}
-                            — Full Supabase platform access
-                          </span>
-                        </p>
-                        <p>
-                          <span className="text-[#D4A853]/80">browserbase</span>
-                          <span className="text-neutral-500">
-                            {" "}
-                            — Cloud browser automation
-                          </span>
-                        </p>
+                      <div className="space-y-3 text-sm">
+                        {[
+                          {
+                            name: "filesystem",
+                            desc: "Read/write files outside the project",
+                          },
+                          {
+                            name: "postgres",
+                            desc: "Query and manage databases",
+                          },
+                          {
+                            name: "supabase",
+                            desc: "Full Supabase platform access",
+                          },
+                          {
+                            name: "browserbase",
+                            desc: "Cloud browser automation",
+                          },
+                        ].map((server) => (
+                          <div key={server.name} className="flex items-baseline gap-3">
+                            <CaretRight
+                              size={10}
+                              weight="bold"
+                              className="text-[#D4A853] flex-shrink-0 mt-1"
+                            />
+                            <p>
+                              <span className="text-[#D4A853]/80 font-mono">
+                                {server.name}
+                              </span>
+                              <span className="text-neutral-500">
+                                {" "}
+                                — {server.desc}
+                              </span>
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="border-l-2 border-[#D4A853]/40 pl-6 text-neutral-400 italic">
+                <div className="border-l-2 border-[#D4A853] pl-6 my-10 text-neutral-400 italic">
                   Each MCP server you add expands what your agent can do. Start
                   with one or two and add more as you need them. The
                   configuration is the same pattern every time.
@@ -385,5 +357,33 @@ export default function WorkshopPage() {
         </div>
       </div>
     </>
+  );
+}
+
+function StepBlock({
+  label,
+  command,
+  note,
+}: {
+  label: string;
+  command: string;
+  note?: string;
+}) {
+  return (
+    <div className="border border-[#1E1E1E] rounded-xl bg-[#141414] overflow-hidden hover:border-[#D4A853]/15 transition-all duration-500 ease-out-expo">
+      <div className="px-5 py-3 border-b border-[#1E1E1E]">
+        <span className="text-xs text-neutral-500">{label}</span>
+      </div>
+      <div className="p-5">
+        <code className="text-sm font-mono text-[#D4A853]/80 block">
+          {command}
+        </code>
+        {note && (
+          <p className="text-neutral-500 text-xs mt-3 leading-relaxed">
+            {note}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
