@@ -3,19 +3,59 @@
 import { useEffect, useRef } from "react";
 
 const GOLD = "#D4A853";
-const GOLD_DIM = "rgba(212, 168, 83, 0.15)";
-const GOLD_FAINT = "rgba(212, 168, 83, 0.06)";
 const PHI = (1 + Math.sqrt(5)) / 2;
 const TAU = Math.PI * 2;
 
+function rgba(alpha: number): string {
+  return `rgba(212,168,83,${alpha})`;
+}
+
 interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  maxLife: number;
+  angle: number;
+  radius: number;
+  speed: number;
   size: number;
+  alpha: number;
+  life: number;
+  phase: number;
+}
+
+function resetParticle(
+  p: Particle,
+  maxR: number
+): void {
+  p.angle = Math.random() * TAU;
+  p.radius = maxR * (0.12 + Math.random() * 0.82);
+  p.speed =
+    (0.00015 + Math.random() * 0.0006) * (Math.random() > 0.5 ? 1 : -1);
+  p.size = 0.4 + Math.random() * 1.8;
+  p.alpha = 0.04 + Math.random() * 0.14;
+  p.life = 1;
+  p.phase = Math.random() * TAU;
+}
+
+function drawPoly(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  sides: number,
+  rot: number,
+  color: string,
+  lw: number
+) {
+  ctx.beginPath();
+  for (let i = 0; i <= sides; i++) {
+    const a = (TAU * i) / sides + rot;
+    const px = x + Math.cos(a) * r;
+    const py = y + Math.sin(a) * r;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.stroke();
 }
 
 export default function AlchemyCanvas() {
@@ -34,311 +74,349 @@ export default function AlchemyCanvas() {
     let cx = 0;
     let cy = 0;
     let time = 0;
+    let maxR = 0;
     const particles: Particle[] = [];
-    const maxParticles = 60;
+    const maxParticles = 80;
+    let mouseX = -9999;
+    let mouseY = -9999;
 
     function resize() {
       const dpr = window.devicePixelRatio || 1;
-      width = window.innerWidth;
-      height = window.innerHeight;
+      const rect = canvas!.parentElement?.getBoundingClientRect();
+      width = rect?.width || window.innerWidth;
+      height = rect?.height || window.innerHeight;
       canvas!.width = width * dpr;
       canvas!.height = height * dpr;
       canvas!.style.width = `${width}px`;
       canvas!.style.height = `${height}px`;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cx = width / 2;
-      cy = height / 2;
+      cx = width * 0.55;
+      cy = height * 0.5;
+      maxR = Math.min(width, height) * 0.4;
     }
 
-    function spawnParticle() {
-      const angle = Math.random() * TAU;
-      const radius = Math.random() * Math.min(width, height) * 0.4;
-      particles.push({
-        x: cx + Math.cos(angle) * radius,
-        y: cy + Math.sin(angle) * radius,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3 - 0.1,
-        life: 0,
-        maxLife: 200 + Math.random() * 300,
-        size: 1 + Math.random() * 1.5,
-      });
+    function onMouse(e: MouseEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
     }
 
-    function updateParticles() {
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life++;
-        if (p.life > p.maxLife) {
-          particles.splice(i, 1);
+    function onMouseLeave() {
+      mouseX = -9999;
+      mouseY = -9999;
+    }
+
+    function drawCircleRings(t: number) {
+      const rings = [0.18, 0.3, 0.45, 0.58, 0.72, 0.86, 1.0];
+      for (let i = 0; i < rings.length; i++) {
+        const r = maxR * rings[i];
+        const pulse = 1 + Math.sin(t * 0.0004 + i * 0.9) * 0.006;
+        const alpha = 0.02 + 0.035 * (1 - rings[i]);
+        ctx!.beginPath();
+        ctx!.arc(cx, cy, r * pulse, 0, TAU);
+        ctx!.strokeStyle = rgba(alpha);
+        ctx!.lineWidth = i === 0 || i === rings.length - 1 ? 0.8 : 0.4;
+        ctx!.stroke();
+      }
+    }
+
+    function drawHexLayers(t: number) {
+      const layers = [
+        { r: 0.22, speed: 0.00014, sides: 6, alpha: 0.08, lw: 0.6 },
+        { r: 0.42, speed: -0.00009, sides: 6, alpha: 0.055, lw: 0.5 },
+        { r: 0.62, speed: 0.00006, sides: 12, alpha: 0.04, lw: 0.4 },
+        { r: 0.82, speed: -0.00004, sides: 6, alpha: 0.03, lw: 0.3 },
+      ];
+      for (const l of layers) {
+        drawPoly(
+          ctx!,
+          cx,
+          cy,
+          maxR * l.r,
+          l.sides,
+          t * l.speed,
+          rgba(l.alpha),
+          l.lw
+        );
+      }
+    }
+
+    function drawTriangles(t: number) {
+      const rot = t * 0.0001;
+      const r = maxR * 0.38;
+      drawPoly(ctx!, cx, cy, r, 3, rot, rgba(0.06), 0.7);
+      drawPoly(ctx!, cx, cy, r * 0.9, 3, -rot + Math.PI / 3, rgba(0.045), 0.5);
+    }
+
+    function drawFlowerOfLife(t: number) {
+      const r = maxR * 0.16;
+      const alpha = 0.03 + Math.sin(t * 0.0003) * 0.008;
+      const baseRot = t * 0.00005;
+      for (let i = 0; i < 6; i++) {
+        const a = (TAU * i) / 6 + baseRot;
+        ctx!.beginPath();
+        ctx!.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, r, 0, TAU);
+        ctx!.strokeStyle = rgba(alpha);
+        ctx!.lineWidth = 0.35;
+        ctx!.stroke();
+      }
+      ctx!.beginPath();
+      ctx!.arc(cx, cy, r, 0, TAU);
+      ctx!.strokeStyle = rgba(alpha);
+      ctx!.lineWidth = 0.35;
+      ctx!.stroke();
+    }
+
+    function drawRadials(t: number) {
+      const count = 24;
+      for (let i = 0; i < count; i++) {
+        const a = (TAU * i) / count + t * 0.00003;
+        const innerR = maxR * 0.04;
+        const outerR = maxR * 0.98;
+        const x1 = cx + Math.cos(a) * innerR;
+        const y1 = cy + Math.sin(a) * innerR;
+        const x2 = cx + Math.cos(a) * outerR;
+        const y2 = cy + Math.sin(a) * outerR;
+
+        const grad = ctx!.createLinearGradient(x1, y1, x2, y2);
+        grad.addColorStop(0, rgba(0));
+        grad.addColorStop(0.2, rgba(i % 4 === 0 ? 0.035 : 0.018));
+        grad.addColorStop(0.8, rgba(i % 4 === 0 ? 0.035 : 0.018));
+        grad.addColorStop(1, rgba(0));
+
+        ctx!.beginPath();
+        ctx!.moveTo(x1, y1);
+        ctx!.lineTo(x2, y2);
+        ctx!.strokeStyle = grad;
+        ctx!.lineWidth = i % 4 === 0 ? 0.4 : 0.2;
+        ctx!.stroke();
+      }
+    }
+
+    function drawOrbitingDots(t: number) {
+      const layers = [
+        { r: 0.22, count: 6, speed: 0.0003, size: 2, alpha: 0.18 },
+        { r: 0.42, count: 8, speed: -0.00022, size: 1.5, alpha: 0.14 },
+        { r: 0.62, count: 12, speed: 0.00016, size: 1.2, alpha: 0.1 },
+        { r: 0.82, count: 18, speed: -0.0001, size: 0.8, alpha: 0.07 },
+      ];
+      for (const l of layers) {
+        for (let i = 0; i < l.count; i++) {
+          const a = (TAU * i) / l.count + t * l.speed;
+          const px = cx + Math.cos(a) * maxR * l.r;
+          const py = cy + Math.sin(a) * maxR * l.r;
+          ctx!.beginPath();
+          ctx!.arc(px, py, l.size, 0, TAU);
+          ctx!.fillStyle = rgba(l.alpha);
+          ctx!.fill();
         }
       }
-      while (particles.length < maxParticles) {
-        spawnParticle();
-      }
     }
 
-    function drawParticles(ctx: CanvasRenderingContext2D) {
-      for (const p of particles) {
-        const progress = p.life / p.maxLife;
-        const alpha = Math.sin(progress * Math.PI) * 0.4;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, TAU);
-        ctx.fillStyle = `rgba(212, 168, 83, ${alpha})`;
-        ctx.fill();
-      }
-    }
+    function drawGoldenSpiral(t: number) {
+      const pulse = 1 + Math.sin(t * 0.0008) * 0.02;
+      const spiralR = maxR * 0.32 * pulse;
+      const spiralRot = t * 0.00012;
 
-    function drawTransmutationCircle(
-      ctx: CanvasRenderingContext2D,
-      t: number
-    ) {
-      const baseRadius = Math.min(width, height) * 0.3;
-      const rotation = t * 0.0002;
+      ctx!.save();
+      ctx!.translate(cx, cy);
 
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      // Outer ring
-      ctx.beginPath();
-      ctx.arc(0, 0, baseRadius, 0, TAU);
-      ctx.strokeStyle = GOLD_DIM;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Second ring
-      ctx.beginPath();
-      ctx.arc(0, 0, baseRadius * 0.85, 0, TAU);
-      ctx.strokeStyle = GOLD_FAINT;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-
-      // Inner ring
-      ctx.beginPath();
-      ctx.arc(0, 0, baseRadius * 0.6, 0, TAU);
-      ctx.strokeStyle = GOLD_DIM;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-
-      // Core ring
-      ctx.beginPath();
-      ctx.arc(0, 0, baseRadius * 0.25, 0, TAU);
-      ctx.strokeStyle = GOLD_FAINT;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-
-      // Rotating inscribed hexagon
-      ctx.save();
-      ctx.rotate(rotation);
-      const sides = 6;
-      ctx.beginPath();
-      for (let i = 0; i <= sides; i++) {
-        const angle = (i / sides) * TAU;
-        const x = Math.cos(angle) * baseRadius * 0.85;
-        const y = Math.sin(angle) * baseRadius * 0.85;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = GOLD_FAINT;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-
-      // Connect hexagon vertices to center
-      for (let i = 0; i < sides; i++) {
-        const angle = (i / sides) * TAU;
-        const x = Math.cos(angle) * baseRadius * 0.85;
-        const y = Math.sin(angle) * baseRadius * 0.85;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(x, y);
-        ctx.strokeStyle = GOLD_FAINT;
-        ctx.lineWidth = 0.3;
-        ctx.stroke();
-      }
-      ctx.restore();
-
-      // Counter-rotating triangle
-      ctx.save();
-      ctx.rotate(-rotation * 1.5);
-      ctx.beginPath();
-      for (let i = 0; i <= 3; i++) {
-        const angle = (i / 3) * TAU - Math.PI / 2;
-        const x = Math.cos(angle) * baseRadius * 0.6;
-        const y = Math.sin(angle) * baseRadius * 0.6;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = GOLD_DIM;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-      ctx.restore();
-
-      // Inverted triangle (slower rotation)
-      ctx.save();
-      ctx.rotate(rotation * 0.7);
-      ctx.beginPath();
-      for (let i = 0; i <= 3; i++) {
-        const angle = (i / 3) * TAU + Math.PI / 2;
-        const x = Math.cos(angle) * baseRadius * 0.6;
-        const y = Math.sin(angle) * baseRadius * 0.6;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = GOLD_FAINT;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-      ctx.restore();
-
-      // Tick marks around outer ring
-      for (let i = 0; i < 36; i++) {
-        const angle = (i / 36) * TAU + rotation * 0.5;
-        const inner = baseRadius * 0.95;
-        const outer = baseRadius * (i % 3 === 0 ? 1.05 : 1.02);
-        ctx.beginPath();
-        ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
-        ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
-        ctx.strokeStyle = i % 3 === 0 ? GOLD_DIM : GOLD_FAINT;
-        ctx.lineWidth = i % 3 === 0 ? 0.8 : 0.3;
-        ctx.stroke();
-      }
-
-      // Twelve divisions with small circles
-      for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * TAU + rotation * 0.3;
-        const r = baseRadius * 0.85;
-        const x = Math.cos(angle) * r;
-        const y = Math.sin(angle) * r;
-        ctx.beginPath();
-        ctx.arc(x, y, 2, 0, TAU);
-        ctx.fillStyle = GOLD_FAINT;
-        ctx.fill();
-      }
-
-      ctx.restore();
-    }
-
-    function drawGoldenSpiral(ctx: CanvasRenderingContext2D, t: number) {
-      const pulse = 1 + Math.sin(t * 0.001) * 0.03;
-      const baseRadius = Math.min(width, height) * 0.28 * pulse;
-      const spiralRotation = t * 0.00015;
-
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(spiralRotation);
-
-      // Draw two mirrored golden spirals
       for (let mirror = 0; mirror < 2; mirror++) {
-        ctx.save();
-        ctx.rotate(mirror * Math.PI);
-
-        ctx.beginPath();
-        const steps = 200;
+        ctx!.save();
+        ctx!.rotate(mirror * Math.PI + spiralRot);
+        ctx!.beginPath();
+        const steps = 240;
         for (let i = 0; i < steps; i++) {
-          const progress = i / steps;
-          const angle = progress * TAU * 2.5;
-          const r = baseRadius * Math.pow(PHI, (angle / TAU) * 0.5 - 1) * 0.3;
+          const prog = i / steps;
+          const angle = prog * TAU * 2.8;
+          const r = spiralR * Math.pow(PHI, (angle / TAU) * 0.5 - 1) * 0.3;
           const x = Math.cos(angle) * r;
           const y = Math.sin(angle) * r;
-
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+          if (i === 0) ctx!.moveTo(x, y);
+          else ctx!.lineTo(x, y);
         }
-        const spiralAlpha = 0.1 + Math.sin(t * 0.0008) * 0.04;
-        ctx.strokeStyle = `rgba(212, 168, 83, ${spiralAlpha})`;
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
-
-        ctx.restore();
+        const spiralAlpha = 0.08 + Math.sin(t * 0.0006) * 0.03;
+        ctx!.strokeStyle = rgba(spiralAlpha);
+        ctx!.lineWidth = 0.7;
+        ctx!.stroke();
+        ctx!.restore();
       }
 
-      ctx.restore();
+      ctx!.restore();
     }
 
-    function drawConnectingLines(ctx: CanvasRenderingContext2D, t: number) {
-      const baseRadius = Math.min(width, height) * 0.3;
-      const rotation = t * 0.0002;
-      const points: [number, number][] = [];
-
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      // Collect vertices from hexagon
-      for (let i = 0; i < 6; i++) {
-        const angle = (i / 6) * TAU + rotation;
-        points.push([
-          Math.cos(angle) * baseRadius * 0.85,
-          Math.sin(angle) * baseRadius * 0.85,
-        ]);
+    function drawTickMarks(t: number) {
+      const rot = t * 0.00005;
+      for (let i = 0; i < 72; i++) {
+        const a = (TAU * i) / 72 + rot;
+        const isMajor = i % 6 === 0;
+        const inner = maxR * (isMajor ? 0.96 : 0.98);
+        const outer = maxR * (isMajor ? 1.04 : 1.01);
+        ctx!.beginPath();
+        ctx!.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner);
+        ctx!.lineTo(cx + Math.cos(a) * outer, cy + Math.sin(a) * outer);
+        ctx!.strokeStyle = rgba(isMajor ? 0.07 : 0.025);
+        ctx!.lineWidth = isMajor ? 0.6 : 0.25;
+        ctx!.stroke();
       }
+    }
 
-      // Collect vertices from triangles
+    function drawCenterSymbol(t: number) {
+      const r = maxR * 0.055;
+      const alpha = 0.14 + Math.sin(t * 0.0007) * 0.04;
+
+      // Circle
+      ctx!.beginPath();
+      ctx!.arc(cx, cy, r, 0, TAU);
+      ctx!.strokeStyle = rgba(alpha);
+      ctx!.lineWidth = 0.8;
+      ctx!.stroke();
+
+      // Dot at center
+      ctx!.beginPath();
+      ctx!.arc(cx, cy, 1.5, 0, TAU);
+      ctx!.fillStyle = rgba(alpha * 1.2);
+      ctx!.fill();
+
+      // Cross
+      const ext = r * 1.8;
+      ctx!.beginPath();
+      ctx!.moveTo(cx - ext, cy);
+      ctx!.lineTo(cx + ext, cy);
+      ctx!.moveTo(cx, cy - ext);
+      ctx!.lineTo(cx, cy + ext);
+      ctx!.strokeStyle = rgba(alpha * 0.5);
+      ctx!.lineWidth = 0.4;
+      ctx!.stroke();
+    }
+
+    function drawDecorativeArcs(t: number) {
+      for (let i = 0; i < 4; i++) {
+        const a = (Math.PI / 2) * i + t * 0.00006;
+        ctx!.beginPath();
+        ctx!.arc(cx, cy, maxR * 0.94, a, a + Math.PI * 0.28);
+        ctx!.strokeStyle = rgba(0.022);
+        ctx!.lineWidth = 2;
+        ctx!.stroke();
+      }
       for (let i = 0; i < 3; i++) {
-        const angle = (i / 3) * TAU - Math.PI / 2 - rotation * 1.5;
-        points.push([
-          Math.cos(angle) * baseRadius * 0.6,
-          Math.sin(angle) * baseRadius * 0.6,
-        ]);
+        const a = (TAU * i) / 3 + t * -0.00008;
+        ctx!.beginPath();
+        ctx!.arc(cx, cy, maxR * 0.52, a, a + Math.PI * 0.35);
+        ctx!.strokeStyle = rgba(0.018);
+        ctx!.lineWidth = 1;
+        ctx!.stroke();
       }
-
-      // Connect non-adjacent vertices with faint lines
-      for (let i = 0; i < points.length; i++) {
-        for (let j = i + 2; j < points.length; j++) {
-          if (j - i === 1) continue;
-          const dx = points[j][0] - points[i][0];
-          const dy = points[j][1] - points[i][1];
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const maxDist = baseRadius * 1.5;
-          if (dist < maxDist) {
-            const alpha = (1 - dist / maxDist) * 0.04;
-            ctx.beginPath();
-            ctx.moveTo(points[i][0], points[i][1]);
-            ctx.lineTo(points[j][0], points[j][1]);
-            ctx.strokeStyle = `rgba(212, 168, 83, ${alpha})`;
-            ctx.lineWidth = 0.3;
-            ctx.stroke();
-          }
-        }
-      }
-
-      ctx.restore();
     }
 
-    function draw() {
+    function drawParticles(t: number) {
+      for (const p of particles) {
+        p.angle += p.speed;
+        p.life -= 0.0008;
+        if (p.life <= 0) resetParticle(p, maxR);
+
+        const wobble = Math.sin(t * 0.0008 + p.phase) * 6;
+        const px = cx + Math.cos(p.angle) * (p.radius + wobble);
+        const py = cy + Math.sin(p.angle) * (p.radius + wobble);
+        const fadeIn = Math.min(1, (1 - p.life) * 4);
+        const fadeOut = Math.min(1, p.life * 4);
+        const alpha = p.alpha * fadeIn * fadeOut;
+
+        ctx!.beginPath();
+        ctx!.arc(px, py, p.size, 0, TAU);
+        ctx!.fillStyle = rgba(alpha);
+        ctx!.fill();
+      }
+    }
+
+    function drawMouseGlow() {
+      if (mouseX < 0 || mouseY < 0) return;
+      const grad = ctx!.createRadialGradient(
+        mouseX,
+        mouseY,
+        0,
+        mouseX,
+        mouseY,
+        150
+      );
+      grad.addColorStop(0, rgba(0.035));
+      grad.addColorStop(1, rgba(0));
+      ctx!.fillStyle = grad;
+      ctx!.fillRect(mouseX - 150, mouseY - 150, 300, 300);
+    }
+
+    function drawVignetteEdges() {
+      // Subtle vignette to help the geometry fade into the background
+      const grad = ctx!.createRadialGradient(
+        cx,
+        cy,
+        maxR * 0.6,
+        cx,
+        cy,
+        maxR * 1.4
+      );
+      grad.addColorStop(0, "rgba(10,10,10,0)");
+      grad.addColorStop(1, "rgba(10,10,10,0.7)");
+      ctx!.fillStyle = grad;
+      ctx!.fillRect(0, 0, width, height);
+    }
+
+    function frame() {
       ctx!.clearRect(0, 0, width, height);
 
-      drawTransmutationCircle(ctx!, time);
-      drawGoldenSpiral(ctx!, time);
-      drawConnectingLines(ctx!, time);
-      updateParticles();
-      drawParticles(ctx!);
+      drawRadials(time);
+      drawCircleRings(time);
+      drawHexLayers(time);
+      drawTriangles(time);
+      drawFlowerOfLife(time);
+      drawOrbitingDots(time);
+      drawGoldenSpiral(time);
+      drawTickMarks(time);
+      drawDecorativeArcs(time);
+      drawCenterSymbol(time);
+      drawParticles(time);
+      drawMouseGlow();
+      drawVignetteEdges();
 
       time += 16;
-      animationId = requestAnimationFrame(draw);
+      animationId = requestAnimationFrame(frame);
     }
 
     resize();
     window.addEventListener("resize", resize);
+    canvas.addEventListener("mousemove", onMouse);
+    canvas.addEventListener("mouseleave", onMouseLeave);
 
-    // Seed initial particles
     for (let i = 0; i < maxParticles; i++) {
-      spawnParticle();
-      // Pre-age them so they don't all appear at once
-      particles[i].life = Math.random() * particles[i].maxLife * 0.8;
+      const p: Particle = {
+        angle: 0,
+        radius: 0,
+        speed: 0,
+        size: 0,
+        alpha: 0,
+        life: 0,
+        phase: 0,
+      };
+      resetParticle(p, maxR);
+      p.life = Math.random();
+      particles.push(p);
     }
 
-    draw();
+    frame();
 
     return () => {
-      window.removeEventListener("resize", resize);
       cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("mousemove", onMouse);
+      canvas.removeEventListener("mouseleave", onMouseLeave);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0"
+      className="absolute inset-0 w-full h-full z-0"
+      style={{ pointerEvents: "auto" }}
       aria-hidden="true"
     />
   );
