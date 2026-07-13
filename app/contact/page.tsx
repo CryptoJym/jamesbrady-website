@@ -4,6 +4,9 @@ import { ArrowUpRight, Check } from "@phosphor-icons/react/dist/ssr";
 import { ContactForm } from "@/components/ContactForm";
 import SectionDivider from "@/components/SectionDivider";
 
+const bookingUrl =
+  "https://www.utlyze.com/booking?utm_source=jamesbrady.org&utm_medium=referral&utm_campaign=personal-site-contact";
+
 export const metadata: Metadata = {
   title: "Work with James",
   description:
@@ -30,7 +33,7 @@ export default function ContactPage() {
     mainEntity: {
       "@type": "Person",
       name: "James Brady",
-      jobTitle: "AI Alchemist",
+      jobTitle: "Founder and AI Systems Builder",
       email: "james@utlyze.com",
       url: "https://www.jamesbrady.org",
     },
@@ -52,7 +55,7 @@ export default function ContactPage() {
               <span className="eyebrow mb-7 inline-block text-[#D4A853]">
                 Work with James
               </span>
-              <h1 className="max-w-[8ch] text-5xl font-bold leading-[0.92] tracking-tighter text-[#E8E4DD] md:text-7xl lg:text-8xl">
+              <h1 className="max-w-[8ch] font-editorial text-5xl font-medium leading-[0.92] tracking-[-0.035em] text-[#E8E4DD] md:text-7xl lg:text-8xl">
                 Build the right system.
               </h1>
               <div className="my-8 h-px w-24 bg-[#D4A853] animate-gold-line" />
@@ -88,6 +91,25 @@ export default function ContactPage() {
                   <ArrowUpRight size={12} weight="bold" />
                 </Link>
               </p>
+
+              <div className="mt-8 rounded-[22px] border border-[#D4A853]/15 bg-[#11100D] p-5">
+                <p className="text-sm font-medium text-[#E8E4DD]">
+                  Ready to put time on the calendar?
+                </p>
+                <a
+                  href={bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group mt-3 inline-flex items-center gap-2 text-sm text-[#D4A853] transition-premium hover:text-[#E5C87A]"
+                >
+                  Book 20 minutes with James
+                  <ArrowUpRight
+                    size={12}
+                    weight="bold"
+                    className="transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </a>
+              </div>
             </div>
 
             <div className="animate-fade-up stagger-2 md:col-span-6 md:col-start-7">

@@ -12,6 +12,9 @@ const initialState: ContactFormState = {
   message: "",
 };
 
+const bookingUrl =
+  "https://www.utlyze.com/booking?utm_source=jamesbrady.org&utm_medium=referral&utm_campaign=personal-site-form-success";
+
 const fieldClass =
   "mt-2 w-full rounded-xl border border-[#292929] bg-[#0A0A0A] px-4 py-3.5 text-[15px] text-[#E8E4DD] placeholder:text-neutral-700 transition-premium hover:border-[#3A3A3A] focus:border-[#D4A853]/60 focus:outline-none";
 const labelClass = "text-sm font-medium text-neutral-300";
@@ -40,6 +43,19 @@ export function ContactForm() {
         <p className="mt-3 max-w-[46ch] leading-relaxed text-neutral-400">
           {state.message}
         </p>
+        <a
+          href={bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group mt-7 inline-flex items-center gap-3 rounded-full border border-[#D4A853]/25 px-5 py-3 text-sm font-medium text-[#E8E4DD] transition-premium hover:border-[#D4A853]/45 hover:bg-[#D4A853]/[0.05]"
+        >
+          Book 20 minutes now
+          <ArrowUpRight
+            size={14}
+            weight="bold"
+            className="text-[#D4A853] transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </a>
       </div>
     );
   }

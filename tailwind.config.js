@@ -20,6 +20,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        editorial: ['Iowan Old Style', 'Baskerville', 'Palatino Linotype', 'Book Antiqua', 'Georgia', 'serif'],
         mono: ['var(--font-geist-mono)', 'monospace'],
       },
       transitionTimingFunction: {

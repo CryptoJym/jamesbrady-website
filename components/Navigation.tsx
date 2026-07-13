@@ -6,13 +6,10 @@ import { usePathname } from 'next/navigation';
 import { List, X } from '@phosphor-icons/react';
 
 const links = [
-  { href: '/primer', label: 'Primer' },
-  { href: '/manuscript', label: 'Manuscript' },
-  { href: '/workshop', label: 'Workshop' },
-  { href: '/about', label: 'About' },
-  { href: '/links', label: 'Links' },
+  { href: '/#work', label: 'Work' },
+  { href: '/#library', label: 'Library' },
   { href: '/watch', label: 'Watch' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/about', label: 'About' },
 ];
 
 export function Navigation() {
@@ -29,7 +26,8 @@ export function Navigation() {
   return (
     <>
       <nav
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-[820px] transition-all duration-600 ease-out-expo ${
+        aria-label="Primary navigation"
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-[900px] transition-all duration-600 ease-out-expo ${
           scrolled
             ? 'bg-[#0A0A0A]/90 backdrop-blur-xl border border-[#1E1E1E] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
             : 'bg-[#0A0A0A]/60 backdrop-blur-md border border-[#1E1E1E]/50'
@@ -38,9 +36,14 @@ export function Navigation() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-[#D4A853] font-semibold tracking-tight text-[15px] hover:opacity-80 transition-opacity duration-300"
+            className="group inline-flex items-center gap-3 text-[#D4A853] font-semibold tracking-tight text-[15px] hover:opacity-80 transition-opacity duration-300"
           >
-            JB
+            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#D4A853]/25 bg-[#D4A853]/[0.06] text-[11px]">
+              JB
+            </span>
+            <span className="hidden text-[13px] font-medium text-[#E8E4DD] lg:inline">
+              James Brady
+            </span>
           </Link>
 
           {/* Desktop nav */}
@@ -58,13 +61,25 @@ export function Navigation() {
                 {l.label}
               </Link>
             ))}
+            <Link
+              href="/contact"
+              className={`ml-1 rounded-full px-4 py-2 text-[12px] font-semibold tracking-wide transition-premium ${
+                pathname === '/contact'
+                  ? 'bg-[#E5C87A] text-[#0A0A0A]'
+                  : 'bg-[#D4A853] text-[#0A0A0A] hover:bg-[#E5C87A]'
+              }`}
+            >
+              Work with James
+            </Link>
           </div>
 
           {/* Mobile toggle */}
           <button
             onClick={() => setOpen((current) => !current)}
             className="md:hidden text-neutral-400 hover:text-[#E8E4DD] transition-colors duration-300 p-1"
-            aria-label="Toggle menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-navigation"
           >
             {open ? (
               <X size={18} weight="light" />
@@ -77,6 +92,9 @@ export function Navigation() {
 
       {/* Mobile overlay */}
       <div
+        id="mobile-navigation"
+        aria-hidden={!open}
+        inert={!open}
         className={`fixed inset-0 z-30 bg-[#0A0A0A]/95 backdrop-blur-2xl transition-all duration-500 ease-out-expo md:hidden ${
           open
             ? 'opacity-100 pointer-events-auto'
@@ -106,6 +124,19 @@ export function Navigation() {
                 {l.label}
               </Link>
             ))}
+            <Link
+              href="/contact"
+              onClick={() => setOpen(false)}
+              className={`mt-6 flex items-center justify-between rounded-full bg-[#D4A853] px-6 py-4 text-lg font-semibold text-[#0A0A0A] transition-all duration-500 ease-out-expo ${
+                open
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-4'
+              }`}
+              style={{ transitionDelay: open ? `${150 + links.length * 75}ms` : '0ms' }}
+            >
+              Work with James
+              <span aria-hidden>↗</span>
+            </Link>
           </div>
           <div className="mt-12 pt-8 border-t border-[#1E1E1E]">
             <Link

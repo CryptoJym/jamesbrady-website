@@ -21,7 +21,7 @@ import SectionDivider from "@/components/SectionDivider";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "James Brady — AI Alchemist. Mixing AI systems, protocols, and programs on a mathematical substrate.",
+    "James Brady is a founder and AI systems builder creating AI-native companies, production workflows, agent architectures, and practical tools.",
 };
 
 const socialLinks = [
@@ -97,9 +97,9 @@ const disciplines = [
 ];
 
 const milestones = [
-  { year: "Now", label: "AI Alchemist — building at the frontier" },
-  { year: "Ongoing", label: "Open-source MCP tooling and agent frameworks" },
-  { year: "Always", label: "Documenting what actually works" },
+  { year: "Founder", label: "Utlyze and the Of One operating thesis" },
+  { year: "Builder", label: "New Reward and a portfolio of AI-native products" },
+  { year: "Practice", label: "30+ products, 100+ repositories, and an open record of the work" },
 ];
 
 export default function AboutPage() {
@@ -114,10 +114,10 @@ export default function AboutPage() {
             mainEntity: {
               "@type": "Person",
               name: "James Brady",
-              jobTitle: "AI Alchemist",
+              jobTitle: "Founder and AI Systems Builder",
               url: "https://jamesbrady.org",
               description:
-                "Mixing AI systems, protocols, and programs on a mathematical substrate.",
+                "Building AI-native companies, production systems, agent architectures, and operating workflows.",
               sameAs: [
                 "https://www.linkedin.com/in/jamesbrady1/",
                 "https://x.com/h3roai",
@@ -140,14 +140,15 @@ export default function AboutPage() {
             <span className="eyebrow text-[#D4A853] mb-8 inline-block">
               About
             </span>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[0.9] mb-8">
+            <h1 className="font-editorial text-5xl md:text-7xl lg:text-8xl font-medium tracking-[-0.04em] leading-[0.9] mb-8">
               James
               <br />
               <span className="text-[#D4A853]">Brady</span>
             </h1>
             <div className="w-24 h-px bg-[#D4A853] animate-gold-line mb-8" />
             <p className="text-xl md:text-2xl text-neutral-300 leading-relaxed max-w-2xl">
-              AI Alchemist. Building systems that think, connect, and ship.
+              Founder and AI systems builder. Turning frontier models into
+              companies, workflows, and tools that carry real work.
             </p>
           </div>
 
@@ -199,8 +200,9 @@ export default function AboutPage() {
           <div className="md:col-span-7 md:col-start-5 space-y-8">
             <ScrollReveal>
               <p className="text-lg md:text-xl text-[#E8E4DD] leading-relaxed">
-                I build with AI systems. Not demos — systems. The kind that run
-                in production, process real data, and solve actual problems.
+                I build AI-native companies and the operating systems behind
+                them. Not demos—the kind of products and workflows that run in
+                production, touch real data, and solve actual problems.
               </p>
             </ScrollReveal>
 
@@ -217,10 +219,10 @@ export default function AboutPage() {
 
             <ScrollReveal delay={200}>
               <p className="text-neutral-400 leading-relaxed">
-                That&apos;s what this site is. Honest documentation of what
-                works in AI tooling right now. The tools that are actually
-                useful, the patterns that actually scale, the workflows that
-                actually save time. No hype. No vaporware.
+                That&apos;s what this site is: the open field notebook behind the
+                work. The tools that are actually useful, the patterns that
+                actually scale, and the workflows that actually save time. No
+                hype. No vaporware.
               </p>
             </ScrollReveal>
 
@@ -235,12 +237,12 @@ export default function AboutPage() {
 
             <ScrollReveal delay={400}>
               <p className="text-neutral-400 leading-relaxed">
-                I work across the full AI stack — from model selection and
-                prompt engineering to agent architecture, MCP integrations, and
-                production deployment. I&apos;m particularly interested in the
-                intersection of AI agents and developer tooling: how we can make
-                AI systems that are genuinely useful for building software, not
-                just generating it.
+                Through Utlyze, New Reward, and a wider portfolio of products, I
+                work across the full AI stack—from model selection and agent
+                architecture to MCP integrations, product delivery, growth
+                systems, and production operations. The recurring question is
+                simple: how much useful, accountable work can one committed
+                operator carry with the right system?
               </p>
             </ScrollReveal>
           </div>
@@ -365,7 +367,7 @@ export default function AboutPage() {
           <div className="md:col-span-5 order-2 md:order-1">
             <ScrollReveal delay={200}>
               <div className="space-y-0">
-                {milestones.map((m, i) => (
+                {milestones.map((m) => (
                   <div
                     key={m.year}
                     className="relative pl-8 pb-8 last:pb-0 border-l border-[#1E1E1E] group"

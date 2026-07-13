@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import {
@@ -13,32 +14,32 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "James Brady — AI Alchemist",
+    default: "James Brady — Founder & AI Systems Builder",
     template: "%s — James Brady",
   },
   description:
-    "James Brady builds production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
+    "James Brady builds AI-native companies, production systems, agent architectures, and operating workflows that turn frontier models into working leverage.",
   metadataBase: new URL("https://www.jamesbrady.org"),
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "James Brady — AI Alchemist",
-    title: "James Brady — AI Alchemist",
+    siteName: "James Brady",
+    title: "James Brady — Founder & AI Systems Builder",
     description:
-      "Production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
+      "Building the companies AI makes possible: products, agents, workflows, and operating systems that carry real work.",
     url: "/",
     images: [
       {
         url: "/images/hero-alchemy-md.jpg",
-        alt: "James Brady — AI Alchemist",
+        alt: "James Brady — Founder and AI Systems Builder",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "James Brady — AI Alchemist",
+    title: "James Brady — Founder & AI Systems Builder",
     description:
-      "Production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
+      "Building the companies AI makes possible: products, agents, workflows, and operating systems that carry real work.",
     images: ["/images/hero-alchemy-md.jpg"],
   },
   robots: {
@@ -65,8 +66,16 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body className="antialiased bg-[#0A0A0A] text-[#E8E4DD] font-sans noise-overlay">
+        <a
+          href="#main-content"
+          className="sr-only fixed left-4 top-4 z-50 rounded-full bg-[#D4A853] px-5 py-3 text-sm font-semibold text-[#0A0A0A] focus:not-sr-only"
+        >
+          Skip to content
+        </a>
         <Navigation />
-        <main className="pt-20">{children}</main>
+        <main id="main-content" className="pt-20">
+          {children}
+        </main>
 
         <SectionDivider variant="wave" className="mt-32 mb-0" />
 
@@ -78,25 +87,25 @@ export default function RootLayout({
                   James Brady
                 </p>
                 <p className="text-neutral-500 text-sm leading-relaxed max-w-[35ch]">
-                  Production AI systems, agent architectures, and practical
-                  tools that work.
+                  Founder and AI systems builder. Turning frontier models into
+                  companies, workflows, and tools that carry real work.
                 </p>
               </div>
               <div className="md:col-span-3 md:col-start-8">
                 <p className="eyebrow mb-4">Navigate</p>
                 <div className="flex flex-col gap-2.5">
-                  <a
-                    href="/primer"
+                  <Link
+                    href="/#work"
                     className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
                   >
-                    The Primer
-                  </a>
-                  <a
-                    href="/manuscript"
+                    Selected work
+                  </Link>
+                  <Link
+                    href="/#library"
                     className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
                   >
-                    The Manuscript
-                  </a>
+                    Library
+                  </Link>
                   <a
                     href="/workshop"
                     className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
