@@ -76,7 +76,7 @@ export async function submitContact(
               lead.budgetRange === "not_applicable"
                 ? "prefer_not_to_say"
                 : lead.budgetRange,
-            source: "jamesbrady.org/contact",
+            source: `jamesbrady.org/${lead.source}`,
           },
         },
       }),

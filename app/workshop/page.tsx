@@ -52,12 +52,6 @@ const guides = [
   },
 ] as const;
 
-const dividerVariants: Array<"metatron" | "wave" | "hexline"> = [
-  "metatron",
-  "wave",
-  "hexline",
-];
-
 /* ---------- page ---------- */
 
 export default function WorkshopPage() {
@@ -264,6 +258,13 @@ export default function WorkshopPage() {
                       <source
                         src="/videos/james-install-first-skill.mp4"
                         type="video/mp4"
+                      />
+                      <track
+                        kind="captions"
+                        src="/captions/james-install-first-skill.vtt"
+                        srcLang="en"
+                        label="English"
+                        default
                       />
                     </video>
                   </div>

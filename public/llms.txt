@@ -1,24 +1,26 @@
-# jamesbrady.org — AI Alchemist
+# jamesbrady.org — James Brady
 
-> James Brady's personal site. AI systems, protocols, and programs on a mathematical substrate. Tools that work.
+> Founder and AI systems builder. Products, agents, workflows, and proof systems that turn AI capability into accountable work.
 
 ## Pages
 
-- / — Home. Hero + 3 cards linking to Primer, Manuscript, Workshop.
-- /primer — The Primer. How coding systems work: what code is, the stack, AI agents, skills, MCP.
-- /manuscript — The Manuscript. Curated catalog of 36 tools across 9 categories: Document Processing, Design & UI, Development Tools, Marketing & Analytics, Agent Frameworks, Local AI, Automation, Memory & Knowledge, MCP Servers.
-- /workshop — The Workshop. Three practical guides: set up an AI agent (Claude Code), install and use skills, connect MCP servers.
-- /about — About James Brady. Bio, philosophy, links.
+- / — The Of One operating thesis, selected proof, current systems work, open library, and direct inquiry form.
+- /about — James Brady's operating perspective, principles, current work, and canonical social profiles.
+- /contact — Direct project, partnership, speaking, and media inquiries routed through the Utlyze lead system.
+- /watch — Narrated system stories and practical walkthroughs with written summaries.
+- /primer — Code, the stack, AI agents, skills, and MCP explained for humans.
+- /manuscript — A curated catalog of tools and frameworks used in the practice.
+- /workshop — Practical guides for setting up an agent, installing skills, and connecting MCP servers.
 
-## Machine-Readable Endpoints
+## Machine-readable endpoints
 
-- /api/catalog — JSON catalog of all tools with name, description, install command, and GitHub URL.
+- /api/catalog — JSON catalog of tools with descriptions and source links.
 - /feed.xml — RSS feed.
-- /.well-known/ai-manifest.json — AI manifest with site structure and capabilities.
+- /.well-known/ai-manifest.json — Site structure and capabilities.
 
-## Key Topics
+## Core topics
 
-This site covers: AI agents, MCP (Model Context Protocol), Claude Code, skills (agent extensions), developer tools, document processing, vector databases, workflow automation, local LLMs, and the modern AI development stack.
+AI-native products, agent architecture, human-and-AI workflows, Model Context Protocol, durable context, verification, operating systems, and evidence-backed execution.
 
 ## Contact
 

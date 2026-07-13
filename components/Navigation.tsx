@@ -1,154 +1,133 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { List, X } from '@phosphor-icons/react';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { List, X } from "@phosphor-icons/react";
 
 const links = [
-  { href: '/#work', label: 'Work' },
-  { href: '/#library', label: 'Library' },
-  { href: '/watch', label: 'Watch' },
-  { href: '/about', label: 'About' },
+  { href: "/#work", label: "Work" },
+  { href: "/#thesis", label: "Thesis" },
+  { href: "/watch", label: "Watch" },
+  { href: "/about", label: "About" },
 ];
 
 export function Navigation() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 32);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    if (!open) return;
+
+    const main = document.getElementById("main-content");
+    const footer = document.getElementById("site-footer");
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    main?.setAttribute("inert", "");
+    footer?.setAttribute("inert", "");
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      main?.removeAttribute("inert");
+      footer?.removeAttribute("inert");
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
 
   return (
     <>
       <nav
         aria-label="Primary navigation"
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-[900px] transition-all duration-600 ease-out-expo ${
-          scrolled
-            ? 'bg-[#0A0A0A]/90 backdrop-blur-xl border border-[#1E1E1E] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
-            : 'bg-[#0A0A0A]/60 backdrop-blur-md border border-[#1E1E1E]/50'
-        } rounded-full px-5 py-2.5`}
+        className="fixed inset-x-0 top-0 z-50 border-b border-[#CDD3CF] bg-[#F4F5F2]"
       >
-        <div className="flex items-center justify-between">
+        <div className="site-shell flex h-[72px] items-center justify-between gap-6">
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 text-[#D4A853] font-semibold tracking-tight text-[15px] hover:opacity-80 transition-opacity duration-300"
+            className="inline-flex min-h-11 items-center text-[18px] font-semibold tracking-[-0.025em] text-[#171A1B] transition-colors duration-150 hover:text-[#B93620]"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#D4A853]/25 bg-[#D4A853]/[0.06] text-[11px]">
-              JB
-            </span>
-            <span className="hidden text-[13px] font-medium text-[#E8E4DD] lg:inline">
-              James Brady
-            </span>
+            James Brady
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={`relative text-[13px] tracking-wide px-3 py-1.5 rounded-full transition-all duration-500 ease-out-expo ${
-                  pathname === l.href
-                    ? 'text-[#D4A853] bg-[#D4A853]/8'
-                    : 'text-neutral-400 hover:text-[#E8E4DD] hover:bg-white/[0.03]'
-                }`}
-              >
-                {l.label}
-              </Link>
-            ))}
-            <Link
-              href="/contact"
-              className={`ml-1 rounded-full px-4 py-2 text-[12px] font-semibold tracking-wide transition-premium ${
-                pathname === '/contact'
-                  ? 'bg-[#E5C87A] text-[#0A0A0A]'
-                  : 'bg-[#D4A853] text-[#0A0A0A] hover:bg-[#E5C87A]'
-              }`}
-            >
-              Work with James
+          <div className="hidden items-center gap-6 md:flex">
+            {links.map((link) => {
+              const active =
+                (link.href === "/about" && pathname === "/about") ||
+                (link.href === "/watch" && pathname === "/watch");
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`inline-flex min-h-11 items-center border-b text-sm font-medium transition-colors duration-150 ${
+                    active
+                      ? "border-[#D94A2E] text-[#171A1B]"
+                      : "border-transparent text-[#5E6864] hover:text-[#B93620]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            <Link href="/contact" className="button-primary">
+              Talk with James
+              <span aria-hidden>↗</span>
             </Link>
           </div>
 
-          {/* Mobile toggle */}
           <button
+            type="button"
             onClick={() => setOpen((current) => !current)}
-            className="md:hidden text-neutral-400 hover:text-[#E8E4DD] transition-colors duration-300 p-1"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#CDD3CF] text-[#171A1B] md:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-navigation"
           >
-            {open ? (
-              <X size={18} weight="light" />
-            ) : (
-              <List size={18} weight="light" />
-            )}
+            {open ? <X size={21} /> : <List size={21} />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile overlay */}
-      <div
+      <nav
         id="mobile-navigation"
+        aria-label="Mobile navigation"
         aria-hidden={!open}
-        inert={!open}
-        className={`fixed inset-0 z-30 bg-[#0A0A0A]/95 backdrop-blur-2xl transition-all duration-500 ease-out-expo md:hidden ${
-          open
-            ? 'opacity-100 pointer-events-auto'
-            : 'opacity-0 pointer-events-none'
+        className={`fixed inset-x-0 bottom-0 top-[72px] z-40 bg-[#F4F5F2] px-4 py-8 md:hidden ${
+          open ? "block" : "hidden"
         }`}
       >
-        <div className="flex flex-col justify-center min-h-[100dvh] px-8">
-          <div className="space-y-1">
-            {links.map((l, i) => (
+        <div className="mx-auto flex h-full max-w-xl flex-col">
+          <div className="border-t border-[#CDD3CF]">
+            {links.map((link) => (
               <Link
-                key={l.href}
-                href={l.href}
+                key={link.href}
+                href={link.href}
                 onClick={() => setOpen(false)}
-                className={`block text-3xl font-medium tracking-tight py-3 transition-all duration-500 ease-out-expo ${
-                  open
-                    ? 'opacity-100 translate-y-0'
-                    : 'opacity-0 translate-y-4'
-                } ${
-                  pathname === l.href
-                    ? 'text-[#D4A853]'
-                    : 'text-neutral-300 hover:text-[#D4A853]'
-                }`}
-                style={{
-                  transitionDelay: open ? `${150 + i * 75}ms` : '0ms',
-                }}
+                className="flex min-h-[68px] items-center justify-between border-b border-[#CDD3CF] text-2xl font-semibold tracking-[-0.035em] text-[#171A1B]"
               >
-                {l.label}
+                {link.label}
+                <span className="text-[#B93620]" aria-hidden>
+                  ↗
+                </span>
               </Link>
             ))}
-            <Link
-              href="/contact"
-              onClick={() => setOpen(false)}
-              className={`mt-6 flex items-center justify-between rounded-full bg-[#D4A853] px-6 py-4 text-lg font-semibold text-[#0A0A0A] transition-all duration-500 ease-out-expo ${
-                open
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-4'
-              }`}
-              style={{ transitionDelay: open ? `${150 + links.length * 75}ms` : '0ms' }}
-            >
-              Work with James
-              <span aria-hidden>↗</span>
-            </Link>
           </div>
-          <div className="mt-12 pt-8 border-t border-[#1E1E1E]">
-            <Link
-              href="/"
-              onClick={() => setOpen(false)}
-              className="text-sm text-neutral-500 hover:text-[#D4A853] transition-colors duration-300"
-            >
-              James Brady
-            </Link>
-          </div>
+          <Link
+            href="/contact"
+            onClick={() => setOpen(false)}
+            className="button-primary mt-8 w-full"
+          >
+            Talk with James
+            <span aria-hidden>↗</span>
+          </Link>
+          <p className="mt-auto border-t border-[#CDD3CF] pt-5 text-sm leading-relaxed text-[#5E6864]">
+            Founder and AI systems builder. Proof before claims.
+          </p>
         </div>
-      </div>
+      </nav>
     </>
   );
 }

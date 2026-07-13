@@ -1,82 +1,81 @@
-import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  BookOpen,
-  Brain,
-  Code,
-  GitBranch,
-  Lightning,
-  Scroll,
-  Terminal,
-  Wrench,
-} from "@phosphor-icons/react/dist/ssr";
-import AlchemyCanvas from "@/components/AlchemyCanvas";
-import ScrollReveal from "@/components/ScrollReveal";
-import SectionDivider from "@/components/SectionDivider";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { ContactForm } from "@/components/ContactForm";
 
-const proofPoints = [
-  { value: "30+", label: "products built" },
-  { value: "100+", label: "repositories" },
-  { value: "13K", label: "people following the work" },
+const proofRows = [
+  {
+    type: "Company",
+    state: "Live company site",
+    title: "Utlyze",
+    claim: "An AI-native venture studio built around smaller, accountable operating systems.",
+    href: "https://www.utlyze.com",
+    external: true,
+  },
+  {
+    type: "Platform",
+    state: "Live platform site",
+    title: "New Reward",
+    claim: "A system for measuring visibility, shipping the work, and preserving the evidence.",
+    href: "https://www.newreward.com",
+    external: true,
+  },
+  {
+    type: "Open field notes",
+    state: "Published here",
+    title: "The operating library",
+    claim: "Plain-language guides to agents, skills, tools, and the systems that connect them.",
+    href: "/primer",
+    external: false,
+  },
 ];
 
-const systems = [
+const buildRows = [
   {
-    icon: Brain,
+    number: "01",
     title: "AI-native products",
     description:
-      "Products and ventures designed around what AI makes possible now—not software with an assistant bolted on later.",
+      "Products designed around what models, tools, and agents make possible now—not legacy software with a chat box attached.",
   },
   {
-    icon: GitBranch,
-    title: "Agent architecture",
+    number: "02",
+    title: "Agent operating systems",
     description:
-      "Specialized agents, skills, tools, memory, and routing assembled into systems that can carry real work.",
+      "Bounded agents, durable context, clear permissions, and routing that can carry work across real business tools.",
   },
   {
-    icon: Terminal,
-    title: "Operating workflows",
+    number: "03",
+    title: "Human-and-AI workflows",
     description:
-      "Human-and-AI workflows with clear ownership, review points, and dependable handoffs across the business.",
+      "Operating loops with an explicit owner, review points, recovery paths, and a next action that survives the handoff.",
   },
   {
-    icon: Code,
+    number: "04",
     title: "Proof infrastructure",
     description:
-      "Control planes, verification loops, and evidence surfaces that show what changed, what worked, and what is next.",
+      "Control planes and evidence surfaces that keep source, delivery, provider state, and actual impact from being confused.",
   },
 ];
 
-const library = [
+const libraryRows = [
   {
-    number: "I",
+    index: "I",
     title: "The Primer",
-    description:
-      "How code, stacks, agents, skills, and MCP actually fit together—written for people who want the system, not the jargon.",
+    description: "Code, stacks, agents, skills, and MCP—explained without the jargon theater.",
     href: "/primer",
-    icon: BookOpen,
   },
   {
-    number: "II",
+    index: "II",
     title: "The Manuscript",
-    description:
-      "A living catalog of tools and frameworks that have earned a place in the work. Vetted, useful, and installable.",
+    description: "A working catalog of tools and methods that have earned a place in the system.",
     href: "/manuscript",
-    icon: Scroll,
   },
   {
-    number: "III",
+    index: "III",
     title: "The Workshop",
-    description:
-      "Practical guides for turning one useful AI behavior into a working operator loop, then building from there.",
+    description: "Practical guides for turning one useful AI behavior into a repeatable operator loop.",
     href: "/workshop",
-    icon: Wrench,
   },
 ];
-
-const bookingUrl =
-  "https://www.utlyze.com/booking?utm_source=jamesbrady.org&utm_medium=referral&utm_campaign=personal-site";
 
 export default function Home() {
   const jsonLd = {
@@ -87,7 +86,7 @@ export default function Home() {
         name: "James Brady",
         url: "https://www.jamesbrady.org",
         description:
-          "James Brady builds AI-native companies, production systems, agent architectures, and operating workflows.",
+          "James Brady builds the operating layer between AI capability and accountable work.",
       },
       {
         "@type": "Person",
@@ -95,16 +94,8 @@ export default function Home() {
         jobTitle: "Founder and AI Systems Builder",
         url: "https://www.jamesbrady.org/about",
         worksFor: [
-          {
-            "@type": "Organization",
-            name: "Utlyze",
-            url: "https://www.utlyze.com",
-          },
-          {
-            "@type": "Organization",
-            name: "New Reward",
-            url: "https://www.newreward.com",
-          },
+          { "@type": "Organization", name: "Utlyze", url: "https://www.utlyze.com" },
+          { "@type": "Organization", name: "New Reward", url: "https://www.newreward.com" },
         ],
         sameAs: [
           "https://www.linkedin.com/in/jamesbrady1/",
@@ -124,412 +115,253 @@ export default function Home() {
         }}
       />
 
-      <section className="relative min-h-[calc(100dvh-5rem)] overflow-hidden border-b border-[#1E1E1E]">
-        <Image
-          src="/images/hero-alchemy.jpg"
-          alt=""
-          fill
-          priority
-          className="object-cover opacity-[0.22] mix-blend-luminosity"
-          sizes="100vw"
-        />
-        <AlchemyCanvas />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_35%,rgba(212,168,83,0.09),transparent_32%),linear-gradient(90deg,rgba(10,10,10,0.98)_0%,rgba(10,10,10,0.78)_52%,rgba(10,10,10,0.42)_100%)]" />
-
-        <div className="relative z-10 mx-auto grid min-h-[calc(100dvh-5rem)] max-w-[1400px] grid-cols-1 items-end gap-12 px-6 pb-16 pt-28 md:grid-cols-12 md:px-12 md:pb-24">
-          <div className="animate-fade-up md:col-span-8">
-            <p className="mb-7 text-[10px] font-medium uppercase tracking-[0.24em] text-[#D4A853]">
-              James Brady · Founder &amp; AI systems builder
+      <section className="border-b border-[#CDD3CF]">
+        <div className="site-shell grid min-h-[calc(100dvh-72px)] gap-16 py-16 md:grid-cols-12 md:items-center md:py-24">
+          <div className="animate-fade-up md:col-span-7">
+            <p className="evidence-label flex items-center gap-3 text-[#5E6864]">
+              <span className="h-2 w-2 rounded-full bg-[#D94A2E]" aria-hidden />
+              James Brady · Founder and systems builder
             </p>
-            <h1 className="max-w-[11ch] font-editorial text-6xl font-medium leading-[0.88] tracking-[-0.045em] text-[#E8E4DD] sm:text-7xl md:text-8xl lg:text-[7.4rem]">
-              Building the companies AI makes possible.
+            <h1 className="thesis-display mt-10 max-w-[10ch] text-balance">
+              One capable operator can now move like a company.
             </h1>
-            <div className="mt-8 h-px w-24 origin-left bg-[#D4A853] animate-gold-line" />
-            <p className="mt-8 max-w-[58ch] text-lg leading-relaxed text-neutral-300 md:text-xl">
-              I turn frontier models into products, workflows, and operating
-              systems that real businesses can use—then document what actually
-              works.
+            <p className="mt-9 max-w-[58ch] text-lg leading-relaxed text-[#5E6864] md:text-xl">
+              I build the operating layer between AI capability and accountable
+              work: products, agents, workflows, and proof that survive the
+              demo.
             </p>
-
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link
-                href="/contact"
-                className="group inline-flex items-center justify-between gap-5 rounded-full bg-[#D4A853] px-6 py-3.5 text-sm font-semibold text-[#0A0A0A] transition-premium hover:bg-[#E5C87A]"
-              >
-                Work with James
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/10 transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                  <ArrowUpRight size={15} weight="bold" />
-                </span>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <Link href="#work" className="button-primary">
+                See the proof
+                <ArrowUpRight size={14} weight="bold" />
               </Link>
-              <Link
-                href="#work"
-                className="group inline-flex items-center justify-between gap-5 rounded-full border border-[#D4A853]/25 bg-[#0A0A0A]/50 px-6 py-3.5 text-sm font-medium text-[#E8E4DD] transition-premium hover:border-[#D4A853]/45 hover:bg-[#D4A853]/[0.06]"
-              >
-                Explore the systems
-                <ArrowUpRight
-                  size={15}
-                  weight="bold"
-                  className="text-[#D4A853] transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                />
+              <Link href="/contact" className="button-secondary">
+                Start a conversation
+                <ArrowUpRight size={14} weight="bold" />
               </Link>
             </div>
           </div>
 
-          <div className="animate-fade-up stagger-3 md:col-span-3 md:col-start-10">
-            <div className="rounded-[28px] border border-white/[0.08] bg-[#0D0D0C]/80 p-2 shadow-[0_28px_90px_rgba(0,0,0,0.38)]">
-              <div className="rounded-[22px] border border-[#D4A853]/10 bg-[#11110F] p-6">
-                <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-neutral-600">
-                  The operating thesis
-                </p>
-                <p className="mt-5 text-xl font-semibold leading-snug tracking-tight text-[#E8E4DD]">
-                  One serious operator can now move with the capacity of a
-                  company.
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-neutral-500">
-                  The advantage is not more AI. It is better systems, clearer
-                  ownership, and proof that the work actually shipped.
-                </p>
-                <Link
-                  href="#thesis"
-                  className="mt-7 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[#D4A853]"
-                >
-                  The Of One idea
-                  <ArrowUpRight size={12} weight="bold" />
-                </Link>
-              </div>
+          <aside
+            className="animate-fade-up stagger-2 border-y border-[#171A1B] md:col-span-4 md:col-start-9"
+            aria-label="The Of One operating thesis"
+          >
+            <div className="flex items-center justify-between py-4">
+              <p className="evidence-label">The working thesis</p>
+              <p className="evidence-label text-[#B93620]">Of One / v1</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-[#1E1E1E] px-6 py-8 md:px-12">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 sm:grid-cols-3">
-          {proofPoints.map((item, index) => (
-            <ScrollReveal key={item.label} delay={index * 90}>
-              <div className="flex items-baseline gap-3 sm:block">
-                <p className="font-mono text-3xl font-semibold tracking-tight text-[#D4A853] md:text-4xl">
-                  {item.value}
-                </p>
-                <p className="mt-1 text-sm text-neutral-500">{item.label}</p>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </section>
-
-      <section id="thesis" className="scroll-mt-28 px-6 py-24 md:px-12 md:py-36">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-12 md:grid-cols-12 md:gap-8">
-          <ScrollReveal className="md:col-span-3">
-            <p className="eyebrow text-[#D4A853]">The thesis</p>
-          </ScrollReveal>
-          <ScrollReveal delay={100} className="md:col-span-7 md:col-start-5">
-            <h2 className="max-w-[15ch] font-editorial text-4xl font-medium leading-[0.98] tracking-[-0.035em] text-[#E8E4DD] md:text-6xl">
-              The era of leverage is becoming the era of one.
-            </h2>
-            <div className="mt-8 space-y-6 text-lg leading-relaxed text-neutral-400">
-              <p>
-                AI gives one capable person reach that used to require layers of
-                staff, agencies, and handoffs. But raw capability is not the
-                same as a working company.
-              </p>
-              <p>
-                I build the missing operating layer: context, specialized
-                agents, permissions, workflows, human judgment, and visible
-                proof. The result is not a louder demo. It is a smaller,
-                faster, more accountable way to build.
-              </p>
-            </div>
-            <div className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-[24px] border border-[#1E1E1E] bg-[#1E1E1E] sm:grid-cols-3">
+            <ol>
               {[
                 ["Context", "The system knows the company and the work."],
-                ["Execution", "The system carries work across real tools."],
-                ["Proof", "The system shows what changed and what remains."],
-              ].map(([title, copy]) => (
-                <div key={title} className="bg-[#0E0E0E] p-6">
-                  <p className="text-sm font-semibold text-[#E8E4DD]">{title}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-600">
-                    {copy}
-                  </p>
-                </div>
+                ["Labor", "Agents carry bounded tasks across real tools."],
+                ["Judgment", "A human owns the decision and the exception."],
+                ["Proof", "The state, source, and next action stay visible."],
+              ].map(([title, description], index) => (
+                <li
+                  key={title}
+                  className="grid grid-cols-[2.5rem_1fr] gap-4 border-t border-[#CDD3CF] py-5"
+                >
+                  <span className="evidence-label text-[#B93620]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <p className="font-semibold tracking-[-0.02em]">{title}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-[#5E6864]">
+                      {description}
+                    </p>
+                  </div>
+                </li>
               ))}
-            </div>
-          </ScrollReveal>
+            </ol>
+          </aside>
         </div>
       </section>
 
-      <SectionDivider variant="metatron" className="my-0" />
-
-      <section id="work" className="scroll-mt-28 px-6 py-24 md:px-12 md:py-36">
-        <div className="mx-auto max-w-[1400px]">
-          <ScrollReveal>
-            <div className="mb-14 grid grid-cols-1 gap-6 md:grid-cols-12 md:items-end">
-              <div className="md:col-span-7">
-                <p className="eyebrow mb-4 text-[#D4A853]">Selected systems</p>
-                <h2 className="max-w-[12ch] font-editorial text-4xl font-medium leading-[0.96] tracking-[-0.035em] text-[#E8E4DD] md:text-6xl">
-                  The thesis, made concrete.
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-sm leading-relaxed text-neutral-500 md:col-span-4 md:col-start-9">
-                Companies, platforms, and public working notes built around the
-                same idea: AI matters when it carries accountable work.
-              </p>
+      <section id="work" className="scroll-mt-24 py-20 md:py-28">
+        <div className="site-shell">
+          <div className="grid gap-8 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-7">
+              <p className="evidence-label text-[#B93620]">Selected proof</p>
+              <h2 className="section-title mt-5 max-w-[12ch] text-balance">
+                The work is the credential.
+              </h2>
             </div>
-          </ScrollReveal>
+            <p className="max-w-[52ch] text-base leading-relaxed text-[#5E6864] md:col-span-4 md:col-start-9">
+              No floating metrics and no vague transformation claims. These are
+              the public systems where the thesis is being made concrete.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-            <ScrollReveal className="md:col-span-7">
-              <a
-                href="https://www.utlyze.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block h-full rounded-[30px] border border-[#D4A853]/20 bg-[#11100D] p-2 transition-premium hover:border-[#D4A853]/40"
-              >
-                <div className="flex h-full min-h-[360px] flex-col justify-between rounded-[24px] border border-white/[0.06] bg-[radial-gradient(circle_at_75%_20%,rgba(212,168,83,0.11),transparent_32%),#121210] p-8 md:p-11">
-                  <div className="flex items-start justify-between gap-6">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-[#D4A853]">
-                        Founder · Active
-                      </p>
-                      <h3 className="mt-5 text-4xl font-bold tracking-tighter text-[#E8E4DD] md:text-5xl">
-                        Utlyze
-                      </h3>
-                    </div>
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#D4A853]/20 bg-[#D4A853]/[0.06] text-[#D4A853] transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                      <ArrowUpRight size={17} weight="bold" />
-                    </span>
+          <div className="mt-14 border-b border-[#CDD3CF]">
+            {proofRows.map((item) => {
+              const content = (
+                <>
+                  <div>
+                    <p className="evidence-label text-[#5E6864]">{item.type}</p>
+                    <p className="evidence-label mt-2 text-[#B93620]">{item.state}</p>
                   </div>
                   <div>
-                    <p className="max-w-[46ch] text-xl leading-relaxed text-neutral-300">
-                      The AI accelerator lab behind the Of One thesis—a digital
-                      workforce for research, product, growth, and operations.
-                    </p>
-                    <p className="mt-6 text-sm leading-relaxed text-neutral-600">
-                      Turning solo operators into AI-native builders who can
-                      carry company-scale work with smaller, better systems.
+                    <h3 className="text-2xl font-semibold tracking-[-0.035em] md:text-3xl">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 max-w-[58ch] leading-relaxed text-[#5E6864]">
+                      {item.claim}
                     </p>
                   </div>
-                </div>
-              </a>
-            </ScrollReveal>
+                  <span className="evidence-label inline-flex items-center gap-2 md:justify-self-end">
+                    Open proof
+                    <ArrowUpRight size={13} weight="bold" />
+                  </span>
+                </>
+              );
 
-            <div className="grid grid-cols-1 gap-6 md:col-span-5">
-              <ScrollReveal delay={100}>
+              const classes =
+                "group grid gap-6 border-t border-[#CDD3CF] py-8 transition-colors duration-150 hover:text-[#B93620] md:grid-cols-[10rem_1fr_auto] md:items-start md:gap-10";
+
+              return item.external ? (
                 <a
-                  href="https://www.newreward.com"
+                  key={item.title}
+                  href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block rounded-[28px] border border-[#1E1E1E] bg-[#101010] p-8 transition-premium hover:border-[#D4A853]/30 md:p-9"
+                  className={classes}
                 >
-                  <div className="flex items-start justify-between gap-5">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-600">
-                        Platform · Shipping
-                      </p>
-                      <h3 className="mt-4 text-2xl font-semibold tracking-tight text-[#E8E4DD]">
-                        New Reward
-                      </h3>
-                    </div>
-                    <ArrowUpRight
-                      size={16}
-                      weight="bold"
-                      className="text-[#D4A853] transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
-                  </div>
-                  <p className="mt-6 text-sm leading-relaxed text-neutral-500">
-                    Brand SEO and AI visibility with execution built in—score
-                    the gap, ship the fix, and preserve the proof.
-                  </p>
+                  {content}
                 </a>
-              </ScrollReveal>
-
-              <ScrollReveal delay={180}>
-                <Link
-                  href="/manuscript"
-                  className="group block rounded-[28px] border border-[#1E1E1E] bg-[#101010] p-8 transition-premium hover:border-[#D4A853]/30 md:p-9"
-                >
-                  <div className="flex items-start justify-between gap-5">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-600">
-                        Field notes · Open
-                      </p>
-                      <h3 className="mt-4 text-2xl font-semibold tracking-tight text-[#E8E4DD]">
-                        The Alchemist&apos;s Library
-                      </h3>
-                    </div>
-                    <ArrowUpRight
-                      size={16}
-                      weight="bold"
-                      className="text-[#D4A853] transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
-                  </div>
-                  <p className="mt-6 text-sm leading-relaxed text-neutral-500">
-                    The public record of tools, methods, experiments, and
-                    practical guides behind the systems.
-                  </p>
+              ) : (
+                <Link key={item.title} href={item.href} className={classes}>
+                  {content}
                 </Link>
-              </ScrollReveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <SectionDivider variant="hexline" className="my-0" />
-
-      <section className="px-6 py-24 md:px-12 md:py-36">
-        <div className="mx-auto max-w-[1400px]">
-          <ScrollReveal>
-            <p className="eyebrow mb-4 text-[#D4A853]">What I build</p>
-            <h2 className="mb-14 max-w-[13ch] font-editorial text-4xl font-medium leading-[0.96] tracking-[-0.035em] text-[#E8E4DD] md:text-6xl">
-              Systems that carry real weight.
-            </h2>
-          </ScrollReveal>
-
-          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-[28px] border border-[#1E1E1E] bg-[#1E1E1E] md:grid-cols-2">
-            {systems.map((system, index) => (
-              <ScrollReveal key={system.title} delay={index * 80}>
-                <div className="group h-full bg-[#0B0B0B] p-8 transition-premium hover:bg-[#10100F] md:p-10">
-                  <div className="flex items-start gap-5">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-[#D4A853]/15 bg-[#D4A853]/[0.04] text-[#D4A853] transition-premium group-hover:border-[#D4A853]/30 group-hover:bg-[#D4A853]/[0.08]">
-                      <system.icon size={21} weight="light" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold tracking-tight text-[#E8E4DD]">
-                        {system.title}
-                      </h3>
-                      <p className="mt-3 max-w-[48ch] text-sm leading-relaxed text-neutral-500 transition-premium group-hover:text-neutral-400">
-                        {system.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <SectionDivider variant="vesica" className="my-0" />
-
-      <section id="library" className="scroll-mt-28 px-6 py-24 md:px-12 md:py-36">
-        <div className="mx-auto max-w-[1400px]">
-          <ScrollReveal>
-            <div className="mb-14 grid grid-cols-1 gap-6 md:grid-cols-12 md:items-end">
-              <div className="md:col-span-7">
-                <p className="eyebrow mb-4 text-[#D4A853]">The library</p>
-                <h2 className="max-w-[14ch] font-editorial text-4xl font-medium leading-[0.96] tracking-[-0.035em] text-[#E8E4DD] md:text-6xl">
-                  Learn the system behind the work.
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-sm leading-relaxed text-neutral-500 md:col-span-4 md:col-start-9">
-                Alchemy remains the editorial language: experiment honestly,
-                keep what works, and make the method available to others.
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-            {library.map((item, index) => {
-              const Icon = item.icon;
-              const span =
-                index === 0
-                  ? "md:col-span-5"
-                  : index === 1
-                    ? "md:col-span-4"
-                    : "md:col-span-3";
-
-              return (
-                <ScrollReveal key={item.href} delay={index * 90} className={span}>
-                  <Link
-                    href={item.href}
-                    className="group flex h-full min-h-[330px] flex-col rounded-[26px] border border-[#1E1E1E] bg-[#101010] p-8 transition-premium hover:-translate-y-1 hover:border-[#D4A853]/30 md:p-9"
-                  >
-                    <div className="flex items-start justify-between">
-                      <span className="font-mono text-xs text-neutral-700">
-                        {item.number}
-                      </span>
-                      <Icon
-                        size={24}
-                        weight="light"
-                        className="text-neutral-700 transition-premium group-hover:text-[#D4A853]"
-                      />
-                    </div>
-                    <div className="mt-auto pt-16">
-                      <h3 className="text-2xl font-semibold tracking-tight text-[#E8E4DD] transition-premium group-hover:text-[#D4A853]">
-                        {item.title}
-                      </h3>
-                      <p className="mt-4 text-sm leading-relaxed text-neutral-500">
-                        {item.description}
-                      </p>
-                      <span className="mt-7 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[#D4A853]">
-                        Start here
-                        <ArrowUpRight
-                          size={12}
-                          weight="bold"
-                          className="transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                        />
-                      </span>
-                    </div>
-                  </Link>
-                </ScrollReveal>
               );
             })}
           </div>
         </div>
       </section>
 
-      <section className="px-6 pb-28 pt-10 md:px-12 md:pb-36">
-        <div className="mx-auto max-w-[1400px]">
-          <ScrollReveal>
-            <div className="relative overflow-hidden rounded-[34px] border border-[#D4A853]/20 bg-[#11100D] p-2">
-              <div className="relative overflow-hidden rounded-[28px] border border-white/[0.06] px-7 py-12 md:px-14 md:py-16">
-                <div className="absolute -right-20 -top-32 h-96 w-96 rounded-full bg-[#D4A853]/[0.09] blur-3xl" />
-                <div className="relative grid grid-cols-1 gap-10 md:grid-cols-12 md:items-end">
-                  <div className="md:col-span-8">
-                    <div className="mb-5 flex items-center gap-3 text-[#D4A853]">
-                      <Lightning size={16} weight="fill" />
-                      <p className="text-[10px] font-medium uppercase tracking-[0.22em]">
-                        Work with James
-                      </p>
-                    </div>
-                    <h2 className="max-w-[13ch] font-editorial text-4xl font-medium leading-[0.96] tracking-[-0.035em] text-[#E8E4DD] md:text-6xl">
-                      Bring me a real operating problem.
-                    </h2>
-                    <p className="mt-6 max-w-[58ch] leading-relaxed text-neutral-400">
-                      Tell me what is stuck, what the system touches, and what a
-                      useful outcome looks like. We&apos;ll determine where AI
-                      creates leverage—and what it takes to ship responsibly.
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-3 md:col-span-3 md:col-start-10">
-                    <Link
-                      href="/contact"
-                      className="group inline-flex items-center justify-between rounded-full bg-[#D4A853] px-6 py-3.5 text-sm font-semibold text-[#0A0A0A] transition-premium hover:bg-[#E5C87A]"
-                    >
-                      Send the context
-                      <ArrowUpRight
-                        size={15}
-                        weight="bold"
-                        className="transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      />
-                    </Link>
-                    <a
-                      href={bookingUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group inline-flex items-center justify-between rounded-full border border-[#D4A853]/25 px-6 py-3.5 text-sm font-medium text-[#E8E4DD] transition-premium hover:border-[#D4A853]/45 hover:bg-[#D4A853]/[0.05]"
-                    >
-                      Book 20 minutes
-                      <ArrowUpRight
-                        size={15}
-                        weight="bold"
-                        className="text-[#D4A853] transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      />
-                    </a>
-                  </div>
-                </div>
+      <section id="thesis" className="scroll-mt-20 bg-[#171A1B] py-20 text-white md:py-28">
+        <div className="site-shell">
+          <div className="grid gap-12 md:grid-cols-12">
+            <div className="md:col-span-4">
+              <p className="evidence-label text-[#E66C55]">The Of One thesis</p>
+            </div>
+            <div className="md:col-span-7 md:col-start-6">
+              <h2 className="section-title max-w-[13ch] text-balance">
+                AI lowers the cost of capability. Systems make it dependable.
+              </h2>
+              <div className="mt-9 max-w-[66ch] space-y-6 text-lg leading-relaxed text-[#B8C0BC]">
+                <p>
+                  One person can now reach across research, product, growth, and
+                  operations. That does not automatically create a company. Raw
+                  capability without context, ownership, and recovery is still
+                  just a promising demo.
+                </p>
+                <p>
+                  The operating advantage comes from assembling the missing
+                  layer: named agents, durable memory, permissions, review
+                  points, and proof of what actually happened.
+                </p>
               </div>
             </div>
-          </ScrollReveal>
+          </div>
+
+          <div className="mt-16 grid border-y border-[#4B5350] md:grid-cols-3">
+            {[
+              ["Capability", "Models, tools, and specialized labor."],
+              ["Operation", "Context, routing, handoffs, and recovery."],
+              ["Accountability", "An owner, an observable state, and evidence."],
+            ].map(([title, description], index) => (
+              <div
+                key={title}
+                className={`py-7 md:px-7 ${index > 0 ? "border-t border-[#4B5350] md:border-l md:border-t-0" : ""}`}
+              >
+                <p className="evidence-label text-[#E66C55]">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-5 text-xl font-semibold tracking-[-0.025em]">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#A5AEAA]">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 md:py-28">
+        <div className="site-shell grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <p className="evidence-label text-[#B93620]">What I build</p>
+            <h2 className="section-title mt-5 max-w-[10ch] text-balance">
+              Systems that carry real weight.
+            </h2>
+          </div>
+          <div className="border-b border-[#CDD3CF] md:col-span-7 md:col-start-6">
+            {buildRows.map((item) => (
+              <article key={item.number} className="grid gap-5 border-t border-[#CDD3CF] py-7 sm:grid-cols-[3rem_1fr]">
+                <p className="evidence-label text-[#B93620]">{item.number}</p>
+                <div>
+                  <h3 className="text-xl font-semibold tracking-[-0.025em]">{item.title}</h3>
+                  <p className="mt-3 max-w-[58ch] leading-relaxed text-[#5E6864]">{item.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="library" className="border-y border-[#CDD3CF] bg-white py-20 md:py-28">
+        <div className="site-shell">
+          <div className="grid gap-8 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-7">
+              <p className="evidence-label text-[#B93620]">Open library</p>
+              <h2 className="section-title mt-5 max-w-[12ch] text-balance">
+                The system behind the work.
+              </h2>
+            </div>
+            <p className="max-w-[50ch] leading-relaxed text-[#5E6864] md:col-span-4 md:col-start-9">
+              A public record of useful tools, working patterns, and practical
+              explanations. Keep what works. Show the method.
+            </p>
+          </div>
+
+          <div className="mt-14 border-b border-[#CDD3CF]">
+            {libraryRows.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group grid gap-5 border-t border-[#CDD3CF] py-7 md:grid-cols-[4rem_15rem_1fr_auto] md:items-center"
+              >
+                <span className="evidence-label text-[#B93620]">{item.index}</span>
+                <h3 className="text-xl font-semibold tracking-[-0.025em] transition-colors group-hover:text-[#B93620]">
+                  {item.title}
+                </h3>
+                <p className="max-w-[58ch] text-sm leading-relaxed text-[#5E6864]">
+                  {item.description}
+                </p>
+                <ArrowUpRight size={16} weight="bold" className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 md:py-28">
+        <div className="site-shell grid gap-14 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <p className="evidence-label text-[#B93620]">Strong-fit work</p>
+            <h2 className="section-title mt-5 max-w-[10ch] text-balance">
+              Bring me the real operating problem.
+            </h2>
+            <p className="mt-7 max-w-[48ch] text-lg leading-relaxed text-[#5E6864]">
+              Tell me what is stuck, what the system touches, and what a useful
+              outcome looks like. We will start with the work—not the AI pitch.
+            </p>
+            <p className="mt-8 max-w-[46ch] border-t border-[#CDD3CF] pt-6 text-sm leading-relaxed text-[#5E6864]">
+              This goes directly into the Utlyze lead system. No mailing list.
+              Replies come from james@utlyze.com.
+            </p>
+          </div>
+          <div className="md:col-span-6 md:col-start-7">
+            <ContactForm source="home" />
+          </div>
         </div>
       </section>
     </>

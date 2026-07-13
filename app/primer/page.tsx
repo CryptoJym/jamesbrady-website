@@ -96,7 +96,7 @@ const tocItems = [
 
 export default function PrimerPage() {
   return (
-    <>
+    <div className="legacy-dark">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -165,7 +165,7 @@ export default function PrimerPage() {
                     <a
                       key={item.id}
                       href={`#${item.id}`}
-                      className="group flex items-center gap-4 py-3 first:pt-0 last:pb-0 transition-premium"
+                      className="group flex min-h-11 items-center gap-4 py-3 first:pt-0 last:pb-0 transition-premium"
                     >
                       <span className="font-mono text-xs text-neutral-600 group-hover:text-[#D4A853] transition-premium w-6">
                         {item.num}
@@ -545,6 +545,6 @@ export default function PrimerPage() {
           </div>
         </div>
       </article>
-    </>
+    </div>
   );
 }

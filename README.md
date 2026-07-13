@@ -1,57 +1,38 @@
-# James Brady — AI Alchemist
+# James Brady — Founder and AI Systems Builder
 
-The source for [jamesbrady.org](https://www.jamesbrady.org): an editorial personal site about production AI systems, agent architecture, tools, and practical implementation.
+Source for [jamesbrady.org](https://www.jamesbrady.org), a proof-led personal site about AI-native products, agent operating systems, and accountable human-and-AI workflows.
 
-## Overview
+## Product and design contracts
 
-This project visualizes the relationship between Human and AI states through three distinct manifolds:
-1.  **Human Manifold**: Represents the user's state (Energy, Valence, Coherence).
-2.  **AI Manifold**: Represents the AI's state (Energy, Valence, Coherence).
-3.  **Center Manifold**: A dynamic "Stability Attractor Field" that emerges from the interaction between Human and AI.
+- `PRODUCT.md` defines the audience, purpose, personality, anti-references, and accessibility commitment.
+- `DESIGN.md` defines the visual system and implementation guardrails.
+- `.impeccable/design.json` exposes the design tokens and canonical component examples to design-aware tools.
 
-## Features
+## Stack
 
-### 3D Visualization
--   **Custom Shaders**: Each manifold uses unique vertex and fragment shaders to represent data visually.
--   **Real-time Dynamics**: The manifolds react in real-time to changes in state (Coherence, Tension, Energy).
--   **Attractor Fields**: Visualizes complex mathematical attractors (Clifford, De Jong) mapped to interaction data.
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS 3
+- Geist Sans and Geist Mono
 
-### Interactive Chat
--   **Markdown Support**: Rich text rendering for AI responses (lists, code blocks, formatting).
--   **Expandable UI**: The chat panel can be minimized to view the manifolds or expanded to read long conversations.
--   **State Integration**: Chatting with the AI updates the underlying state, which immediately reflects in the 3D visualization.
+## Local development
 
-## Tech Stack
+```bash
+npm install
+npm run dev
+```
 
--   **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
--   **3D Engine**: [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) / [Three.js](https://threejs.org/)
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
--   **State Management**: [Zustand](https://github.com/pmndrs/zustand)
--   **Animations**: [Framer Motion](https://www.framer.com/motion/)
--   **Markdown**: `react-markdown`, `remark-gfm`
+The production checks are:
 
-## Getting Started
-
-1.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
-
-2.  **Run the development server**:
-    ```bash
-    npm run dev
-    ```
-
-3.  **Open the application**:
-    Navigate to [http://localhost:3000](http://localhost:3000) (or the port specified in the console).
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
 
 ## Lead delivery
 
-The `/contact` form sends inquiries through a Server Action to the shared Utlyze lead gateway, which stores the inquiry and forwards it to the published HighLevel workflow. No CRM secret is exposed in this public repository. Set `LEAD_INGEST_URL` only when a local or staging override is needed, and never expose it with a `NEXT_PUBLIC_` prefix.
+The homepage and `/contact` forms use a Server Action to send inquiries through the shared Utlyze lead gateway. The visible form asks for only three required fields; optional routing fields are normalized to safe defaults on the server. No CRM credential is exposed in this repository.
 
-## Key Components
-
--   `components/ManifoldScene.tsx`: The main 3D scene orchestrator.
--   `components/manifolds/CenterManifold.tsx`: The central stability field with custom shader logic.
--   `components/ChatPanel.tsx`: The interactive chat interface with Markdown support.
--   `lib/attractorMapping.ts`: Mathematical functions mapping state to visual parameters.
+Set `LEAD_INGEST_URL` only for a local or staging override. Never expose it with a `NEXT_PUBLIC_` prefix.

@@ -26,9 +26,9 @@ export function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>James Brady — AI Alchemist</title>
+    <title>James Brady — Founder and AI Systems Builder</title>
     <link>https://jamesbrady.org</link>
-    <description>AI systems, protocols, and programs on a mathematical substrate. Tools that work.</description>
+    <description>Products, agents, workflows, and proof systems that turn AI capability into accountable work.</description>
     <language>en-us</language>
     <lastBuildDate>${now}</lastBuildDate>
     <atom:link href="https://jamesbrady.org/feed.xml" rel="self" type="application/rss+xml"/>

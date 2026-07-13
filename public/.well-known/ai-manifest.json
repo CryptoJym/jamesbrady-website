@@ -1,56 +1,56 @@
 {
-  "name": "James Brady — AI Alchemist",
-  "description": "AI systems, protocols, and programs on a mathematical substrate. Curated tools and practical guides.",
-  "url": "https://jamesbrady.org",
+  "name": "James Brady — Founder and AI Systems Builder",
+  "description": "Products, agents, workflows, and proof systems that turn AI capability into accountable work.",
+  "url": "https://www.jamesbrady.org",
   "author": {
     "name": "James Brady",
-    "url": "https://jamesbrady.org/about"
+    "url": "https://www.jamesbrady.org/about"
   },
   "capabilities": {
     "catalog_api": "/api/catalog",
     "rss_feed": "/feed.xml",
-    "llms_txt": "/llms.txt"
+    "llms_txt": "/llms.txt",
+    "contact_form": "/contact"
   },
   "content": {
     "pages": [
       {
         "path": "/",
         "title": "Home",
-        "description": "AI Alchemist — mixing AI systems, protocols, and programs."
-      },
-      {
-        "path": "/primer",
-        "title": "The Primer",
-        "description": "How coding systems work: code, the stack, AI agents, skills, and MCP."
-      },
-      {
-        "path": "/manuscript",
-        "title": "The Manuscript",
-        "description": "Curated catalog of tools, frameworks, and MCP servers across 9 categories."
-      },
-      {
-        "path": "/workshop",
-        "title": "The Workshop",
-        "description": "Three practical guides: set up an AI agent, install skills, connect MCP servers."
+        "description": "The Of One operating thesis, selected proof, current systems work, and direct inquiry."
       },
       {
         "path": "/about",
         "title": "About",
-        "description": "James Brady — bio and links."
+        "description": "James Brady's operating perspective, principles, current work, and canonical profiles."
+      },
+      {
+        "path": "/contact",
+        "title": "Work with James",
+        "description": "Direct project, partnership, speaking, and media inquiries."
+      },
+      {
+        "path": "/watch",
+        "title": "Watch",
+        "description": "Narrated system stories and practical walkthroughs with written summaries."
+      },
+      {
+        "path": "/primer",
+        "title": "The Primer",
+        "description": "Code, the stack, AI agents, skills, and MCP explained for humans."
+      },
+      {
+        "path": "/manuscript",
+        "title": "The Manuscript",
+        "description": "A curated catalog of tools and frameworks used in the practice."
+      },
+      {
+        "path": "/workshop",
+        "title": "The Workshop",
+        "description": "Practical guides for setting up an agent, installing skills, and connecting MCP servers."
       }
-    ],
-    "categories": [
-      "Document Processing",
-      "Design & UI",
-      "Development Tools",
-      "Marketing & Analytics",
-      "Agent Frameworks",
-      "Local AI",
-      "Automation",
-      "Memory & Knowledge",
-      "MCP Servers"
     ]
   },
-  "structured_data": "JSON-LD on every page",
-  "last_updated": "2025-03-21"
+  "structured_data": "JSON-LD on primary pages",
+  "last_updated": "2026-07-13"
 }

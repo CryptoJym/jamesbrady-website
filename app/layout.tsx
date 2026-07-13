@@ -2,14 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import {
-  RssSimple,
-  FileText,
-  Code,
-  ArrowUpRight,
-} from "@phosphor-icons/react/dist/ssr";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Navigation } from "@/components/Navigation";
-import SectionDivider from "@/components/SectionDivider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +12,7 @@ export const metadata: Metadata = {
     template: "%s — James Brady",
   },
   description:
-    "James Brady builds AI-native companies, production systems, agent architectures, and operating workflows that turn frontier models into working leverage.",
+    "James Brady builds the operating layer between AI capability and accountable work: products, agents, workflows, and proof systems.",
   metadataBase: new URL("https://www.jamesbrady.org"),
   openGraph: {
     type: "website",
@@ -26,21 +20,14 @@ export const metadata: Metadata = {
     siteName: "James Brady",
     title: "James Brady — Founder & AI Systems Builder",
     description:
-      "Building the companies AI makes possible: products, agents, workflows, and operating systems that carry real work.",
+      "Building the operating layer between AI capability and accountable work.",
     url: "/",
-    images: [
-      {
-        url: "/images/hero-alchemy-md.jpg",
-        alt: "James Brady — Founder and AI Systems Builder",
-      },
-    ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "James Brady — Founder & AI Systems Builder",
     description:
-      "Building the companies AI makes possible: products, agents, workflows, and operating systems that carry real work.",
-    images: ["/images/hero-alchemy-md.jpg"],
+      "Building the operating layer between AI capability and accountable work.",
   },
   robots: {
     index: true,
@@ -54,6 +41,14 @@ export const metadata: Metadata = {
   },
 };
 
+const footerLinks = [
+  { label: "Work", href: "/#work" },
+  { label: "Thesis", href: "/#thesis" },
+  { label: "Watch", href: "/watch" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -65,115 +60,65 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
-      <body className="antialiased bg-[#0A0A0A] text-[#E8E4DD] font-sans noise-overlay">
+      <body className="bg-[#F4F5F2] font-sans text-[#171A1B] antialiased">
         <a
           href="#main-content"
-          className="sr-only fixed left-4 top-4 z-50 rounded-full bg-[#D4A853] px-5 py-3 text-sm font-semibold text-[#0A0A0A] focus:not-sr-only"
+          className="sr-only fixed left-4 top-4 z-[60] rounded-[6px] bg-[#171A1B] px-4 py-3 text-sm font-semibold text-white focus:not-sr-only"
         >
           Skip to content
         </a>
         <Navigation />
-        <main id="main-content" className="pt-20">
+        <main id="main-content" className="pt-[72px]">
           {children}
         </main>
 
-        <SectionDivider variant="wave" className="mt-32 mb-0" />
-
-        <footer className="border-t border-[#1E1E1E]">
-          <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 md:py-24">
+        <footer id="site-footer" className="border-t border-[#CDD3CF] bg-[#F4F5F2]">
+          <div className="site-shell py-12 md:py-16">
+            <div className="grid gap-12 md:grid-cols-12">
               <div className="md:col-span-5">
-                <p className="text-[#D4A853] font-semibold tracking-tight text-lg mb-3">
+                <p className="text-2xl font-semibold tracking-[-0.04em]">
                   James Brady
                 </p>
-                <p className="text-neutral-500 text-sm leading-relaxed max-w-[35ch]">
-                  Founder and AI systems builder. Turning frontier models into
-                  companies, workflows, and tools that carry real work.
+                <p className="mt-4 max-w-[44ch] text-sm leading-relaxed text-[#5E6864]">
+                  Founder and AI systems builder. Turning capability into
+                  products, workflows, and proof that carry real work.
                 </p>
+                <Link href="/contact" className="text-link mt-6 inline-flex items-center gap-2 text-sm">
+                  Start a conversation
+                  <ArrowUpRight size={13} weight="bold" />
+                </Link>
               </div>
+
               <div className="md:col-span-3 md:col-start-8">
-                <p className="eyebrow mb-4">Navigate</p>
-                <div className="flex flex-col gap-2.5">
-                  <Link
-                    href="/#work"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Selected work
-                  </Link>
-                  <Link
-                    href="/#library"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Library
-                  </Link>
-                  <a
-                    href="/workshop"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    The Workshop
-                  </a>
-                  <a
-                    href="/about"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    About
-                  </a>
-                  <a
-                    href="/links"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Links
-                  </a>
-                  <a
-                    href="/watch"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Watch
-                  </a>
-                  <a
-                    href="/contact"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Contact
-                  </a>
+                <p className="evidence-label text-[#5E6864]">Navigate</p>
+                <div className="mt-4 flex flex-col items-start gap-2">
+                  {footerLinks.map((link) => (
+                    <Link key={link.href} href={link.href} className="text-link py-1 text-sm">
+                      {link.label}
+                    </Link>
+                  ))}
                 </div>
               </div>
+
               <div className="md:col-span-2">
-                <p className="eyebrow mb-4">Meta</p>
-                <div className="flex flex-col gap-3">
-                  <a
-                    href="/feed.xml"
-                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    <RssSimple size={14} weight="light" />
+                <p className="evidence-label text-[#5E6864]">Open surfaces</p>
+                <div className="mt-4 flex flex-col items-start gap-2">
+                  <a href="/feed.xml" className="text-link py-1 text-sm">
                     RSS
                   </a>
-                  <a
-                    href="/llms.txt"
-                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    <FileText size={14} weight="light" />
+                  <a href="/llms.txt" className="text-link py-1 text-sm">
                     llms.txt
                   </a>
-                  <a
-                    href="/api/catalog"
-                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    <Code size={14} weight="light" />
+                  <a href="/api/catalog" className="text-link py-1 text-sm">
                     API
-                    <ArrowUpRight size={10} weight="bold" className="opacity-40" />
                   </a>
                 </div>
               </div>
             </div>
-            <div className="border-t border-[#1E1E1E] py-6 flex flex-col md:flex-row justify-between items-center gap-3">
-              <span className="text-xs text-neutral-600">
-                &copy; {new Date().getFullYear()} James Brady. All rights
-                reserved.
-              </span>
-              <span className="text-xs text-neutral-700 font-mono">
-                Built with AI agents
-              </span>
+
+            <div className="mt-12 flex flex-col gap-3 border-t border-[#CDD3CF] pt-6 text-xs text-[#5E6864] sm:flex-row sm:items-center sm:justify-between">
+              <span>&copy; {new Date().getFullYear()} James Brady.</span>
+              <span className="font-mono">Proof before claims.</span>
             </div>
           </div>
         </footer>

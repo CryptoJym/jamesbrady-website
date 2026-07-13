@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Icon } from "@phosphor-icons/react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -26,7 +27,7 @@ type LinkItem = {
   label: string;
   href: string;
   note: string;
-  icon: any;
+  icon: Icon;
   external?: boolean;
 };
 
@@ -86,7 +87,7 @@ const siteLinks: LinkItem[] = [
   {
     label: "Home",
     href: "/",
-    note: "AI Alchemist entry point",
+    note: "The Of One thesis and selected proof",
     icon: Sparkle,
   },
   {
@@ -111,9 +112,9 @@ const siteLinks: LinkItem[] = [
 
 const featuredVideoLinks: LinkItem[] = [
   {
-    label: "What is AI Alchemy?",
-    href: "/",
-    note: "Homepage featured video overview",
+    label: "From models to operating leverage",
+    href: "/watch#operating-system",
+    note: "Narrated system-story overview",
     icon: PlayCircle,
   },
   {
@@ -206,7 +207,7 @@ function LinkSection({
 
 export default function LinksPage() {
   return (
-    <>
+    <div className="legacy-dark">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -266,6 +267,6 @@ export default function LinksPage() {
         title="Narrated pieces worth starting with"
         items={featuredVideoLinks}
       />
-    </>
+    </div>
   );
 }

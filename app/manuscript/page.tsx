@@ -85,7 +85,7 @@ export default function ManuscriptPage() {
                     <a
                       key={cat.id}
                       href={`#${cat.id}`}
-                      className="text-xs px-3.5 py-1.5 rounded-full border border-[#1E1E1E] text-neutral-500 hover:text-[#D4A853] hover:border-[#D4A853]/30 transition-premium"
+                      className="inline-flex min-h-11 items-center rounded-full border border-[#1E1E1E] px-3.5 py-1.5 text-xs text-neutral-500 transition-premium hover:border-[#D4A853]/30 hover:text-[#D4A853]"
                     >
                       {cat.name}
                     </a>
@@ -144,7 +144,7 @@ export default function ManuscriptPage() {
                               href={tool.github}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-neutral-600 hover:text-[#D4A853] transition-premium text-xs shrink-0 group/link"
+                              className="group/link -mr-2 inline-flex min-h-11 shrink-0 items-center gap-1 px-2 text-xs text-neutral-600 transition-premium hover:text-[#D4A853]"
                             >
                               <span>GitHub</span>
                               <ArrowUpRight

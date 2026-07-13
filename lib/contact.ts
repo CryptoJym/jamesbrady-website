@@ -24,6 +24,8 @@ export const budgetRanges = [
   "prefer_not_to_say",
 ] as const;
 
+export const contactSources = ["home", "contact"] as const;
+
 export type ContactLead = {
   name: string;
   email: string;
@@ -32,6 +34,7 @@ export type ContactLead = {
   timeline: (typeof timelines)[number];
   budgetRange: (typeof budgetRanges)[number];
   message: string;
+  source: (typeof contactSources)[number];
 };
 
 export type ContactValidationResult =
@@ -55,10 +58,11 @@ export function validateContactForm(
     name: value(formData, "name"),
     email: value(formData, "email").toLowerCase(),
     company: value(formData, "company"),
-    helpType: value(formData, "helpType"),
-    timeline: value(formData, "timeline"),
-    budgetRange: value(formData, "budgetRange"),
+    helpType: value(formData, "helpType") || "other",
+    timeline: value(formData, "timeline") || "exploring",
+    budgetRange: value(formData, "budgetRange") || "prefer_not_to_say",
     message: value(formData, "message"),
+    source: value(formData, "source") || "contact",
   };
   const fieldErrors: Record<string, string> = {};
 
@@ -85,6 +89,9 @@ export function validateContactForm(
   if (data.message.length < 20 || data.message.length > 3000) {
     fieldErrors.message =
       "Share at least 20 characters and keep the note under 3,000.";
+  }
+  if (!contactSources.includes(data.source as ContactLead["source"])) {
+    data.source = "contact";
   }
 
   if (Object.keys(fieldErrors).length > 0) {
