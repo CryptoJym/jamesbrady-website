@@ -17,14 +17,36 @@ export const metadata: Metadata = {
     template: "%s — James Brady",
   },
   description:
-    "AI systems, protocols, and programs on a mathematical substrate. Tools that work.",
-  metadataBase: new URL("https://jamesbrady.org"),
+    "James Brady builds production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
+  metadataBase: new URL("https://www.jamesbrady.org"),
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "James Brady — AI Alchemist",
+    title: "James Brady — AI Alchemist",
+    description:
+      "Production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
+    url: "/",
+    images: [
+      {
+        url: "/images/hero-alchemy-md.jpg",
+        alt: "James Brady — AI Alchemist",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "James Brady — AI Alchemist",
+    description:
+      "Production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
+    images: ["/images/hero-alchemy-md.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
   alternates: {
+    canonical: "/",
     types: {
       "application/rss+xml": "/feed.xml",
     },
@@ -37,7 +59,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+    >
       <body className="antialiased bg-[#0A0A0A] text-[#E8E4DD] font-sans noise-overlay">
         <Navigation />
         <main className="pt-20">{children}</main>
@@ -52,8 +78,8 @@ export default function RootLayout({
                   James Brady
                 </p>
                 <p className="text-neutral-500 text-sm leading-relaxed max-w-[35ch]">
-                  AI systems, protocols, and programs on a mathematical
-                  substrate.
+                  Production AI systems, agent architectures, and practical
+                  tools that work.
                 </p>
               </div>
               <div className="md:col-span-3 md:col-start-8">
@@ -94,6 +120,12 @@ export default function RootLayout({
                     className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
                   >
                     Watch
+                  </a>
+                  <a
+                    href="/contact"
+                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
+                  >
+                    Contact
                   </a>
                 </div>
               </div>

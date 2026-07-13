@@ -12,6 +12,7 @@ const links = [
   { href: '/about', label: 'About' },
   { href: '/links', label: 'Links' },
   { href: '/watch', label: 'Watch' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export function Navigation() {
@@ -25,14 +26,10 @@ export function Navigation() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
   return (
     <>
       <nav
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-[720px] transition-all duration-600 ease-out-expo ${
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-[820px] transition-all duration-600 ease-out-expo ${
           scrolled
             ? 'bg-[#0A0A0A]/90 backdrop-blur-xl border border-[#1E1E1E] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
             : 'bg-[#0A0A0A]/60 backdrop-blur-md border border-[#1E1E1E]/50'
@@ -52,7 +49,7 @@ export function Navigation() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`relative text-[13px] tracking-wide px-3.5 py-1.5 rounded-full transition-all duration-500 ease-out-expo ${
+                className={`relative text-[13px] tracking-wide px-3 py-1.5 rounded-full transition-all duration-500 ease-out-expo ${
                   pathname === l.href
                     ? 'text-[#D4A853] bg-[#D4A853]/8'
                     : 'text-neutral-400 hover:text-[#E8E4DD] hover:bg-white/[0.03]'
@@ -65,7 +62,7 @@ export function Navigation() {
 
           {/* Mobile toggle */}
           <button
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpen((current) => !current)}
             className="md:hidden text-neutral-400 hover:text-[#E8E4DD] transition-colors duration-300 p-1"
             aria-label="Toggle menu"
           >

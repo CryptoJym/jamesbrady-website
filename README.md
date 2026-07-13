@@ -1,6 +1,6 @@
-# James Brady | Human-AI Manifold
+# James Brady — AI Alchemist
 
-A sophisticated 3D visualization of Human-AI interaction dynamics, built with Next.js, React Three Fiber, and custom shaders.
+The source for [jamesbrady.org](https://www.jamesbrady.org): an editorial personal site about production AI systems, agent architecture, tools, and practical implementation.
 
 ## Overview
 
@@ -23,7 +23,7 @@ This project visualizes the relationship between Human and AI states through thr
 
 ## Tech Stack
 
--   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+-   **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 -   **3D Engine**: [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) / [Three.js](https://threejs.org/)
 -   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 -   **State Management**: [Zustand](https://github.com/pmndrs/zustand)
@@ -44,6 +44,10 @@ This project visualizes the relationship between Human and AI states through thr
 
 3.  **Open the application**:
     Navigate to [http://localhost:3000](http://localhost:3000) (or the port specified in the console).
+
+## Lead delivery
+
+The `/contact` form sends inquiries through a Server Action to the shared Utlyze lead gateway, which stores the inquiry and forwards it to the published HighLevel workflow. No CRM secret is exposed in this public repository. Set `LEAD_INGEST_URL` only when a local or staging override is needed, and never expose it with a `NEXT_PUBLIC_` prefix.
 
 ## Key Components
 

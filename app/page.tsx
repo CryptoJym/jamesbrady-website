@@ -47,16 +47,21 @@ export default function Home() {
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "James Brady — AI Alchemist",
-            url: "https://jamesbrady.org",
+            url: "https://www.jamesbrady.org",
             description:
-              "AI systems, protocols, and programs on a mathematical substrate. Tools that work.",
+              "Production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
             author: {
               "@type": "Person",
               name: "James Brady",
               jobTitle: "AI Alchemist",
-              url: "https://jamesbrady.org/about",
+              url: "https://www.jamesbrady.org/about",
+              sameAs: [
+                "https://www.linkedin.com/in/jamesbrady1/",
+                "https://x.com/h3roai",
+                "https://github.com/CryptoJym",
+              ],
             },
-          }),
+          }).replace(/</g, "\\u003c"),
         }}
       />
 
@@ -87,13 +92,25 @@ export default function Home() {
               <div className="w-24 h-[2px] bg-[#D4A853] mt-8 animate-gold-line" />
 
               <p className="text-neutral-400 text-lg leading-relaxed max-w-[50ch] mt-8 animate-fade-up stagger-2">
-                Systems, protocols, and programs on a mathematical substrate.
-                Turning raw AI into tools that work.
+                Production AI systems, agent architectures, and programs on a
+                mathematical substrate. Turning frontier models into tools that
+                work.
               </p>
             </div>
 
             <div className="md:col-span-4 md:col-start-9 animate-fade-up stagger-3">
               <div className="flex flex-col gap-4">
+                <Link
+                  href="/contact"
+                  className="group inline-flex items-center gap-3 text-sm text-[#D4A853] hover:text-[#E5C87A] transition-all duration-500 ease-out-expo"
+                >
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-[#D4A853]/30 bg-[#D4A853]/10 group-hover:border-[#D4A853]/50 group-hover:bg-[#D4A853]/15 transition-all duration-500 ease-out-expo">
+                    <ArrowUpRight size={14} weight="bold" />
+                  </span>
+                  <span className="tracking-wide uppercase text-xs font-medium">
+                    Work with James
+                  </span>
+                </Link>
                 <Link
                   href="/primer"
                   className="group inline-flex items-center gap-3 text-sm text-[#D4A853] hover:text-[#E5C87A] transition-all duration-500 ease-out-expo"
@@ -325,6 +342,44 @@ export default function Home() {
               </ScrollReveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      <SectionDivider variant="hexline" className="my-4" />
+
+      <section className="px-6 md:px-12 py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto">
+          <ScrollReveal>
+            <div className="relative overflow-hidden rounded-[32px] border border-[#D4A853]/20 bg-[#10100F] px-7 py-12 md:px-14 md:py-16">
+              <div className="absolute -right-24 -top-28 h-72 w-72 rounded-full bg-[#D4A853]/[0.08] blur-3xl" />
+              <div className="relative grid grid-cols-1 gap-10 md:grid-cols-12 md:items-end">
+                <div className="md:col-span-8">
+                  <p className="eyebrow mb-5">Work with James</p>
+                  <h2 className="text-4xl md:text-6xl font-bold tracking-tighter leading-[0.95] text-[#E8E4DD] max-w-[13ch]">
+                    Have a system worth building?
+                  </h2>
+                  <p className="mt-6 max-w-[58ch] text-neutral-400 leading-relaxed">
+                    Bring the real problem, the constraints, and the outcome.
+                    I&apos;ll help determine whether AI belongs in the system—and
+                    what it takes to ship it well.
+                  </p>
+                </div>
+                <div className="md:col-span-3 md:col-start-10">
+                  <Link
+                    href="/contact"
+                    className="group inline-flex w-full items-center justify-between rounded-full border border-[#D4A853]/30 bg-[#D4A853] px-6 py-4 text-sm font-semibold text-[#0A0A0A] transition-premium hover:bg-[#E5C87A]"
+                  >
+                    Start a conversation
+                    <ArrowUpRight
+                      size={16}
+                      weight="bold"
+                      className="transition-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
     </>
