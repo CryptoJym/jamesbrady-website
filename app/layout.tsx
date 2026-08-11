@@ -1,173 +1,45 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import {
-  RssSimple,
-  FileText,
-  Code,
-  ArrowUpRight,
-} from "@phosphor-icons/react/dist/ssr";
-import { Navigation } from "@/components/Navigation";
-import SectionDivider from "@/components/SectionDivider";
+
+import { Dock } from "@/components/site/Dock";
+import { SITE } from "@/lib/seo/site";
 import "./globals.css";
 
+/**
+ * Root layout. Holds only what is genuinely sitewide: the document, the skip
+ * link, the grain, and the Ask dock. Page chrome lives in the route-group
+ * layouts — app/(site) carries Direction B, app/(legacy) keeps the archived
+ * volumes on their existing skin at their existing URLs.
+ *
+ * Every route's own metadata comes from lib/seo/metadata.ts. Nothing here sets
+ * a canonical, because a layout-level canonical is exactly how the live site
+ * ended up canonicalizing every subpage to the homepage.
+ */
 export const metadata: Metadata = {
-  title: {
-    default: "James Brady — AI Alchemist",
-    template: "%s — James Brady",
-  },
-  description:
-    "James Brady builds production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
-  metadataBase: new URL("https://www.jamesbrady.org"),
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    siteName: "James Brady — AI Alchemist",
-    title: "James Brady — AI Alchemist",
-    description:
-      "Production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
-    url: "/",
-    images: [
-      {
-        url: "/images/hero-alchemy-md.jpg",
-        alt: "James Brady — AI Alchemist",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "James Brady — AI Alchemist",
-    description:
-      "Production AI systems, agent architectures, and practical tools that turn frontier models into working leverage.",
-    images: ["/images/hero-alchemy-md.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  alternates: {
-    canonical: "/",
-    types: {
-      "application/rss+xml": "/feed.xml",
-    },
-  },
+  title: { default: SITE.title, template: "%s — James Brady" },
+  description: SITE.description,
+  metadataBase: new URL(SITE.host),
+  alternates: { types: { "application/rss+xml": "/feed.xml" } },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
       data-scroll-behavior="smooth"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
-      <body className="antialiased bg-[#0A0A0A] text-[#E8E4DD] font-sans noise-overlay">
-        <Navigation />
-        <main className="pt-20">{children}</main>
-
-        <SectionDivider variant="wave" className="mt-32 mb-0" />
-
-        <footer className="border-t border-[#1E1E1E]">
-          <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 md:py-24">
-              <div className="md:col-span-5">
-                <p className="text-[#D4A853] font-semibold tracking-tight text-lg mb-3">
-                  James Brady
-                </p>
-                <p className="text-neutral-500 text-sm leading-relaxed max-w-[35ch]">
-                  Production AI systems, agent architectures, and practical
-                  tools that work.
-                </p>
-              </div>
-              <div className="md:col-span-3 md:col-start-8">
-                <p className="eyebrow mb-4">Navigate</p>
-                <div className="flex flex-col gap-2.5">
-                  <a
-                    href="/primer"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    The Primer
-                  </a>
-                  <a
-                    href="/manuscript"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    The Manuscript
-                  </a>
-                  <a
-                    href="/workshop"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    The Workshop
-                  </a>
-                  <a
-                    href="/about"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    About
-                  </a>
-                  <a
-                    href="/links"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Links
-                  </a>
-                  <a
-                    href="/watch"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Watch
-                  </a>
-                  <a
-                    href="/contact"
-                    className="text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    Contact
-                  </a>
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <p className="eyebrow mb-4">Meta</p>
-                <div className="flex flex-col gap-3">
-                  <a
-                    href="/feed.xml"
-                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    <RssSimple size={14} weight="light" />
-                    RSS
-                  </a>
-                  <a
-                    href="/llms.txt"
-                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    <FileText size={14} weight="light" />
-                    llms.txt
-                  </a>
-                  <a
-                    href="/api/catalog"
-                    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4A853] transition-premium"
-                  >
-                    <Code size={14} weight="light" />
-                    API
-                    <ArrowUpRight size={10} weight="bold" className="opacity-40" />
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-[#1E1E1E] py-6 flex flex-col md:flex-row justify-between items-center gap-3">
-              <span className="text-xs text-neutral-600">
-                &copy; {new Date().getFullYear()} James Brady. All rights
-                reserved.
-              </span>
-              <span className="text-xs text-neutral-700 font-mono">
-                Built with AI agents
-              </span>
-            </div>
-          </div>
-        </footer>
+      <body>
+        <a className="skip" href="#main">
+          Skip to content
+        </a>
+        <div className="grain" aria-hidden="true" />
+        {children}
+        <Dock />
       </body>
     </html>
   );

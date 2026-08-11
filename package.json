@@ -7,7 +7,9 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "og": "node scripts/make-og.mjs",
+    "verify:seo": "node scripts/verify-seo.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

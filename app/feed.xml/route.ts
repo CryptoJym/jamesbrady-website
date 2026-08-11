@@ -1,45 +1,73 @@
-import { catalog } from "@/lib/catalog";
+import { discoverableTheories, work } from "@/lib/content";
+import { SITE, absolute } from "@/lib/seo/site";
 
+export const dynamic = "force-static";
+
+function esc(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function rfc822(iso: string): string {
+  return new Date(`${iso}T00:00:00Z`).toUTCString();
+}
+
+/**
+ * RSS, generated from the collections.
+ *
+ * Channel lastBuildDate is max(item dateModified), NOT new Date(): a feed
+ * whose build date moves without its content moving trains aggregators to
+ * ignore it. Every link is www — the old feed emitted bare jamesbrady.org,
+ * which undercut the canonicals.
+ */
 export function GET() {
-  const now = new Date().toUTCString();
-
   const items = [
-    {
-      title: "The Primer — How Coding Systems Work",
-      link: "https://jamesbrady.org/primer",
-      description:
-        "Code, the stack, AI agents, skills, and MCP — explained for humans.",
-    },
-    {
-      title: "The Manuscript — Curated Tools & Servers",
-      link: "https://jamesbrady.org/manuscript",
-      description: `A curated catalog of ${catalog.reduce((n, c) => n + c.tools.length, 0)} tools across ${catalog.length} categories.`,
-    },
-    {
-      title: "The Workshop — Build Something",
-      link: "https://jamesbrady.org/workshop",
-      description:
-        "Three practical guides: set up an AI agent, install skills, connect MCP servers.",
-    },
-  ];
+    ...work.map((w) => ({
+      title: w.title,
+      path: `/work/${w.slug}`,
+      description: w.answerCapsule,
+      datePublished: w.datePublished,
+      dateModified: w.dateModified,
+      category: "Work",
+    })),
+    ...discoverableTheories.map((t) => ({
+      title: t.title,
+      path: `/theories/${t.slug}`,
+      description: t.answerCapsule,
+      datePublished: t.datePublished,
+      dateModified: t.dateModified,
+      category: "Theories",
+    })),
+  ]
+    .sort((a, b) => (a.dateModified < b.dateModified ? 1 : -1))
+    .slice(0, 50);
+
+  const lastBuildDate = rfc822(
+    items.map((i) => i.dateModified).sort().slice(-1)[0] ?? items[0].datePublished,
+  );
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>James Brady — AI Alchemist</title>
-    <link>https://jamesbrady.org</link>
-    <description>AI systems, protocols, and programs on a mathematical substrate. Tools that work.</description>
+    <title>${esc(SITE.name)}</title>
+    <link>${absolute("/")}</link>
+    <description>${esc(SITE.descriptor)}</description>
     <language>en-us</language>
-    <lastBuildDate>${now}</lastBuildDate>
-    <atom:link href="https://jamesbrady.org/feed.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>${lastBuildDate}</lastBuildDate>
+    <atom:link href="${absolute("/feed.xml")}" rel="self" type="application/rss+xml"/>
 ${items
   .map(
     (item) => `    <item>
-      <title>${item.title}</title>
-      <link>${item.link}</link>
-      <description>${item.description}</description>
-      <guid>${item.link}</guid>
-    </item>`
+      <title>${esc(item.title)}</title>
+      <link>${absolute(item.path)}</link>
+      <guid isPermaLink="true">${absolute(item.path)}</guid>
+      <pubDate>${rfc822(item.datePublished)}</pubDate>
+      <category>${esc(item.category)}</category>
+      <description>${esc(item.description)}</description>
+    </item>`,
   )
   .join("\n")}
   </channel>

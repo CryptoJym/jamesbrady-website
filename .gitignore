@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# Client-name denylist. The committed file is a PLACEHOLDER with a marker and
+# no terms; CI materializes the real list from the CLIENT_DENYLIST secret and
+# must never commit it back.
+.seo-denylist.local.txt

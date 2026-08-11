@@ -1,24 +1,22 @@
 import type { MetadataRoute } from "next";
 
-const baseUrl = "https://www.jamesbrady.org";
+import { indexableRoutes } from "@/lib/seo/routes";
+import { absolute } from "@/lib/seo/site";
 
+/**
+ * Sitemap with a REAL per-URL lastModified (geo-seo-spec §5.3).
+ *
+ * Entry routes use their own dateModified; index routes use max(children);
+ * hand-built TSX routes use the git last-commit date of their own files.
+ * changeFrequency and priority are dropped — major engines ignore them and
+ * they invite hand-typed drift.
+ *
+ * CI must check out with full history (fetch-depth: 0), or the git dates
+ * collapse to the clone date. verify-seo check 6 catches that.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    { url: baseUrl, changeFrequency: "monthly", priority: 1 },
-    { url: `${baseUrl}/primer`, changeFrequency: "monthly", priority: 0.9 },
-    {
-      url: `${baseUrl}/manuscript`,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/workshop`,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    { url: `${baseUrl}/watch`, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/about`, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/links`, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${baseUrl}/contact`, changeFrequency: "yearly", priority: 0.8 },
-  ];
+  return indexableRoutes().map((r) => ({
+    url: absolute(r.path),
+    lastModified: new Date(`${r.lastModified}T00:00:00Z`),
+  }));
 }
