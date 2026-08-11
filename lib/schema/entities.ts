@@ -81,8 +81,17 @@ export const websiteNode = {
   inLanguage: "en-US",
 } as const;
 
-/** The identity nodes every page carries. */
-export const identityNodes = [personNode, utlyzeNode, newRewardNode];
+/**
+ * The identity nodes every page carries.
+ *
+ * WebSite is in here, not only on `/` (independent review, P1-4). Every
+ * template emits `isPartOf: {"@id": …/#website"}`, and a graph that REFERENCES
+ * a node it does not DEFINE is a dangling edge for anything crawling that URL
+ * standalone — the same defect the "never a bespoke Person copy" ruling
+ * closed for Person. verify-seo check 2 now fails on any unresolved @id, so
+ * dropping a node from this list breaks the build rather than the graph.
+ */
+export const identityNodes = [personNode, utlyzeNode, newRewardNode, websiteNode];
 
 export const personRef = { "@id": PERSON_ID } as const;
 

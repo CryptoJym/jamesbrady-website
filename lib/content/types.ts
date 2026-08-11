@@ -112,6 +112,39 @@ export type ProofMetric = {
   state: "active" | "live" | "paused" | "dormant";
 };
 
+/**
+ * One fact on a work card's foot line.
+ *
+ * P0-1 (independent review, 2026-08-11): the foot line used to be a free-text
+ * string that RE-TYPED computed data — "Python · 3 stars" alongside a
+ * `repo.stars: 3` two lines below it, "7 domains · 28 questions" alongside the
+ * capsule that states the same figures. A typed parallel copy of a computed
+ * value is exactly what the site brief bans, and it drifts silently.
+ *
+ * So a foot fact is either:
+ *   · a REFERENCE to a field the rest of the site already reads, resolved by
+ *     the template at render time (`field`), or
+ *   · a MEASURE that lives nowhere else, in which case the numeral is a
+ *     `number`, the unit is a separate string, and `method` says where the
+ *     figure came from — the same contract ProofMetric already carries, or
+ *   · pure prose, in which case validation REJECTS any digit in it.
+ *
+ * There is no fourth shape. A numeral can only reach a card by being data.
+ */
+export type FootFact =
+  /** Resolves to `repo.stars` from the dated snapshot. */
+  | { field: "repo.stars" }
+  /** Resolves to `stack[0]` — the same value JSON-LD uses as programmingLanguage. */
+  | { field: "stack.primary" }
+  /** Resolves to `repo.license`. */
+  | { field: "repo.license" }
+  /** Resolves to `anonymized`. */
+  | { field: "anonymized" }
+  /** A measured count with its unit and its method, held apart. */
+  | { count: number; unit: string; method: string }
+  /** Prose. Validation rejects digits — a number here has no method. */
+  | { label: string };
+
 export type WorkEntry = BaseEntry & {
   collection: "work";
   kicker: string;
@@ -122,8 +155,8 @@ export type WorkEntry = BaseEntry & {
   repo?: RepoRef;
   anonymized: boolean;
   clearance?: { clientName: string; grantedAt: string; scope: string };
-  /** Card foot line — the unit this card is showing. */
-  footUnit: string;
+  /** Card foot line, structured. See FootFact — never a hand-typed string. */
+  footFacts: FootFact[];
   /** Present only on entries that earn a slot in the home proof bank. */
   proofMetric?: ProofMetric;
   /** Live URLs checked read-only, with the date of the check. */

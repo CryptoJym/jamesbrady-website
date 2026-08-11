@@ -25,7 +25,7 @@ export const entry: WorkEntry = {
   ],
   timeframe: { start: "2025-11" },
   anonymized: true,
-  footUnit: "In production · anonymized",
+  footFacts: [{ label: "In production" }, { field: "anonymized" }],
   liveUrls: [
     { url: "https://new-rewards.vercel.app", checkedAt: "2026-08-11", status: 200 },
     { url: "https://newreward.com", checkedAt: "2026-08-11", status: 200 },

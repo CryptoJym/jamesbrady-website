@@ -8,18 +8,39 @@
 // animates, that the readout numbers on screen equal the collection-derived
 // values, that the CSS-counter tally really recounts when a filter changes,
 // that reduced-motion and no-JS both fall back to the static SVG, and that the
-// archived volumes still render. Screenshots land in docs/evidence/wave-1/.
+// five archived routes render EXACTLY as they do on main.
+//
+// SCREENSHOT DESTINATION. By default screenshots go to the UNTRACKED out/
+// directory. Pass --update-evidence to write docs/evidence/wave-1/ instead.
+// Before this split, every run rewrote 16 tracked PNGs — a review lane watched
+// them mutate by 8 bytes each on a re-run and had to work out whether that was
+// drift or tampering. Evidence should change when someone decides to refresh
+// it, not as a side effect of verifying.
+//
+// LEGACY PARITY (independent review, P1-2). --legacy-base <url> points at a
+// second server running a build of `main`; the two /primer renders are then
+// pixel-diffed and any difference fails. Without it the legacy check degrades
+// to "still renders", and says so rather than implying parity it did not test.
 
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 import { chromium } from "playwright";
 
-const BASE = process.argv.includes("--base")
-  ? process.argv[process.argv.indexOf("--base") + 1]
-  : "http://localhost:4123";
-const OUT = join(process.cwd(), "docs", "evidence", "wave-1");
+const arg = (flag) =>
+  process.argv.includes(flag) ? process.argv[process.argv.indexOf(flag) + 1] : null;
+
+const BASE = arg("--base") ?? "http://localhost:4123";
+/** A server running a build of `main`, for the legacy pixel-diff. */
+const LEGACY_BASE = arg("--legacy-base");
+const UPDATE_EVIDENCE = process.argv.includes("--update-evidence");
+const OUT = UPDATE_EVIDENCE
+  ? join(process.cwd(), "docs", "evidence", "wave-1")
+  : join(process.cwd(), "out", "verify-visual");
 mkdirSync(OUT, { recursive: true });
+
+/** The five archived routes, which must render exactly as they do on main. */
+const LEGACY_ROUTES = ["/primer", "/manuscript", "/workshop", "/links", "/watch"];
 
 let failed = 0;
 const report = (name, ok, detail) => {
@@ -271,6 +292,121 @@ report(
 );
 await page.screenshot({ path: join(OUT, "primer-legacy-1440.png"), fullPage: true });
 
+/* ------------------------------------------- LEGACY PARITY AGAINST main --- */
+//
+// The gate the review asked for. A shared tailwind.config.js, a shared
+// globals.css and a shared root layout mean a Direction B change can re-render
+// five pages nobody touched: a `spacing` key moved p-8 from 32px to 64px, a
+// `body{font-size:15px}` rule re-typeset all five, and the grain overlay and
+// the Ask dock painted on pages that never had them. None of that showed up in
+// a "still renders" assertion, which is why this one compares PIXELS.
+
+if (LEGACY_BASE) {
+  // Both sides are captured the SAME way, and the way removes TIME from the
+  // comparison. The legacy skin's reveal animations run 800ms with staggered
+  // delays, so two screenshots of the same page taken at different moments
+  // differ by thousands of pixels for no reason at all — measured at 7,237 px
+  // between two identical renders. So: settle past the longest reveal, then
+  // freeze animations and transitions at whatever state they reached.
+  //
+  // Do NOT scroll here. Scrolling fires the IntersectionObserver that gates
+  // the below-the-fold reveals, and whether it has fired by screenshot time is
+  // a race — measured at 1,391,008 px of pure noise. A fullPage capture goes
+  // through CDP captureBeyondViewport, which does not fire the observer, so
+  // leaving the page at the top makes both sides deterministic.
+  const FREEZE = `*,*::before,*::after{
+    animation-duration:0s !important; animation-delay:0s !important;
+    transition-duration:0s !important; transition-delay:0s !important;
+  }`;
+  const parityShot = async (base, route) => {
+    const p = await desktop.newPage();
+    await p.goto(`${base}${route}`, { waitUntil: "networkidle" });
+    await p.waitForTimeout(2000);
+    await p.addStyleTag({ content: FREEZE });
+    const buf = await p.screenshot({ fullPage: true });
+    await p.close();
+    return buf;
+  };
+
+  // All FIVE archived routes, not just /primer. They share one layout, one
+  // stylesheet and one tailwind config, so a leak reaches all of them — and a
+  // gate that watches one page while four go unwatched invites the next fix to
+  // land on the page nobody is looking at.
+  const parityFailures = [];
+  const parityDetail = [];
+  for (const route of LEGACY_ROUTES) {
+    const branchShot = await parityShot(BASE, route);
+    const mainShot = await parityShot(LEGACY_BASE, route);
+    if (route === "/primer") {
+      // Keep the pair on disk for the one route the evidence packet names.
+      const { writeFileSync } = await import("node:fs");
+      writeFileSync(join(OUT, "primer-main-1440.png"), mainShot);
+    }
+
+  const diff = await page.evaluate(
+    async ([a, b]) => {
+      const load = (b64) =>
+        new Promise((res) => {
+          const img = new Image();
+          img.onload = () => res(img);
+          img.src = `data:image/png;base64,${b64}`;
+        });
+      const [ia, ib] = await Promise.all([load(a), load(b)]);
+      if (ia.width !== ib.width || ia.height !== ib.height) {
+        return { sizeMismatch: `${ia.width}x${ia.height} vs ${ib.width}x${ib.height}`, changed: -1, total: 0 };
+      }
+      const c = document.createElement("canvas");
+      c.width = ia.width;
+      c.height = ia.height;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(ia, 0, 0);
+      const da = ctx.getImageData(0, 0, c.width, c.height).data;
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.drawImage(ib, 0, 0);
+      const db = ctx.getImageData(0, 0, c.width, c.height).data;
+      let n = 0;
+      for (let i = 0; i < da.length; i += 4) {
+        if (
+          Math.abs(da[i] - db[i]) +
+            Math.abs(da[i + 1] - db[i + 1]) +
+            Math.abs(da[i + 2] - db[i + 2]) >
+          12
+        )
+          n++;
+      }
+      return { changed: n, total: da.length / 4 };
+    },
+    [branchShot.toString("base64"), mainShot.toString("base64")],
+  );
+
+    if (diff.sizeMismatch) {
+      parityFailures.push(
+        `${route}: page HEIGHT changed, ${diff.sizeMismatch} — a spacing or type token leaked into the archived skin`,
+      );
+    } else if (diff.changed !== 0) {
+      // Zero, not "close enough". These pages were explicitly out of scope, so
+      // any changed pixel is an unintended render change.
+      parityFailures.push(
+        `${route}: ${diff.changed} of ${diff.total} px differ (${((diff.changed / diff.total) * 100).toFixed(4)}%)`,
+      );
+    } else {
+      parityDetail.push(`${route}:0/${diff.total}`);
+    }
+  }
+  report(
+    `Legacy routes are pixel-identical to main (${LEGACY_ROUTES.length} routes)`,
+    parityFailures.length === 0,
+    parityFailures.length ? parityFailures.join(" | ") : `${parityDetail.join(" · ")} vs ${LEGACY_BASE}`,
+  );
+} else {
+  report(
+    "Legacy routes are pixel-identical to main",
+    false,
+    "NOT RUN — pass --legacy-base <url> pointing at a server running a build of " +
+      "main. A legacy check that does not compare against main is not a parity check.",
+  );
+}
+
 /* --------------------------------------------------------------- 375 mobile */
 
 const mobile = await browser.newContext({
@@ -353,5 +489,7 @@ await browser.close();
 
 console.log("─".repeat(72));
 console.log(failed ? `${failed} visual check(s) FAILED` : "all visual checks passed");
-console.log(`screenshots → docs/evidence/wave-1/`);
+console.log(
+  `screenshots → ${UPDATE_EVIDENCE ? "docs/evidence/wave-1/ (tracked evidence REFRESHED)" : "out/verify-visual/ (untracked; pass --update-evidence to refresh the committed set)"}`,
+);
 process.exit(failed ? 1 : 0);

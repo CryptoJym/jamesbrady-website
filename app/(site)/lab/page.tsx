@@ -29,6 +29,7 @@ export default function LabPage() {
       <section className="work work--bare">
         <div className="wrap" style={{ paddingTop: "var(--s-8)" }}>
           <SectionHead
+            level={1}
             eyebrow="Lab"
             heading="Things you can poke at."
             aside="Every artifact here ships with a written explanation page. One that does not is excluded from search engines by the loader, not by anyone remembering to set a flag."
@@ -42,7 +43,7 @@ export default function LabPage() {
                     <Dot state={entry.state} /> {entry.stateWord}
                   </span>
                 </div>
-                <h3>{entry.title}</h3>
+                <h2 className="card__title">{entry.title}</h2>
                 <p className="card__body">{entry.answerCapsule}</p>
                 <div className="prose" style={{ fontSize: "var(--ts-small)" }}>
                   <Prose html={renderMarkdown(entry.body)} />

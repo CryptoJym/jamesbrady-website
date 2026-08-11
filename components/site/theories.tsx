@@ -7,13 +7,23 @@ import { Dot, DOT_WORD } from "./instruments";
  * A theory row. The maturity state is shown as prominently as the title, and
  * amber means paused — only ever paused. `--warn` never means "bad".
  */
-export function TheoryRow({ entry, index }: { entry: TheoryEntry; index: number }) {
+export function TheoryRow({
+  entry,
+  index,
+  headingLevel = 3,
+}: {
+  entry: TheoryEntry;
+  index: number;
+  /** 2 on the /theories index, where the section head is the page h1. */
+  headingLevel?: 2 | 3;
+}) {
   const state = entry.paused ? "paused" : "active";
+  const Heading = (headingLevel === 2 ? "h2" : "h3") as "h2" | "h3";
   return (
     <article className="thy__row">
       <p className="thy__n">T-{String(index + 1).padStart(2, "0")}</p>
       <div>
-        <h3 className="thy__name">{entry.name}</h3>
+        <Heading className="thy__name">{entry.name}</Heading>
         <span className={entry.paused ? "thy__flag thy__flag--warn" : "thy__flag"}>
           {entry.flagLabel}
         </span>
@@ -31,11 +41,17 @@ export function TheoryRow({ entry, index }: { entry: TheoryEntry; index: number 
   );
 }
 
-export function TheoryList({ entries }: { entries: TheoryEntry[] }) {
+export function TheoryList({
+  entries,
+  headingLevel,
+}: {
+  entries: TheoryEntry[];
+  headingLevel?: 2 | 3;
+}) {
   return (
     <div className="thy">
       {entries.map((e, i) => (
-        <TheoryRow key={e.slug} entry={e} index={i} />
+        <TheoryRow key={e.slug} entry={e} index={i} headingLevel={headingLevel} />
       ))}
     </div>
   );

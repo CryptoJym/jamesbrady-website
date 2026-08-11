@@ -127,11 +127,21 @@
    ============================================================ */
 .slot__val,.readout .v,.tally .n{transition:none;animation:none}
 
-/* ============================================================ RESET */
+/* ============================================================ RESET
+   SCOPE RULE (independent review, P1-2): document-level metrics stay OFF
+   `body`. `body` is shared with the five archived routes, which inherit
+   whatever is set here — a 15px/1.6 body rule silently re-typeset all five.
+   Everything Direction B needs lives on `.b-room`, which wraps every new
+   surface (app/(site)/layout.tsx). `body` keeps only what main already had:
+   margin:0 from preflight, plus the page-canvas colour so overscroll is not
+   white. verify-visual's legacy pixel-diff gate fails if this drifts back. */
 .b-room *,.b-room *::before,.b-room *::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;color-scheme:dark}
+html{-webkit-text-size-adjust:100%}
 body{
   margin:0;
+  background:var(--c-base);
+}
+.b-room{
   background:var(--c-base);
   color:var(--t-mid);
   font-family:var(--f-inst);
@@ -140,7 +150,11 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   font-variant-numeric:tabular-nums;
-  overflow-x:hidden;
+  color-scheme:dark;
+  min-height:100vh;
+  /* `clip`, never `hidden`: hidden makes .b-room a scroll container and the
+     sticky nav would stick to it instead of to the viewport. */
+  overflow-x:clip;
 }
 /* The comp's reset zeroes margins on h1-h3/p/figure/ul and strips list styling.
    Tailwind's preflight already does exactly that, globally, so re-stating it
@@ -159,11 +173,15 @@ body{
    width; each button component states its own colour. */
 
 /* Interaction feedback is --sig's documented fourth role (ruling B). */
-.b-room :focus-visible,.skip:focus-visible,.dock:focus-visible{
+.b-room :focus-visible,.skip:focus-visible{
   outline:2px solid var(--sig);
   outline-offset:3px;
   border-radius:2px;
 }
+/* The dock's ring goes on the PILL, not on the invisible stretched hit target,
+   which would draw a rectangle across the rounded edge. */
+.dock:has(.dock__hit:focus-visible){outline:2px solid var(--sig);outline-offset:3px}
+.dock__hit:focus-visible{outline:none}
 
 .vh{
   position:absolute;width:1px;height:1px;margin:-1px;padding:0;
@@ -528,6 +546,32 @@ main:focus{outline:none}
 .b-room h2{
   font-size:var(--ts-h2);font-weight:600;
   letter-spacing:var(--track-display);color:var(--t-hi);line-height:1.15;
+}
+/* HEADING LEVEL IS STRUCTURE, NOT STYLE (independent review, P1-5).
+   /work, /theories, /lab and /learn had no <h1> at all: the section head was
+   an <h2> and the items under it were <h3>. Promoting the section head to the
+   page <h1> and the items to <h2> fixes the outline WITHOUT moving a pixel —
+   these three rules pin each promoted element to the metrics it already
+   rendered at. Out-specify .b-room h1 / .b-room h2 by one class each. */
+.b-room .sec-head h1{
+  font-size:var(--ts-h2);font-weight:600;
+  letter-spacing:var(--track-display);color:var(--t-hi);line-height:1.15;
+  max-width:none;
+}
+.b-room .card__title{
+  font-size:var(--ts-h3);font-weight:600;
+  letter-spacing:var(--track-display);color:var(--t-hi);line-height:1.25;
+  max-width:none;
+}
+/* NOTE for wave 2: .thy__name asks for --ts-serif-md but `.b-room h3` (one
+   class + one type) already out-specified it, so theory names have always
+   rendered at --ts-h3. Pinned here deliberately so the h3→h2 promotion is
+   invisible; whether the serif display size was the intent is a design
+   question, not a heading-outline question, and it is not decided here. */
+.b-room .thy__name{
+  font-size:var(--ts-h3);font-weight:600;
+  letter-spacing:var(--track-display);color:var(--t-hi);line-height:1.25;
+  max-width:none;
 }
 .sec-aside{
   font-family:var(--f-mono);font-size:var(--ts-micro);
@@ -930,8 +974,17 @@ main:focus{outline:none}
   font-size:var(--ts-micro);color:var(--t-lo);font-family:var(--f-mono);
   letter-spacing:var(--track-data);
 }
-.dock__mail{color:var(--sig);text-decoration:underline;text-underline-offset:3px}
-.dock:hover,.dock:focus-visible,.dock.is-open{
+.dock__mail{color:var(--sig);text-decoration:underline;text-underline-offset:3px;
+  position:relative;z-index:1}
+/* The hit target. Absolutely positioned, so it is OUT OF FLOW and never
+   becomes a third grid item — the pill's geometry is unchanged from when
+   .dock was itself the <button> (independent review, P3). */
+.dock__hit{
+  position:absolute;inset:0;z-index:0;
+  width:100%;height:100%;margin:0;padding:0;border:0;
+  background:none;border-radius:inherit;cursor:pointer;
+}
+.dock:hover,.dock:has(.dock__hit:focus-visible),.dock.is-open{
   width:min(330px,calc(100vw - var(--dock-gap) * 2));
   height:auto;min-height:var(--dock-size);
   grid-template-columns:auto 1fr;

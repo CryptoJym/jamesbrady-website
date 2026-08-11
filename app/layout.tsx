@@ -2,15 +2,19 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
-import { Dock } from "@/components/site/Dock";
 import { SITE } from "@/lib/seo/site";
 import "./globals.css";
 
 /**
- * Root layout. Holds only what is genuinely sitewide: the document, the skip
- * link, the grain, and the Ask dock. Page chrome lives in the route-group
- * layouts — app/(site) carries Direction B, app/(legacy) keeps the archived
- * volumes on their existing skin at their existing URLs.
+ * Root layout. Holds only the document and the skip link — nothing that
+ * paints. Page chrome lives in the route-group layouts: app/(site) carries
+ * Direction B (grain, console rail, nav, footer, Ask dock), app/(legacy)
+ * keeps the archived volumes on their existing skin at their existing URLs.
+ *
+ * The grain overlay and the Ask dock used to live here. Both painted on the
+ * five archived routes, which main does not have (independent review, P1-2) —
+ * they moved into app/(site)/layout.tsx and the legacy pixel-diff gate in
+ * verify-visual keeps them there.
  *
  * Every route's own metadata comes from lib/seo/metadata.ts. Nothing here sets
  * a canonical, because a layout-level canonical is exactly how the live site
@@ -37,9 +41,7 @@ export default function RootLayout({
         <a className="skip" href="#main">
           Skip to content
         </a>
-        <div className="grain" aria-hidden="true" />
         {children}
-        <Dock />
       </body>
     </html>
   );

@@ -23,7 +23,7 @@ export const entry: WorkEntry = {
   ],
   timeframe: { start: "2026-06" },
   anonymized: false,
-  footUnit: "Unit: $ per merged PR",
+  footFacts: [{ label: "Unit: dollars per merged pull request" }],
   repo: {
     owner: "CryptoJym",
     name: "plimsoll",

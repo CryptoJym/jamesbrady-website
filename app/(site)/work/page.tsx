@@ -33,6 +33,7 @@ export default function WorkIndexPage() {
       <section className="work work--bare">
         <div className="wrap" style={{ paddingTop: "var(--s-8)" }}>
           <SectionHead
+            level={1}
             eyebrow="Work"
             heading="What kind of thing do you want to look at?"
             aside={CAPSULE}
@@ -46,7 +47,7 @@ export default function WorkIndexPage() {
             repositories, and each card&rsquo;s foot line prints the unit it is showing.
           </p>
           <WorkFilters />
-          <WorkGrid entries={work} />
+          <WorkGrid entries={work} headingLevel={2} />
           <Tally />
           <PageNameplate
             source="The typed content source · dated repo snapshot"

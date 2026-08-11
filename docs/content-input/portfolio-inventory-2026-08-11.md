@@ -1,5 +1,9 @@
 # Portfolio inventory — merged research, 2026-08-11
 
+> **Redaction, 2026-08-11.** This repository is public. Client names are
+> withheld here under the anonymized-client policy: the industry stays, the
+> name and the domain go. Nothing else in this file was altered.
+
 Sources: three read-only research lanes (h3ro-dev census: 174 repos, 20 inspected;
 CryptoJym census: 139 repos, 21 inspected; beyond-GitHub sweep: domains, papers,
 identities, hardware) + lead-agent verification of conflicting claims. Facts
@@ -9,7 +13,7 @@ material for /work, /lab, and /about. Client names never appear here.
 ## The estate, in one paragraph
 
 Two GitHub identities (h3ro-dev org: 174 repos; CryptoJym user: 139), plus the
-Vuplicity org (13 repos; client relationship — see ruling below). The
+A background-screening SaaS client's org (13 repos; client relationship — see ruling below). The
 Apocaltips account on this machine is ANOTHER USER's (ruled by James
 2026-08-11) — its repos are excluded and never attributed. Three live business fronts (utlyze.com, newreward.com,
 seopr1.com) and a personal-methodology product (of1.ai). A governed 26-domain
@@ -68,7 +72,7 @@ STILL UNDECIDED (small, resolve in Phase 2):
 | adhd-founder.com | 200 live (VERIFIED) | Matches his adhd-founder-planner skill; authorship to confirm |
 | businessofone.ai + family | 21 live of 26 governed domains | Mostly Lovable landing pages; real apps: financeofone.com (CFOofOne), vcofone; audit: `businessofone/research/domain-repository-provider-map.md` |
 | plimsoll.dev / plimsoll-cloud.vercel.app | live | OSS + hosted tier |
-| vuplicity.com | live | RULED (James, 2026-08-11): client work — New Reward provided SEO/GEO. Anonymized-client policy applies; never framed as his venture |
+| (client domain withheld) | live | RULED (James, 2026-08-11): client work — New Reward provided SEO/GEO for a background-screening SaaS client. Anonymized-client policy applies; never framed as his venture |
 | jamesbrady.org | live | This site |
 | royal-rwa.com | DEAD — no response (VERIFIED) | Code exists (6 repos); royalrwa.com (no dash) is an unrelated stub — do not conflate |
 | h3ro.ai | NXDOMAIN (does not resolve) | Social handles (@h3roai, @h3ro.ai, h3ro-dev) imply a domain that doesn't exist |
@@ -102,7 +106,7 @@ STILL UNDECIDED (small, resolve in Phase 2):
 
 ## Open ownership/framing questions (for James)
 
-ANSWERED 2026-08-11: Vuplicity = client work (New Reward SEO/GEO). Royal RWA =
+ANSWERED 2026-08-11: a background-screening SaaS client = client work (New Reward SEO/GEO). Royal RWA =
 excluded, not his. Of One = thesis-in-progress case study. Lab picks =
 wrath-shield + games (+ manifold chat); glasses and trading stay off.
 

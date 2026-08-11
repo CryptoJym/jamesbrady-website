@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "og": "node scripts/make-og.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
-    "verify:visual": "node scripts/verify-visual.mjs"
+    "verify:visual": "node scripts/verify-visual.mjs",
+    "verify:fixtures": "node scripts/verify-fixtures.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

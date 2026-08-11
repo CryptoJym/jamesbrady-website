@@ -36,11 +36,12 @@ export default function TheoriesIndexPage() {
       <section className="theories theories--bare">
         <div className="wrap" style={{ paddingTop: "var(--s-8)" }}>
           <SectionHead
+            level={1}
             eyebrow="Theories"
             heading="Open questions I'm working in public."
             aside={`${CAPSULE} The ladder is named, sketched, developed, live demo — with paused as a separate flag, because paused is a status, not a rung. ${theoriesActive} active, ${theoriesPaused} paused.`}
           />
-          <TheoryList entries={discoverableTheories} />
+          <TheoryList entries={discoverableTheories} headingLevel={2} />
           <PageNameplate
             source="The typed content source"
             method="Listed where maturity is at least sketched; the count and the rows are the same list"

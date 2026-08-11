@@ -1,0 +1,4 @@
+F4 — the token as brand copy in ordinary prose.
+The h3ro-dev collective maintains the scanning skills used on this work.
+No URL anywhere near it. The old gate allowlisted the bare string `h3ro-dev`
+anywhere in a document, so this passed.

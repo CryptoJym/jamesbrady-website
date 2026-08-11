@@ -1,0 +1,5 @@
+CONTROL — the four permitted URL shapes. None of these may be flagged.
+https://x.com/h3roai
+https://www.tiktok.com/@h3ro.ai
+https://github.com/h3ro-dev/new-reward-seo-skills-os
+https://h3ro-dev.github.io/new-reward-seo-skills-os/

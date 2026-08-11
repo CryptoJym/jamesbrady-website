@@ -27,6 +27,7 @@ export default function LearnPage() {
       <section className="work work--bare">
         <div className="wrap" style={{ paddingTop: "var(--s-8)" }}>
           <SectionHead
+            level={1}
             eyebrow="Learn"
             heading="Three volumes, written earlier, kept where they were."
             aside="These are archived as written. They stay at their original URLs — nothing moved, nothing redirected — and each one carries the date it stopped being maintained. Archived is not the same as paused, and it is not the same as wrong."
@@ -39,11 +40,11 @@ export default function LearnPage() {
                   <ArchivedBadge date={entry.archivedDate} />
                 </div>
                 <p className="card__kicker">{entry.kicker}</p>
-                <h3>
+                <h2 className="card__title">
                   <Link className="card__link" href={entry.volumeRoute}>
                     {entry.title}
                   </Link>
-                </h3>
+                </h2>
                 <p className="card__body">{entry.answerCapsule}</p>
                 <p className="card__foot">
                   <span>{entry.volumeRoute}</span>{" "}

@@ -41,7 +41,12 @@ yarn-error.log*
 next-env.d.ts
 .env*.local
 
-# Client-name denylist. The committed file is a PLACEHOLDER with a marker and
-# no terms; CI materializes the real list from the CLIENT_DENYLIST secret and
-# must never commit it back.
+# Client-name denylist (geo-seo-spec §9-C: the live list is GITIGNORED).
+#
+# The gate reads .seo-denylist.txt and that name is ignored HERE, so a real
+# client list can never be committed by accident. The committed artifact is
+# .seo-denylist.example.txt, which carries the placeholder marker and no
+# terms. CI copies the example into place when the CLIENT_DENYLIST secret is
+# absent — and in CI mode that path fails the run, it does not pass.
+.seo-denylist.txt
 .seo-denylist.local.txt

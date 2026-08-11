@@ -10,10 +10,11 @@ export const dynamic = "force-static";
  *
  * The old public/llms.txt was deleted along with public/.well-known/
  * ai-manifest.json: a file in public/ shadows a route, and that is exactly how
- * both of them went stale ("AI Alchemist" naming, a 2025 last_updated string,
- * a five-page map, non-www URLs).
+ * both of them went stale: the retired job title in the name, a 2025
+ * last_updated string, a five-page map, non-www URLs. (The retired title is
+ * not quoted here — this file is inside the register-rule scan.)
  *
- * verify-seo check 5 asserts the URL set here equals the indexable route set.
+ * verify-seo check 6 asserts the URL set here equals the indexable route set.
  */
 export function GET() {
   const routes = indexableRoutes();

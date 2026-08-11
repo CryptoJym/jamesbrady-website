@@ -1,0 +1,6 @@
+F7 — the retired domain used as a destination, dressed as an allowlisted link.
+<a href="https://h3ro.ai/skills">Our skills</a>
+<a href="https://www.h3ro.ai">Home</a>
+The domain is banned outright by the ruling, allowlist or not. MEASURED: the
+old gate caught this too; it is kept so the domain rule cannot be folded into
+the URL allowlist by accident.

@@ -1,4 +1,4 @@
-# James Brady — AI Alchemist
+# James Brady — builds AI systems that show their work
 
 The source for [jamesbrady.org](https://www.jamesbrady.org): an editorial personal site about production AI systems, agent architecture, tools, and practical implementation.
 
@@ -53,5 +53,5 @@ The `/contact` form sends inquiries through a Server Action to the shared Utlyze
 
 -   `components/ManifoldScene.tsx`: The main 3D scene orchestrator.
 -   `components/manifolds/CenterManifold.tsx`: The central stability field with custom shader logic.
--   `components/ChatPanel.tsx`: The interactive chat interface with Markdown support.
+-   `components/ChatPanel.tsx`: UNMOUNTED. Its `/api/chat` backend was deleted 2026-08-11 (unauthenticated LLM proxy, zero callers); the component is kept for the wave-2 lab rebuild and needs a real backend before it is mounted.
 -   `lib/attractorMapping.ts`: Mathematical functions mapping state to visual parameters.

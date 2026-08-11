@@ -34,8 +34,13 @@ function publisherRef(entities: string[]): Node {
   return org ? { "@id": ENTITY_NODE_ID[org] } : personRef;
 }
 
+/**
+ * `/` adds nothing beyond the identity nodes — WebSite rides on every page
+ * now (P1-4), so emitting it again here would put two WebSite nodes with the
+ * same @id in one graph.
+ */
 export function homeGraph(): Node[] {
-  return withIdentity([websiteNode as unknown as Node]);
+  return withIdentity([]);
 }
 
 export function collectionGraph(input: {

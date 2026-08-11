@@ -24,7 +24,22 @@ export const entry: WorkEntry = {
   ],
   timeframe: { start: "2025-07", end: "2025-08" },
   anonymized: false,
-  footUnit: "7 domains · 28 questions",
+  footFacts: [
+    // Measured off the shipped assessment: seven competency domains, 28
+    // questions. Held as numbers with their unit and method, not as prose.
+    {
+      count: 7,
+      unit: "domains",
+      method:
+        "Counted from the shipped assessment's domain list, ai-readiness-assessment, read 2026-08-11.",
+    },
+    {
+      count: 28,
+      unit: "questions",
+      method:
+        "Counted from the shipped assessment's question bank, ai-readiness-assessment, read 2026-08-11.",
+    },
+  ],
   repo: {
     owner: "CryptoJym",
     name: "ai-readiness-assessment",

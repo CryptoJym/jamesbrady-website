@@ -25,11 +25,12 @@ export function openDock() {
  */
 export function Dock() {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLButtonElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const handleOpen = useCallback(() => {
     setOpen(true);
-    ref.current?.focus();
+    btnRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -57,11 +58,14 @@ export function Dock() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
-        ref.current?.focus();
+        btnRef.current?.focus();
       }
     };
+    // Tested against the ROOT, not the button: the terms text and its mailto
+    // link are siblings of the hit target, and a click on the mail link must
+    // not close the dock out from under the navigation.
     const onPointerDown = (e: PointerEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointerDown);
@@ -72,16 +76,27 @@ export function Dock() {
   }, [open]);
 
   return (
-    <button
-      type="button"
-      ref={ref}
-      className={open ? "dock is-open" : "dock"}
-      aria-haspopup="dialog"
-      aria-expanded={open}
-      aria-label="Ask about my work"
-      aria-describedby="dock-terms"
-      onClick={() => (open ? setOpen(false) : handleOpen())}
-    >
+    // STRUCTURE (independent review, P3): the dock used to be one <button>
+    // with an <a> nested inside it — invalid HTML, and browsers recover from
+    // it differently, so the mailto was not reliably reachable. The hit target
+    // is now a sibling stretched over the pill (the same pattern .card uses
+    // for its stretched link), so the whole pill is still one click, the mail
+    // link is a real link, and the keyboard path is unchanged: Tab reaches the
+    // button, Enter/Space toggles, Escape closes, ⌘K opens.
+    //
+    // aria-haspopup="dialog" is GONE. Nothing here is a dialog — no focus
+    // trap, no modality. It is a disclosure: aria-expanded plus aria-controls
+    // pointing at the region that actually appears.
+    <div ref={rootRef} className={open ? "dock is-open" : "dock"}>
+      <button
+        type="button"
+        ref={btnRef}
+        className="dock__hit"
+        aria-expanded={open}
+        aria-controls="dock-terms"
+        aria-label="Ask about my work"
+        onClick={() => (open ? setOpen(false) : handleOpen())}
+      />
       <span className="dock__ico">
         <span className="dot dot--live" aria-hidden="true" />
       </span>
@@ -98,7 +113,6 @@ export function Dock() {
               <a
                 className="dock__mail"
                 href={`mailto:${SITE.email}?subject=Question%20about%20your%20work`}
-                onClick={(e) => e.stopPropagation()}
               >
                 {SITE.email}
               </a>
@@ -108,7 +122,7 @@ export function Dock() {
           )}
         </span>
       </span>
-    </button>
+    </div>
   );
 }
 

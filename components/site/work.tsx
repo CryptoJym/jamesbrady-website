@@ -1,6 +1,11 @@
 import Link from "next/link";
 
-import { CATEGORY_LABEL, CATEGORY_TOKEN, type WorkEntry } from "@/lib/content/types";
+import {
+  CATEGORY_LABEL,
+  CATEGORY_TOKEN,
+  type FootFact,
+  type WorkEntry,
+} from "@/lib/content/types";
 import { Dot, DOT_WORD, Nameplate } from "./instruments";
 
 const FILTERS = [
@@ -47,8 +52,47 @@ export function Tally() {
   );
 }
 
-export function WorkCard({ entry }: { entry: WorkEntry }) {
+/**
+ * Resolve one foot fact against the entry.
+ *
+ * P0-1: every numeral on a card foot line arrives from a field — `repo.stars`
+ * is the same number the readout sums and JSON-LD publishes, and a `count`
+ * carries its own unit and method. Nothing here formats a hand-typed string.
+ * Returns null when the referenced field is absent, so a missing snapshot
+ * drops the fact rather than printing a stale or invented one.
+ */
+function footFactText(fact: FootFact, entry: WorkEntry): string | null {
+  if ("label" in fact) return fact.label;
+  if ("count" in fact) return `${fact.count} ${fact.unit}`;
+  switch (fact.field) {
+    case "repo.stars": {
+      const n = entry.repo?.stars;
+      if (typeof n !== "number") return null;
+      return `${n} ${n === 1 ? "star" : "stars"}`;
+    }
+    case "stack.primary":
+      return entry.stack[0] ?? null;
+    case "repo.license":
+      return entry.repo?.license ?? null;
+    case "anonymized":
+      return entry.anonymized ? "Anonymized" : "Named";
+  }
+}
+
+export function WorkCard({
+  entry,
+  headingLevel = 3,
+}: {
+  entry: WorkEntry;
+  /** 2 on the /work index, where the section head is the page h1. */
+  headingLevel?: 2 | 3;
+}) {
   const cats = entry.categories.map((c) => CATEGORY_TOKEN[c]).join(" ");
+  const Heading = (headingLevel === 2 ? "h2" : "h3") as "h2" | "h3";
+  const foot = entry.footFacts
+    .map((f) => footFactText(f, entry))
+    .filter((t): t is string => Boolean(t))
+    .join(" · ");
   return (
     <article className="card" data-cat={cats}>
       <div className="card__top">
@@ -56,24 +100,30 @@ export function WorkCard({ entry }: { entry: WorkEntry }) {
         <span className="card__cat">{CATEGORY_LABEL[entry.categories[0]]}</span>
       </div>
       <p className="card__kicker">{entry.kicker}</p>
-      <h3>
+      <Heading className="card__title">
         <Link className="card__link" href={`/work/${entry.slug}`}>
           {entry.title}
         </Link>
-      </h3>
+      </Heading>
       <p className="card__body">{entry.summary}</p>
       <p className="card__foot">
-        <span>{entry.footUnit}</span> <span className="arw" aria-hidden="true">→</span>
+        <span>{foot}</span> <span className="arw" aria-hidden="true">→</span>
       </p>
     </article>
   );
 }
 
-export function WorkGrid({ entries }: { entries: WorkEntry[] }) {
+export function WorkGrid({
+  entries,
+  headingLevel,
+}: {
+  entries: WorkEntry[];
+  headingLevel?: 2 | 3;
+}) {
   return (
     <div className="grid-work">
       {entries.map((e) => (
-        <WorkCard key={e.slug} entry={e} />
+        <WorkCard key={e.slug} entry={e} headingLevel={headingLevel} />
       ))}
     </div>
   );

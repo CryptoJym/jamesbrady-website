@@ -1,11 +1,22 @@
 import type { WorkEntry } from "@/lib/content/types";
 
+/**
+ * RECATEGORIZED PER OWNER RECORDS 2026-08-11 (independent review, P2-9).
+ *
+ * seopr1.com was filed as `client-work` and `anonymized: true`, which put a
+ * withheld-names note on a page with no client on it. The owner's own records
+ * are explicit — "SEOPR1 own marketing site" — so it is James's marketing
+ * property, not client work: category `products` only, `anonymized: false`,
+ * and the anonymization note is gone from the body. That ruling also resolves
+ * the second [JAMES:] mark this entry carried, which asked exactly this
+ * question. The performance-number mark stays open: no measurement exists yet.
+ */
 export const entry: WorkEntry = {
   collection: "work",
   slug: "seopr1",
   title: "seopr1.com",
   kicker: "Marketing site that has to prove itself",
-  categories: ["products", "client-work"],
+  categories: ["products"],
   answerCapsule:
     "seopr1.com is a five-page marketing site for AI-search visibility, built so the site itself survives the scrutiny the service invites. Pages ship as static HTML with one framework dependency; a WebGL tuning fork tied to scroll carries the hero, and every effect has an explicit fallback. If WebGL is missing, the whole DOM experience remains and only the 3D drops. Nothing important lives inside the animation.",
   summary:
@@ -22,8 +33,16 @@ export const entry: WorkEntry = {
     "Vercel",
   ],
   timeframe: { start: "2026-07" },
-  anonymized: true,
-  footUnit: "Live · 1 dependency",
+  anonymized: false,
+  footFacts: [
+    { label: "Live" },
+    {
+      count: 1,
+      unit: "production dependency",
+      method:
+        "Read from package.json in CryptoJym/seopr1-site via the GitHub API on 2026-08-11: astro ^6.2.2 is the only production dependency.",
+    },
+  ],
   repo: {
     owner: "CryptoJym",
     name: "seopr1-site",
@@ -74,8 +93,6 @@ Structured data describes the service in the page source, so an assistant readin
 Accessibility and fallback behaviour are in the source rather than asserted here: the WebGL branch has an explicit no-WebGL path, and decorative canvases carry \`aria-hidden\`.
 
 [JAMES: supply a performance number with its method. A Lighthouse or CrUX score for seopr1.com, with the date and the device profile. The site brief bans typed numbers, so this needs a real measurement you approve.]
-
-[JAMES: this is a live commercial front. Confirm it belongs in the portfolio as your work, and confirm whether to name it as a New Reward property or as a client property.]
 
 ## Stack
 

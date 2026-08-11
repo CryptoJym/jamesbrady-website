@@ -144,7 +144,7 @@ export default async function TheoryPage({
                         {p.url ? (
                           <a
                             href={p.url}
-                            rel="noopener"
+                            rel="noopener noreferrer"
                             style={{ color: "var(--t-hi)", textDecoration: "underline" }}
                           >
                             {p.label}

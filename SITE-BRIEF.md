@@ -106,7 +106,7 @@ Flagship: Universal Question Geometry (OfOne). Then: Question-Answer Dynamics, C
 - 2026-08-11 — Hero: "builds AI systems that show their work" + fleet-scale support. — James
 - 2026-08-11 — Latent Emotions developed via in-chat interview. — James
 - 2026-08-11 — v1 audit merged from three lenses → this v2. — pending James's lock
-- 2026-08-11 — Vuplicity = client work (New Reward provided SEO/GEO); anonymized-client policy applies. — James
+- 2026-08-11 — a background-screening SaaS client (name withheld) = client work (New Reward provided SEO/GEO); anonymized-client policy applies. Client name redacted from this public repository 2026-08-11 under the same policy. — James
 - 2026-08-11 — Royal RWA excluded entirely ("not mine to claim"). — James
 - 2026-08-11 — Of One family told as one thesis-in-progress case study (real apps + honestly-labeled staked ground). — James
 - 2026-08-11 — /lab approved: manifold chat, wrath-shield-v3 (after framing/claims fix), games + playful builds. VisionClaw and trading systems stay off the site. — James

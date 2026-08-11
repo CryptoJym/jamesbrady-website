@@ -81,7 +81,7 @@ function NameplateLink({ href, children }: { href: string; children: ReactNode }
     </>
   );
   return external ? (
-    <a href={href} rel="noopener">
+    <a href={href} rel="noopener noreferrer">
       {inner}
     </a>
   ) : (
@@ -113,17 +113,29 @@ export function PageNameplate({
 
 /* ------------------------------------------------------------- sec head */
 
+/**
+ * A section head.
+ *
+ * `level` is the document-outline level, not a size: on `/`, sections sit
+ * under the hero h1 and stay h2. On the four index routes the section head IS
+ * the page heading, so it renders h1 — and `.b-room .sec-head h1` pins it to
+ * the same metrics, so the outline is fixed without a visual change
+ * (independent review, P1-5).
+ */
 export function SectionHead({
   num,
   eyebrow,
   heading,
   aside,
+  level = 2,
 }: {
   num?: string;
   eyebrow: string;
   heading: string;
   aside?: string;
+  level?: 1 | 2;
 }) {
+  const Heading = (level === 1 ? "h1" : "h2") as "h1" | "h2";
   return (
     <div className="sec-head">
       <div>
@@ -134,7 +146,7 @@ export function SectionHead({
           ) : null}
           <em>{eyebrow}</em>
         </p>
-        <h2>{heading}</h2>
+        <Heading>{heading}</Heading>
       </div>
       {aside ? <p className="sec-aside">{aside}</p> : null}
     </div>

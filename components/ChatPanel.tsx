@@ -1,5 +1,16 @@
 'use client';
 
+/*
+ * UNMOUNTED. No route imports this component.
+ *
+ * Its `/api/chat` endpoint was DELETED on 2026-08-11 (security sweep, A1): it
+ * was an unauthenticated, unrate-limited proxy to a paid LLM with zero
+ * callers. The fetch below therefore 404s. The component is kept because the
+ * wave-2 lab rebuild reuses it, but it needs a real backend — authenticated,
+ * rate-limited, and grounded only in published content per
+ * docs/specs/chatbot-spec.md — before it is mounted anywhere.
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Sparkles, Terminal } from 'lucide-react';

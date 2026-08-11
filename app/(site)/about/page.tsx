@@ -49,6 +49,19 @@ const FAQ = [
   },
 ];
 
+/*
+ * "One person, operating at fleet scale" is OWNER-APPROVED COPY, not an
+ * unresolved question (review addendum, A7). SITE-BRIEF.md line 8 sets the
+ * support line verbatim and the decisions log ratifies it on 2026-08-11
+ * ("Hero: 'builds AI systems that show their work' + fleet-scale support. —
+ * James"). The [JAMES:] clearance mark that used to sit under the doctrine
+ * section asked whether the fleet could be described in public at all; that
+ * ruling answers it, so the mark is resolved and the copy stands.
+ *
+ * Still open here, and deliberately: the human story, the multi-year goal,
+ * the real photograph, the entity-structure confirmation, and the one
+ * measured throughput figure. Those are facts nobody but James has.
+ */
 const STORY = `## The short version
 
 James Brady builds AI systems that show their work. One person, operating at fleet scale, documenting what actually works. Based in Lehi, Utah.
@@ -80,8 +93,6 @@ const DOCTRINE = `**Machines hold the gates, not memory.** Required checks run o
 **Irreversible things stop for a human.** Sending a client message, spending money, publishing, deploying, deleting data. Agents prepare those. A person approves them. That is not a limitation I am working around. It is the design.
 
 [JAMES: one measured throughput number would make this section land, with its method and window. Something in the shape of "N changes merged in a 7-day window, every one through the same required checks". You have measured this. Approve a figure and a window, or this section stays qualitative.]
-
-[JAMES: clearance. Are you comfortable describing the fleet in public at all, or does the about page describe the discipline without the scale?]
 
 ## What I use, and what is not mine
 

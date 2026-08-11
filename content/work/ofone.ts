@@ -28,7 +28,7 @@ export const entry: WorkEntry = {
   ],
   timeframe: { start: "2026-05" },
   anonymized: false,
-  footUnit: "Docs live · MIT",
+  footFacts: [{ label: "Docs live" }, { field: "repo.license" }],
   repo: {
     owner: "CryptoJym",
     name: "ofone-skillchain",

@@ -16,7 +16,7 @@ export const entry: WorkEntry = {
   stack: ["Python 3.8+", "NumPy", "SciPy", "Matplotlib"],
   timeframe: { start: "2025-09", end: "2025-11" },
   anonymized: false,
-  footUnit: "Python · 3 stars",
+  footFacts: [{ field: "stack.primary" }, { field: "repo.stars" }],
   repo: {
     owner: "CryptoJym",
     name: "eeg-meditation-analysis",

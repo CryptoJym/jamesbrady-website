@@ -26,7 +26,15 @@ export const entry: TheoryEntry = {
   entities: ["person:james", "org:utlyze"],
   history: [
     { date: "2026-07-05", state: "sketched", note: "Revision R5. Sections 4 onward unreviewed." },
-    { date: "2026-08-11", state: "sketched", note: "Introduction-only page approved; the document itself stays private." },
+    {
+      date: "2026-08-11",
+      state: "sketched",
+      // Attribution, not a bare assertion (review addendum, A4): a history
+      // line that says "approved" without naming who approved it and where
+      // is indistinguishable from a decision the build made for itself.
+      note:
+        "Introduction-only page per owner ruling 2026-08-11 (SITE-BRIEF decisions log); the document itself stays private.",
+    },
   ],
   proof: [
     {

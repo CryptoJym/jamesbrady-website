@@ -51,6 +51,13 @@ export const metadata: Metadata = {
  * new root layout can be minimal; the `legacy-skin` wrapper scopes the old
  * palette so it cannot leak onto a Direction B surface.
  *
+ * EXACT-PORT RULE (independent review, P1-2): the markup below is the root
+ * layout at 4217d37, character for character below the wrapper div. The
+ * footer had drifted — a /learn link the old footer never had, and a new
+ * closing stamp — which re-rendered five pages that were explicitly out of
+ * scope. verify-visual pixel-diffs /primer against a worktree of main; any
+ * further edit here has to survive that gate.
+ *
  * Reskinning these pages under Direction B is a later wave.
  */
 export default function LegacyLayout({
@@ -84,7 +91,6 @@ export default function LegacyLayout({
                   ["/primer", "The Primer"],
                   ["/manuscript", "The Manuscript"],
                   ["/workshop", "The Workshop"],
-                  ["/learn", "Learn"],
                   ["/about", "About"],
                   ["/links", "Links"],
                   ["/watch", "Watch"],
@@ -133,7 +139,7 @@ export default function LegacyLayout({
               &copy; {new Date().getFullYear()} James Brady. All rights reserved.
             </span>
             <span className="text-xs text-neutral-700 font-mono">
-              Utlyze (studio) · New Reward (agency) — James operates both
+              Built with AI agents
             </span>
           </div>
         </div>

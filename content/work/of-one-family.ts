@@ -16,7 +16,7 @@ export const entry: WorkEntry = {
   stack: ["Next.js", "Vercel", "Shared component library (ofone-ui)"],
   timeframe: { start: "2025-06" },
   anonymized: false,
-  footUnit: "Live apps vs staked ground — labelled",
+  footFacts: [{ label: "Live apps vs staked ground — labelled" }],
   liveUrls: [
     { url: "https://businessofone.ai", checkedAt: "2026-08-11", status: 200 },
     { url: "https://financeofone.com", checkedAt: "2026-08-11", status: 200 },
