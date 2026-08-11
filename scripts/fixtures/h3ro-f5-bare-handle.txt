@@ -1,0 +1,4 @@
+F5 — a bare handle away from its link.
+<footer><p>Follow along: @h3ro.ai</p></footer>
+There is no tiktok.com URL on this page at all. The old gate allowlisted the
+handle pattern globally, so this passed.

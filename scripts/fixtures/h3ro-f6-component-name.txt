@@ -1,0 +1,6 @@
+F6 — the token in a component name and an identifier.
+import { H3roPanel } from "@/components/H3roPanel";
+export const h3roConfig = { enabled: true };
+Register-rule surface, not a link. MEASURED: the old token-global gate DID
+catch this one (4 hits) — it is kept as a regression fixture so a future
+"simplification" of the allowlist cannot start letting it through.

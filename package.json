@@ -7,7 +7,11 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "og": "node scripts/make-og.mjs",
+    "verify:seo": "node scripts/verify-seo.mjs",
+    "verify:visual": "node scripts/verify-visual.mjs",
+    "verify:fixtures": "node scripts/verify-fixtures.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
@@ -39,6 +43,7 @@
     "postcss": "^8.5.6",
     "raw-loader": "^4.0.2",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "playwright": "^1.62.1"
   }
 }

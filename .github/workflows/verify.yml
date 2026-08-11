@@ -1,0 +1,150 @@
+name: verify
+
+# The gates run on a machine, not on anyone remembering to run them
+# (independent review, P1-6). Wave 1 shipped a full verification battery and no
+# CI at all, which means every green tally in the PR was a claim about one
+# developer's laptop.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "rebuild/**"
+
+# A second push supersedes the first: nothing is proved by finishing a run
+# against a commit that is already history.
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # geo-seo-spec §5.3: sitemap lastmod for hand-built routes comes from
+          # the git last-commit date of the route's own files. A shallow clone
+          # collapses every one of those to the clone day and check 7 would be
+          # measuring the checkout, not the content.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # NOTE: `npm run lint` is deliberately NOT a gate yet. The base branch
+      # carries 33 pre-existing eslint errors in untouched legacy components;
+      # wiring lint in now would make this workflow red for a reason wave 1 did
+      # not cause, and a permanently-red gate teaches people to ignore red.
+      # Wave 2 clears those and turns it on.
+
+      # ---------------------------------------------------------------------
+      # The client-name denylist. FAIL-CLOSED, and closed means RED.
+      #
+      # geo-seo-spec §9-C: the live list is gitignored, so a fresh checkout has
+      # no file, and a gate with no denylist passes vacuously — fail-open on the
+      # one gate that protects client confidentiality. CI materializes the file
+      # from a secret. When the secret does not exist this step FAILS with an
+      # explicit message; it does NOT fall back to the committed placeholder and
+      # call the gate green.
+      #
+      # James creates CLIENT_DENYLIST at deploy setup. Until then this workflow
+      # is red on purpose, and the red is the honest state.
+      # ---------------------------------------------------------------------
+      - name: Materialize the client-name denylist
+        env:
+          CLIENT_DENYLIST: ${{ secrets.CLIENT_DENYLIST }}
+        run: |
+          if [ -z "${CLIENT_DENYLIST}" ]; then
+            echo "::error title=CLIENT_DENYLIST secret is missing::The client-name denylist gate cannot run."
+            echo ""
+            echo "  geo-seo-spec §9-C: the denylist is gitignored, so CI must materialize"
+            echo "  .seo-denylist.txt from the CLIENT_DENYLIST repository secret before"
+            echo "  scripts/verify-seo.mjs check 10 runs."
+            echo ""
+            echo "  This step FAILS CLOSED rather than copying .seo-denylist.example.txt"
+            echo "  into place: a zero-term placeholder proves nothing about client"
+            echo "  confidentiality, and a green tally that included it would be a lie."
+            echo ""
+            echo "  TO FIX: add a repository secret named CLIENT_DENYLIST containing one"
+            echo "  client term per line. The gate prints file + line + a sha256 prefix on"
+            echo "  a match, never the term itself, so nothing leaks into this log."
+            exit 1
+          fi
+          printf '%s\n' "${CLIENT_DENYLIST}" > .seo-denylist.txt
+          echo "denylist materialized: $(grep -cve '^\s*#' -e '^\s*$' .seo-denylist.txt) term(s)"
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Gate fixtures (red-team the gates themselves)
+        run: npm run verify:fixtures
+
+      - name: Build
+        run: npm run build
+
+      # No wait-on dependency: a curl loop needs nothing that is not already
+      # on the runner, and a fetched-at-CI-time helper is one more thing that
+      # can fail for a reason that has nothing to do with this repo.
+      - name: Start the built app
+        run: |
+          npx next start -p 4123 &
+          echo $! > .next-server.pid
+          for _ in $(seq 1 60); do
+            curl -sfo /dev/null http://localhost:4123 && exit 0
+            sleep 2
+          done
+          echo "::error::the built app never answered on :4123"; exit 1
+
+      - name: verify-seo
+        run: node scripts/verify-seo.mjs --base http://localhost:4123
+
+      - name: Install the headless browser
+        run: npx playwright install --with-deps chromium
+
+      # Legacy parity needs a second server running a build of the base branch,
+      # so the two /primer renders can be pixel-diffed. Built into a worktree so
+      # the working tree is untouched.
+      - name: Build main into a worktree for the legacy pixel-diff
+        run: |
+          git worktree add ../main-baseline origin/${{ github.event.pull_request.base.ref || 'main' }}
+          cd ../main-baseline
+          npm ci
+          npm run build
+          npx next start -p 4124 &
+          cd -
+          for _ in $(seq 1 90); do
+            curl -sfo /dev/null http://localhost:4124 && exit 0
+            sleep 2
+          done
+          echo "::error::the main baseline never answered on :4124"; exit 1
+
+      - name: verify-visual (incl. legacy pixel-diff against main)
+        run: |
+          node scripts/verify-visual.mjs \
+            --base http://localhost:4123 \
+            --legacy-base http://localhost:4124
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-visual-screenshots
+          path: out/verify-visual/
+          if-no-files-found: warn
+
+      - name: Stop servers
+        if: always()
+        run: |
+          [ -f .next-server.pid ] && kill "$(cat .next-server.pid)" || true
+          pkill -f "next start -p 4124" || true

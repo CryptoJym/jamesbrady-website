@@ -1,0 +1,27 @@
+# CLIENT NAME DENYLIST — EXAMPLE / PLACEHOLDER. One term per line, # comments.
+#
+# THE GATE DOES NOT READ THIS FILE. It reads `.seo-denylist.txt`, which is
+# GITIGNORED (geo-seo-spec §9-C) precisely so a real client list can never be
+# committed to a public repository. This example is the committed artifact and
+# the only one that is ever tracked.
+#
+# Local use:   cp .seo-denylist.example.txt .seo-denylist.txt
+# CI use:      .github/workflows/verify.yml materializes .seo-denylist.txt
+#              from the CLIENT_DENYLIST repository secret. If that secret is
+#              ABSENT the workflow FAILS RED — it does not fall back to this
+#              placeholder and call the gate green.
+#
+# TODO(deploy-setup, blocking): the CLIENT_DENYLIST secret does not exist yet.
+# James creates it at deploy setup. Until then check 9 of scripts/verify-seo.mjs
+# reports UNPROVEN, and `CI=true` makes UNPROVEN a nonzero exit.
+#
+# The gate FAILS CLOSED: if `.seo-denylist.txt` is missing entirely, the check
+# fails. With the marker below and no terms it reports UNPROVEN — never PASS.
+#
+# The gate prints file + line number + a hash of any match, NEVER the matched
+# term — echoing a client name into a public CI log is the exact harm this
+# gate exists to prevent.
+#
+# A name leaves the list only when the corresponding work entry carries a
+# `clearance` record in the content source.
+PLACEHOLDER-EMPTY-DENYLIST
