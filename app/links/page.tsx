@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "Links",
   description:
     "James Brady link hub — core socials, essays, walkthroughs, and primary ways to connect.",
+  alternates: {
+    canonical: "/links",
+  },
 };
 
 type LinkItem = {

@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "James Brady — AI Alchemist. Mixing AI systems, protocols, and programs on a mathematical substrate.",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 const socialLinks = [
