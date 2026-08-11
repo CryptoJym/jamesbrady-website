@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   RssSimple,
   FileText,
@@ -7,6 +8,38 @@ import {
 
 import { Navigation } from "@/components/Navigation";
 import SectionDivider from "@/components/SectionDivider";
+
+/**
+ * OG for the archived routes, supplied HERE rather than in the page files.
+ *
+ * geo-seo-spec §8.7 requires openGraph and twitter tags on every indexable
+ * route, and these five had none. The page files are out of scope this wave
+ * (they keep their URLs, copy and skin untouched), so the tags are inherited
+ * from this layout instead — each page's own title and description flow into
+ * the openGraph block, and the archive plate is the shared image.
+ *
+ * Wave 2, when these pages are reskinned: move each page onto pageMetadata()
+ * so it declares its own OG image and alt like every other template.
+ */
+export const metadata: Metadata = {
+  openGraph: {
+    type: "article",
+    locale: "en_US",
+    siteName: "James Brady",
+    images: [
+      {
+        url: "/og/learn.png",
+        width: 1200,
+        height: 630,
+        alt: "James Brady — an archived volume",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [{ url: "/og/learn.png", alt: "James Brady — an archived volume" }],
+  },
+};
 
 /**
  * The archived volumes plus /links and /watch.

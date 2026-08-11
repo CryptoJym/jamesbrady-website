@@ -35,7 +35,21 @@ export function Dock() {
   useEffect(() => {
     const onOpen = () => handleOpen();
     window.addEventListener(DOCK_OPEN_EVENT, onOpen);
-    return () => window.removeEventListener(DOCK_OPEN_EVENT, onOpen);
+    // The nav pill advertises ⌘K, so ⌘K has to do something. It opens the
+    // dock, which states its terms — the same thing every other ask
+    // affordance does. A shortcut printed on screen that does nothing is the
+    // small end of the same dishonesty this site is built against.
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        handleOpen();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener(DOCK_OPEN_EVENT, onOpen);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [handleOpen]);
 
   useEffect(() => {

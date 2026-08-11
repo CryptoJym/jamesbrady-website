@@ -16,8 +16,11 @@ export const WORK_GLOSSARY_ID = `${SITE.host}/#work-glossary`;
 
 /**
  * Exact list, ordered, no additions without a ruling. The X and TikTok entries
- * are plain profile links only, permitted by the 2026-08-11 ruling. No h3ro
- * branding and no h3ro.ai domain appear anywhere else on this site.
+ * are plain profile links only, permitted by the 2026-08-11 ruling: the
+ * retired brand token is allowed as a social handle and as an org
+ * infrastructure path, and nowhere else. It never appears as brand copy, and
+ * its domain is never used, anywhere on this site. verify-seo check 8 enforces
+ * exactly that distinction.
  */
 export const SAME_AS = [
   "https://github.com/CryptoJym",
@@ -33,7 +36,7 @@ export const personNode = {
   "@id": PERSON_ID,
   name: "James Brady",
   url: absolute("/"),
-  // Register rule: never "AI Alchemist".
+  // Register rule: the mystical job title the old graph carried is retired.
   jobTitle: "Builder of AI systems",
   description: SITE.description,
   email: `mailto:${SITE.email}`,

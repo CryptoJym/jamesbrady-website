@@ -52,6 +52,7 @@ export function SiteNav() {
           <>
             <Dot state="live" />
             ASK<span className="vh"> about my work.</span>
+            <span className="kbd" aria-hidden="true">⌘K</span>
           </>
         </DockTrigger>
       </div>

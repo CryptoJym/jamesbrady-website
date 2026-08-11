@@ -142,11 +142,21 @@ body{
   font-variant-numeric:tabular-nums;
   overflow-x:hidden;
 }
-.b-room h1,.b-room h2,.b-room h3,.b-room p,.b-room figure,.b-room ul,.b-room ol{margin:0}
-.b-room ul{padding:0;list-style:none}
+/* The comp's reset zeroes margins on h1-h3/p/figure/ul and strips list styling.
+   Tailwind's preflight already does exactly that, globally, so re-stating it
+   scoped under .b-room is not just redundant — a `.b-room p{margin:0}` rule
+   out-specifies every component rule that sets a margin on a <p> or <ul>
+   (.hero__sub, .hero__terms, .eyebrow-b, .sec-num, .sec-aside, .slot__unit,
+   .tally, .nav__links). That silently flattened the hero rhythm and killed the
+   nav's margin-left:auto. Leave the reset to preflight. */
 .b-room a{color:inherit;text-decoration:none}
 .b-room img,.b-room svg{display:block;max-width:100%}
-.b-room button{font:inherit;color:inherit;background:none;border:0}
+/* Same trap as the margin reset: the comp's bare `button{font:inherit;
+   background:none;border:0}` loses to .btn, but a scoped `.b-room button`
+   BEATS it — and `font:inherit` would strip .btn's mono face and size while
+   `border:0` and `background:none` erased .btn--ghost's edge and fill
+   outright. Preflight already inherits the font family and zeroes the border
+   width; each button component states its own colour. */
 
 /* Interaction feedback is --sig's documented fourth role (ruling B). */
 .b-room :focus-visible,.skip:focus-visible,.dock:focus-visible{
