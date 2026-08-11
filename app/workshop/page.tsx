@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   title: "The Workshop",
   description:
     "Three practical guides. Set up an AI agent, install skills, connect MCP servers.",
+  alternates: {
+    canonical: "/workshop",
+  },
 };
 
 /* ---------- guide data ---------- */

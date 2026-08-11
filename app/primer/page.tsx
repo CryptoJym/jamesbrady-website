@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   title: "The Primer",
   description:
     "How coding systems work. Code, the stack, AI agents, skills, and MCP — explained for humans.",
+  alternates: {
+    canonical: "/primer",
+  },
 };
 
 const stackLayers = [

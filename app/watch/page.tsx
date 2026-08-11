@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: "Watch",
   description:
     "Narrated video essays and walkthroughs from James Brady on AI systems, operator loops, and applied leverage.",
+  alternates: {
+    canonical: "/watch",
+  },
 };
 
 type VideoItem = {

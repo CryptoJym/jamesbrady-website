@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "The Manuscript",
   description:
     "A curated catalog of the best AI tools, frameworks, and MCP servers. Each one vetted. Each one real.",
+  alternates: {
+    canonical: "/manuscript",
+  },
 };
 
 const dividerVariants: Array<"metatron" | "wave" | "hexline" | "vesica"> = [

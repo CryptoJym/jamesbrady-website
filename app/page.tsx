@@ -9,6 +9,10 @@ import {
 import AlchemyCanvas from "@/components/AlchemyCanvas";
 import SectionDivider from "@/components/SectionDivider";
 import ScrollReveal from "@/components/ScrollReveal";
+import { catalog } from "@/lib/catalog";
+
+const toolCount = catalog.reduce((n, c) => n + c.tools.length, 0);
+const categoryCount = catalog.length;
 
 const cards = [
   {
@@ -327,8 +331,8 @@ export default function Home() {
         <div className="max-w-[1400px] mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {[
-              { number: "298", label: "Tools cataloged" },
-              { number: "9", label: "Categories" },
+              { number: String(toolCount), label: "Tools cataloged" },
+              { number: String(categoryCount), label: "Categories" },
               { number: "3", label: "Practical guides" },
               { number: "5", label: "Core concepts" },
             ].map((stat, i) => (
