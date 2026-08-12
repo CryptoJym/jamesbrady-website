@@ -732,6 +732,51 @@ main:focus{outline:none}
   margin-top:var(--s-3);
 }
 
+/* ============================================================ 00 DOORS
+   Sorted by WHO the visitor is. Interactive edges use --c-edge-int; the
+   only --sig here is interaction feedback (the documented fourth role,
+   ruling B), never a fill competing with a primary action. */
+.doorway{padding-block:var(--s-7) 0}
+.doorway--bare{padding-top:var(--s-7)}
+/* .b-room h2 sets --ts-h2 with one more element of specificity, so this
+   selector carries the room class too. Without it the row's kicker rendered
+   at section-heading size and out-shouted the doors it was labelling. */
+.b-room .doorway__h{
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-lo);
+  font-weight:400;line-height:1.4;
+}
+.doors{
+  margin-top:var(--s-4);
+  display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-4);
+}
+.door{
+  display:flex;flex-direction:column;gap:var(--s-2);
+  padding:var(--s-5);
+  border:1px solid var(--c-edge-int);border-radius:var(--r-md);
+  background:var(--c-panel);
+  transition:transform var(--dur) var(--ease),
+             border-color var(--dur) var(--ease),
+             background var(--dur) var(--ease);
+}
+.door:hover{transform:translateY(-3px);background:var(--c-raised);border-color:var(--sig-edge)}
+.door__n{
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  color:var(--t-faint);letter-spacing:var(--track-data);
+}
+.door__label{
+  font-size:var(--ts-h3);font-weight:600;letter-spacing:var(--track-display);
+  color:var(--t-hi);line-height:1.25;
+}
+.door__label .arw{display:inline-block;margin-left:6px;
+  transition:transform var(--dur) var(--ease)}
+.door:hover .door__label .arw{transform:translateX(3px);color:var(--sig)}
+.door__who{
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-lo);
+}
+.door__detail{font-size:var(--ts-small);line-height:1.6;color:var(--t-lo)}
+
 /* ============================================================ 01 PROOF */
 .proof{padding-block:var(--s-9)}
 .bank{
@@ -873,6 +918,27 @@ main:focus{outline:none}
 .card:hover .card__foot .arw{transform:translateX(3px);color:var(--sig)}
 .card__foot .arw{transition:transform var(--dur) var(--ease),color var(--dur) var(--ease)}
 
+/* The repository, one click from the card. It sits ABOVE the stretched
+   .card__link overlay (z-index 1), because a link a reader can see and
+   cannot press is worse than no link. */
+.card__repo{position:relative;z-index:2;margin-top:calc(var(--s-3) * -1)}
+.card__repo a{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  min-height:32px;
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-faint);
+  transition:color var(--dur) var(--ease);
+}
+.card__repo a:hover{color:var(--sig)}
+.card__repo-k{
+  border:1px solid var(--c-edge-int);border-radius:2px;padding:2px 6px;
+  color:var(--t-lo);
+}
+.card__repo-v{color:var(--t-lo);letter-spacing:var(--track-data);text-transform:none}
+.card__repo-s{color:var(--t-faint)}
+.card__repo .arw{margin-left:auto;transition:transform var(--dur) var(--ease)}
+.card__repo a:hover .arw{transform:translateX(3px)}
+
 .tally{
   margin-top:var(--s-4);padding-top:var(--s-3);
   border-top:1px solid var(--c-line);
@@ -998,6 +1064,172 @@ main:focus{outline:none}
 }
 .pending__q{display:block;color:var(--t-lo)}
 
+/* The same gap, addressed to a reader instead of to the owner. Quiet prose
+   rather than a labelled box: on a buyer page the fact that something is not
+   published yet is one sentence of context, not an item on a list somebody
+   else has to work through. Never --warn — an unpublished figure is not a
+   fault state. */
+.pending-note{color:var(--t-lo)}
+.prose .pending-note-row{
+  border-left:2px solid var(--c-line-hot);
+  padding:var(--s-2) 0 var(--s-2) var(--s-4);
+  color:var(--t-lo);
+}
+
+/* ============================================================ OPEN ITEMS
+   The whole second-person register, on /now and nowhere else. */
+.open-items{margin-top:var(--s-8);border-top:1px solid var(--c-line);padding-top:var(--s-6)}
+.b-room .open-items h2{
+  font-size:var(--ts-h2);color:var(--t-hi);letter-spacing:var(--track-display);
+  line-height:1.15;
+}
+.open-items__lead{
+  margin-top:var(--s-3);max-width:72ch;
+  font-size:var(--ts-small);line-height:1.6;color:var(--t-lo);
+}
+.open-items__list{
+  counter-reset:openitems;
+  margin:var(--s-5) 0 0;padding:0;list-style:none;
+  border-top:1px solid var(--c-line);
+}
+.open-items__list li{
+  counter-increment:openitems;
+  padding:var(--s-4) 0 var(--s-4) var(--s-6);
+  border-bottom:1px solid var(--c-line);
+  position:relative;max-width:78ch;
+}
+.open-items__list li::before{
+  content:counter(openitems,decimal-leading-zero);
+  position:absolute;left:0;top:var(--s-4);
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  color:var(--t-faint);letter-spacing:var(--track-data);
+}
+.open-items__where{
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-faint);
+  margin-bottom:6px;
+}
+.open-items__where a{color:var(--t-lo)}
+.open-items__where a:hover{color:var(--sig)}
+.open-items__q{font-size:var(--ts-small);line-height:1.65;color:var(--t-mid)}
+
+/* ============================================================ OFFERS */
+.grid-work--2{grid-template-columns:repeat(2,1fr)}
+.card--offer .card__body{color:var(--t-mid)}
+.card--link .card__title{font-size:var(--ts-small);word-break:break-word}
+.card--link .card__title a{font-family:var(--f-mono);letter-spacing:var(--track-data)}
+
+.delivery{
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  letter-spacing:var(--track-data);color:var(--t-faint);line-height:1.6;
+  margin-top:var(--s-3);
+}
+.delivery__k{
+  text-transform:uppercase;letter-spacing:var(--track-label);color:var(--t-faint);
+}
+.delivery a{color:var(--t-mid);text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--c-edge-int)}
+.delivery a:hover{color:var(--sig);text-decoration-color:var(--sig)}
+.delivery a .arw{display:inline-block;margin-left:4px;
+  transition:transform var(--dur) var(--ease)}
+.delivery a:hover .arw{transform:translateX(3px)}
+.delivery__role{color:var(--t-faint)}
+/* The delivery line sits above the card's stretched link overlay so the
+   agency link is pressable from the card. */
+.card .delivery{position:relative;z-index:2}
+
+/* A question-shaped heading. The answer capsule sits directly under it, as
+   real prose in the body, so an engine can quote the pair (geo-seo §4). */
+/* Same specificity note as .doorway__h: .b-room h2 would otherwise decide
+   the size of a heading this file is trying to own. */
+.b-room .offer__q{
+  font-size:var(--ts-h2);color:var(--t-hi);letter-spacing:var(--track-display);
+  line-height:1.15;margin-bottom:var(--s-4);
+}
+.offer__capsule{
+  max-width:72ch;font-size:var(--ts-body);line-height:1.7;color:var(--t-mid);
+}
+
+.steps{counter-reset:steps;margin:0;padding:0;list-style:none;
+  border-top:1px solid var(--c-line);max-width:72ch}
+.step{
+  counter-increment:steps;
+  padding:var(--s-4) 0 var(--s-4) var(--s-6);
+  border-bottom:1px solid var(--c-line);position:relative;
+}
+.step::before{
+  content:counter(steps,decimal-leading-zero);
+  position:absolute;left:0;top:calc(var(--s-4) + 2px);
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  color:var(--t-faint);letter-spacing:var(--track-data);
+}
+.step__label{
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-hi);
+  margin-bottom:6px;
+}
+.step__detail{font-size:var(--ts-small);line-height:1.65;color:var(--t-lo)}
+
+.deliverables{margin:0;padding:0;list-style:none;display:grid;gap:var(--s-4);
+  max-width:72ch}
+.deliverables li{
+  padding:var(--s-4);border:1px solid var(--c-line);border-radius:var(--r-md);
+  background:var(--c-panel);
+}
+.deliverable__label{color:var(--t-hi);font-size:var(--ts-small);font-weight:600;
+  margin-bottom:6px}
+.deliverable__detail{font-size:var(--ts-small);line-height:1.65;color:var(--t-lo)}
+
+.bands{margin:0 0 var(--s-3);padding:0;list-style:none;display:flex;
+  flex-wrap:wrap;gap:var(--s-2)}
+.bands li{
+  font-family:var(--f-mono);font-size:var(--ts-nano);letter-spacing:var(--track-label);
+  text-transform:uppercase;color:var(--t-hi);
+  border:1px solid var(--c-line-2);border-radius:2px;padding:4px 8px;
+}
+.bands__note{font-size:var(--ts-small);line-height:1.6;color:var(--t-lo)}
+
+/* Proof, in a narrow column. Label first as the descriptive anchor, the full
+   URL under it, the method under that. */
+.prooflist{margin:0;padding:0;list-style:none;display:grid;gap:var(--s-4)}
+.prooflist li{display:flex;flex-direction:column;gap:4px}
+.prooflist a{
+  color:var(--t-hi);font-size:var(--ts-small);line-height:1.45;
+  text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--c-edge-int);
+}
+.prooflist a:hover{color:var(--sig);text-decoration-color:var(--sig)}
+.prooflist a .arw{display:inline-block;margin-left:6px;
+  transition:transform var(--dur) var(--ease)}
+.prooflist a:hover .arw{transform:translateX(3px)}
+.prooflist__label{color:var(--t-hi);font-size:var(--ts-small);line-height:1.45}
+.prooflist__url{
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-data);color:var(--t-faint);overflow-wrap:anywhere;
+}
+.prooflist__method{font-size:var(--ts-small);line-height:1.5;color:var(--t-lo)}
+
+/* ============================================================ LINK LIST */
+.linklist{margin:var(--s-5) 0 0;padding:0;list-style:none;
+  border-top:1px solid var(--c-line)}
+.linklist li{border-bottom:1px solid var(--c-line)}
+.linklist a{
+  display:flex;align-items:baseline;gap:var(--s-5);flex-wrap:wrap;
+  min-height:44px;padding-block:var(--s-3);
+  transition:color var(--dur) var(--ease);
+}
+.linklist a:hover .linklist__label{color:var(--sig)}
+.linklist a:hover .linklist__label .arw{transform:translateX(3px)}
+.linklist__label{
+  min-width:120px;color:var(--t-hi);
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  letter-spacing:var(--track-label);text-transform:uppercase;
+  transition:color var(--dur) var(--ease);
+}
+.linklist__label .arw{display:inline-block;margin-left:6px;
+  transition:transform var(--dur) var(--ease)}
+.linklist__note{font-size:var(--ts-small);line-height:1.6;color:var(--t-lo);flex:1}
+
 /* ============================================================ CHIPS / BADGES */
 .chip-row{display:flex;flex-wrap:wrap;gap:var(--s-2);margin-top:var(--s-3)}
 .chip{
@@ -1067,6 +1299,10 @@ main:focus{outline:none}
 }
 /* Who you are actually dealing with. */
 .who{display:flex;align-items:flex-start;gap:var(--s-5);max-width:56ch}
+/* Footer variant: the photo slot is dropped until a real asset exists, and
+   the colophon takes the width the box was holding. The labelled gap stays
+   on /about, which is the page whose subject is the person. */
+.who--nophoto{max-width:64ch}
 .who__ph{
   flex:none;width:76px;height:76px;
   border:1px dashed var(--c-line-hot);border-radius:var(--r-sm);
@@ -1331,6 +1567,7 @@ main:focus{outline:none}
       var(--scrim-42) 62%, var(--scrim-10) 84%,
       var(--scrim-85) 100%)}
   .grid-work,.grid-work--3{grid-template-columns:repeat(2,1fr)}
+  .doors{grid-template-columns:repeat(3,1fr);gap:var(--s-3)}
   .bank{grid-template-columns:repeat(2,1fr)}
   .slot:nth-child(2n){border-right:0}
   .slot:nth-child(-n+2){border-bottom:1px solid var(--c-line)}
@@ -1355,7 +1592,10 @@ main:focus{outline:none}
 }
 @media (max-width:620px){
   :root{--gutter:22px;--s-9:64px;--s-10:80px;--dock-gap:16px}
-  .grid-work,.grid-work--3{grid-template-columns:1fr}
+  .grid-work,.grid-work--3,.grid-work--2{grid-template-columns:1fr}
+  .doors{grid-template-columns:1fr}
+  .linklist a{gap:var(--s-2)}
+  .linklist__label{min-width:0}
   .bank{grid-template-columns:1fr}
   .slot{border-right:0;border-bottom:1px solid var(--c-line)}
   .slot:last-child{border-bottom:0}

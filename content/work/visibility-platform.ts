@@ -78,6 +78,23 @@ export const entry: WorkEntry = {
     image: "/og/work.png",
     imageAlt: "James Brady — case study: a platform that measures findability in search and AI answers",
   },
+  /*
+   * BUYER RENDER MODE (wave 3).
+   *
+   * This is the case study the visibility engagement points at, so the people
+   * reading it are deciding whether to pay for the thing it describes. The
+   * three marks below stay in the body, exactly as written, and /now still
+   * prints them in full as open questions. Here they render as statements of
+   * absence, because the reader is not the person who can close them.
+   *
+   * One note per gap, in gap order. lib/content/validate.ts fails the build if
+   * the counts stop matching.
+   */
+  publicNotes: [
+    "One client outcome figure, with its method and its window, is not published here yet.",
+    "Neither is a recorded walkthrough of a real run.",
+    "No client has cleared their name for publication, so this case study stays anonymized.",
+  ],
   body: `> **Anonymization note.** Client names and identifying details are withheld per agreement. Industries are named, specific clients are not. Screenshots and metrics are otherwise unaltered. Named case studies get published only when a client gives written clearance.
 
 ## The problem

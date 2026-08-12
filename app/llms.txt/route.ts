@@ -1,4 +1,4 @@
-import { discoverableTheories, lab, learn, now, work } from "@/lib/content";
+import { discoverableTheories, lab, learn, now, offers, work } from "@/lib/content";
 import { MATURITY_LABEL } from "@/lib/content/types";
 import { indexableRoutes } from "@/lib/seo/routes";
 import { SITE, absolute } from "@/lib/seo/site";
@@ -26,6 +26,30 @@ export function GET() {
 
   sections.push(`# ${SITE.name}
 > ${SITE.descriptor}`);
+
+  // Work with me sits above Work, because an engine answering "can I hire
+  // James Brady, and for what" should reach the two engagements before it
+  // reaches the portfolio that backs them.
+  sections.push(
+    [
+      "## Work with me",
+      line(
+        "/work-with-me",
+        "Work with me",
+        routes.find((r) => r.path === "/work-with-me")!.capsule,
+      ),
+      ...offers
+        .filter((o) => has(`/work-with-me/${o.slug}`))
+        .map((o) =>
+          line(
+            `/work-with-me/${o.slug}`,
+            o.title,
+            o.answerCapsule,
+            ` — delivered by ${o.deliveredBy.name}`,
+          ),
+        ),
+    ].join("\n"),
+  );
 
   sections.push(
     [

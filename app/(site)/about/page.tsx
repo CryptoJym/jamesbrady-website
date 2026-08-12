@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import {
   JsonLd,
@@ -6,6 +7,7 @@ import {
   Prose,
   SectionHead,
 } from "@/components/site/instruments";
+import { aboutDoctrine, aboutStory } from "@/content/site";
 import { renderMarkdown } from "@/lib/content/markdown";
 import { aboutGraph, serializeGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -50,57 +52,11 @@ const FAQ = [
 ];
 
 /*
- * "One person, operating at fleet scale" is OWNER-APPROVED COPY, not an
- * unresolved question (review addendum, A7). SITE-BRIEF.md line 8 sets the
- * support line verbatim and the decisions log ratifies it on 2026-08-11
- * ("Hero: 'builds AI systems that show their work' + fleet-scale support. —
- * James"). The [JAMES:] clearance mark that used to sit under the doctrine
- * section asked whether the fleet could be described in public at all; that
- * ruling answers it, so the mark is resolved and the copy stands.
- *
- * Still open here, and deliberately: the human story, the multi-year goal,
- * the real photograph, the entity-structure confirmation, and the one
- * measured throughput figure. Those are facts nobody but James has.
+ * The prose moved to content/site/index.ts in wave 3 so two consumers can read
+ * it: this page, which renders its gaps in the third person for a reader who
+ * is not the owner, and /now, which lists the same gaps as the work log they
+ * are. The marks themselves are untouched, text included.
  */
-const STORY = `## The short version
-
-James Brady builds AI systems that show their work. One person, operating at fleet scale, documenting what actually works. Based in Lehi, Utah.
-
-[JAMES: the human story. Two or three paragraphs, in your voice, covering: how you got here, what you were doing before this, and why you work this way instead of some other way. This is the single biggest gap on the page. Everything else below is process, and process without a person reads like a manual.]
-
-[JAMES: one sentence on what you are trying to build over the next few years. Not a mission statement. The actual goal.]
-
-[JAMES: a real photograph. The site brief lists a real photo asset as a build gate.]
-
-## Who does what
-
-Three names show up across this site, and they are not the same thing.
-
-**James Brady** is the person. The theories, the open-source projects, and the writing are mine.
-
-**Utlyze** is the studio. It builds products and takes on custom software and systems work.
-
-**New Reward** is the agency. It does the visibility work: measuring how findable a business is in search and inside AI assistants, and then fixing it.
-
-I operate both. When a page on this site says a client engagement, it names the industry and not the company, unless that company has given written permission to be named.
-
-[JAMES: confirm this split is how you want it stated, and confirm the legal entity names and structure. Is Utlyze the parent, is New Reward a brand under it, or are they separate? This paragraph should match reality exactly, because it is the one a lawyer or a prospective client will read closely.]`;
-
-const DOCTRINE = `**Machines hold the gates, not memory.** Required checks run on every change. A merge queue tests changes together, in order, before they land, so two changes that each pass alone but break together get caught before a person sees them. None of this depends on anyone remembering to run something.
-
-**Numbers are computed, not typed.** Every number on this site is derived from its source when the page is built. The old version of this site displayed a hand-typed count that was wrong by a factor of eight. That class of mistake is now impossible here, by construction.
-
-**Irreversible things stop for a human.** Sending a client message, spending money, publishing, deploying, deleting data. Agents prepare those. A person approves them. That gate is the design, and not something I am working around.
-
-[JAMES: one measured throughput number would make this section land, with its method and window. Something in the shape of "N changes merged in a 7-day window, every one through the same required checks". You have measured this. Approve a figure and a window, or this section stays qualitative.]
-
-## What I use, and what is not mine
-
-\`OpenClaw\` is a third-party project. I run and extend a self-hosted instance of it, with custom skills, a gateway, and hardware hookups. I did not build OpenClaw.
-
-\`architect-loop\` is a fork of a project by Dan McInerney. I run a heavily customized copy daily and have contributed a fix upstream. The original design is his.
-
-I mention both because a portfolio that quietly absorbs other people's work is exactly the kind of thing this site is supposed to be the opposite of.`;
 
 export default function AboutPage() {
   return (
@@ -125,7 +81,12 @@ export default function AboutPage() {
 
         <div className="article">
           <div>
-            <Prose html={renderMarkdown(STORY)} />
+            <Prose
+              html={renderMarkdown(aboutStory.body, {
+                mode: "public",
+                notes: aboutStory.publicNotes,
+              })}
+            />
 
             <section aria-labelledby="reliability" style={{ marginTop: "var(--s-7)" }}>
               <SectionHead
@@ -144,7 +105,12 @@ export default function AboutPage() {
                 ))}
               </div>
               <div style={{ marginTop: "var(--s-6)" }}>
-                <Prose html={renderMarkdown(DOCTRINE)} />
+                <Prose
+                  html={renderMarkdown(aboutDoctrine.body, {
+                    mode: "public",
+                    notes: aboutDoctrine.publicNotes,
+                  })}
+                />
               </div>
             </section>
           </div>
@@ -191,6 +157,19 @@ export default function AboutPage() {
                     supplied yet. The box says so rather than standing in for one.
                   </p>
                 </div>
+              </div>
+            </div>
+            {/* The trail stays walkable. This page states what is missing; the
+                work log states the same gaps as the open questions they are,
+                in the words they were asked in. */}
+            <div className="panel">
+              <div className="panel__head">
+                <span>Open items</span>
+              </div>
+              <div className="panel__body">
+                Where this page says a fact is not published yet, the open question behind
+                it is listed in full on <Link href="/now">the work log</Link>, together
+                with every other one the site is carrying.
               </div>
             </div>
           </aside>

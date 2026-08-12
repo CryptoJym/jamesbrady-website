@@ -10,9 +10,11 @@ import {
   SectionHead,
 } from "@/components/site/instruments";
 import { ProofBank, Tally, WorkFilters, WorkGrid } from "@/components/site/work";
+import { DoorRow } from "@/components/site/offers";
 import { TheoryList } from "@/components/site/theories";
 import {
   discoverableTheories,
+  offers,
   outsideStars,
   proofSlots,
   publicRepoNames,
@@ -42,6 +44,12 @@ export const metadata: Metadata = pageMetadata({
 function pad(n: number): string {
   return String(n).padStart(2, "0");
 }
+
+// The door row reads the offer collection rather than restating it: the
+// summaries, the slugs and the delivering entity all come from the same
+// entries the offer pages render, so the door and the page it opens cannot
+// describe different things.
+const [getFound, buildSystem] = offers;
 
 export default function HomePage() {
   return (
@@ -73,8 +81,11 @@ export default function HomePage() {
               One person, operating at fleet scale — documenting what actually works.
             </p>
 
+            {/* Both demoted to ghost in wave 3. The door row below now carries
+                the page's primary sort, and two competing primary treatments
+                above the fold is how a visitor ends up pressing neither. */}
             <div className="hero__cta rise d5">
-              <Link href="#proof" className="btn btn--primary">
+              <Link href="#proof" className="btn btn--ghost">
                 SEE THE PROOF <span className="arw" aria-hidden="true">→</span>
               </Link>
               <DockTrigger className="btn btn--ghost">
@@ -146,6 +157,44 @@ export default function HomePage() {
       </header>
 
       <main id="main" tabIndex={-1}>
+        {/* ======================= 00 / DOORS ======================= *
+         * Sorted by WHO the visitor is, not by what the site contains.
+         * The five-persona audit found every persona landing on the same
+         * two buttons: an owner who wants customers, a founder who wants
+         * something built, and a builder who wants the source were all
+         * offered "see the proof". Two of the three had no reason to press
+         * it. */}
+        <section className="doorway" aria-labelledby="doorway-h">
+          <div className="wrap">
+            <h2 className="doorway__h" id="doorway-h">
+              What did you come here to do?
+            </h2>
+            <DoorRow
+              label="Choose a starting point"
+              doors={[
+                {
+                  label: "Get my business found",
+                  who: "For an owner whose customers cannot find them",
+                  detail: `${getFound.summary} Delivered by ${getFound.deliveredBy.name}.`,
+                  href: `/work-with-me/${getFound.slug}`,
+                },
+                {
+                  label: "Build me a system",
+                  who: "For a founder or an operator with a build to run",
+                  detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
+                  href: `/work-with-me/${buildSystem.slug}`,
+                },
+                {
+                  label: "Read the code",
+                  who: "For a builder who would rather check than be told",
+                  detail: `${systemsListed} systems, ${publicRepos.length} of them in public repositories you can open from the card.`,
+                  href: "/work",
+                },
+              ]}
+            />
+          </div>
+        </section>
+
         {/* ======================= 01 / PROOF ======================= */}
         <section className="proof" id="proof">
           <div className="wrap">

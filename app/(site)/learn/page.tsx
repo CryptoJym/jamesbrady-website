@@ -54,6 +54,16 @@ export default function LearnPage() {
             ))}
           </div>
           <Tally />
+          {/* The recorded walkthroughs were reachable from no page on this
+              site. Same archive, same decision to keep them at their URL, and
+              now with a way in. */}
+          <p className="sec-aside" style={{ marginTop: "var(--s-5)", maxWidth: "72ch" }}>
+            Some of the same ground is covered out loud. The{" "}
+            <Link href="/watch">recorded walkthroughs</Link> are narrated, carry
+            transcripts, and are archived at their original URL alongside these three
+            volumes. Everything else on this site is linked from{" "}
+            <Link href="/links">the links page</Link>.
+          </p>
           <PageNameplate
             source="The typed content source"
             method="Volume count read from the collection; each archive date comes from its own entry"

@@ -75,7 +75,23 @@ export default async function WorkEntryPage({
 
         <div className="article">
           <div>
-            <Prose html={renderMarkdown(entry.body)} />
+            {/*
+              The render mode is a property of the ENTRY, not of the template.
+              A case study that carries `publicNotes` is one a buyer is being
+              sent to, and its gaps render as statements of absence; every
+              other case study keeps the owner-facing question inline, where a
+              technical reader treats an open question as a reason to trust the
+              rest. Both readings are honest. Only the address differs, and
+              /now carries the full second-person register either way.
+            */}
+            <Prose
+              html={renderMarkdown(
+                entry.body,
+                entry.publicNotes
+                  ? { mode: "public", notes: entry.publicNotes }
+                  : { mode: "inline" },
+              )}
+            />
 
             {entry.deltas.length > 0 ? (
               <section aria-labelledby="deltas">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import {
   Dot,
@@ -8,6 +9,7 @@ import {
   Prose,
 } from "@/components/site/instruments";
 import { daysSince, now, weeksSince } from "@/lib/content";
+import { pendingCount, pendingItems, pendingPaths } from "@/lib/content/pending";
 import { renderMarkdown } from "@/lib/content/markdown";
 import { nowGraph, serializeGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -49,7 +51,52 @@ export default function NowPage() {
         </div>
 
         <div className="article">
-          <Prose html={renderMarkdown(now.body)} />
+          <div>
+            <Prose html={renderMarkdown(now.body)} />
+
+            {/*
+              OPEN ITEMS — the whole second-person register, in one place.
+              Every question here is still in the source file it belongs to,
+              and every page still shows that a fact is missing. What changed
+              in wave 3 is placement: a buyer sizing James up on /about or on
+              an offer page met four questions addressed to somebody else and
+              read the page as unfinished. This page is the work log, and a
+              work log is where a work log belongs.
+
+              The list is derived from the same bodies the pages render, so an
+              item cannot be closed here while its gap is still on the page,
+              and closing the gap removes the item the same build.
+            */}
+            <section className="open-items" aria-labelledby="open-items">
+              <h2 id="open-items">Open items</h2>
+              <p className="open-items__lead">
+                {pendingCount} questions the site is still carrying, across{" "}
+                {pendingPaths.length} pages. Each one is a fact only James has. Where one
+                of these is unanswered, the page it belongs to says the fact is not
+                published rather than filling the hole.
+              </p>
+              <ol className="open-items__list">
+                {pendingItems.map((item, i) => (
+                  <li key={`${item.path}-${i}`}>
+                    <p className="open-items__where">
+                      <Link href={item.path}>{item.where}</Link>
+                    </p>
+                    <p className="open-items__q">{item.question}</p>
+                  </li>
+                ))}
+              </ol>
+              <Nameplate
+                className="np--stamp"
+                fields={[
+                  { label: "Source", value: "Every pending mark in the content source" },
+                  {
+                    label: "Method",
+                    value: "Scanned from the same bodies the pages render, counted at build",
+                  },
+                ]}
+              />
+            </section>
+          </div>
 
           <aside className="article__aside" aria-label="Freshness">
             <div className="panel">

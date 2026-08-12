@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { JsonLd, PageNameplate, Prose } from "@/components/site/instruments";
 import { LeadForm } from "@/components/site/LeadForm";
+import { contactQualify } from "@/content/site";
+import { HELP_LABEL, INQUIRY_PARAM, parseHelpType } from "@/lib/contact";
 import { renderMarkdown } from "@/lib/content/markdown";
 import { contactGraph, serializeGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -28,19 +30,31 @@ const FAQ = [
   },
 ];
 
-const QUALIFY = `## What makes a strong fit
+/**
+ * PRESELECTING THE ENQUIRY TYPE.
+ *
+ * The offer pages link here with `?inquiry=<type>`, and the form arrives with
+ * that type already chosen. Reading it on the SERVER, rather than with
+ * useSearchParams in the form component, is a deliberate call: the client hook
+ * forces a statically-rendered page to fall back to a Suspense boundary, which
+ * would take the whole enquiry form out of the server response. A contact form
+ * that only exists after hydration is a contact form that does not exist for a
+ * visitor with JavaScript off, and "the site is fully usable with JS off" is a
+ * brief requirement, not a preference. The cost is that /contact renders per
+ * request instead of at build. The canonical, the metadata and the JSON-LD are
+ * unaffected.
+ *
+ * An unknown or absent value selects nothing, exactly as before.
+ */
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const raw = params[INQUIRY_PARAM];
+  const preselected = parseHelpType(Array.isArray(raw) ? raw[0] : raw);
 
-- A real operating problem, not an AI demo looking for a home.
-- Access to the people, the process, or the data the system has to serve.
-- A willingness to define what success means before choosing the tools.
-
-## What this is not
-
-If what you want is a headcount replacement, a number to put in a deck, or a system nobody will be allowed to check, we will both have a bad time. The work on this site is built to be inspected. That only pays off if you want it inspected.
-
-[JAMES: what makes someone a strong fit to reach out, in one or two lines, in your words? The three bullets above are carried over from the current site. A real qualification in your voice would be stronger than a generic one.]`;
-
-export default function ContactPage() {
   return (
     <main id="main" tabIndex={-1}>
       <JsonLd json={serializeGraph(contactGraph(FAQ))} />
@@ -62,7 +76,12 @@ export default function ContactPage() {
 
         <div className="article">
           <div>
-            <Prose html={renderMarkdown(QUALIFY)} />
+            <Prose
+              html={renderMarkdown(contactQualify.body, {
+                mode: "public",
+                notes: contactQualify.publicNotes,
+              })}
+            />
             <p className="form-note">
               Prefer email? <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
             </p>
@@ -73,7 +92,13 @@ export default function ContactPage() {
           </div>
 
           <aside className="article__aside" aria-label="Send an enquiry">
-            <LeadForm />
+            {preselected ? (
+              <p className="form-status" role="status">
+                Enquiry type set to &ldquo;{HELP_LABEL[preselected]}&rdquo; from the page
+                you came from. Change it below if that is not right.
+              </p>
+            ) : null}
+            <LeadForm preselectedHelpType={preselected} />
           </aside>
         </div>
       </div>

@@ -127,6 +127,8 @@ Flagship: Universal Question Geometry (OfOne). Then: Question-Answer Dynamics, C
 - 2026-08-11 — problem-solving-system gets an MIT license; commit staged as a PR for James's merge approval. — James
 - 2026-08-11 — GEO spec conflict rulings (lead agent): (A) www.jamesbrady.org is canonical everywhere — feed, JSON-LD Person.url, ai-manifest normalize to www; (B) robots keeps `Disallow: /api/` but adds an explicit `Allow: /api/catalog` (deliberate machine-readable endpoint, advertised in llms.txt); (C) client-name denylist gate is FAIL-CLOSED, materialized from a CLIENT_DENYLIST secret created at Phase-5 setup with James's approval — gate output prints line+hash, never the term; (D) /links and /watch appear in sitemap + llms.txt and their content summaries join the grounding pack; (E) YouTube channel-ID URL stands (verified beats pretty); (F) dateModified gets a git-mtime cross-check — warn in v1, fail in v2. h3ro gate nuance: blocks h3ro-as-brand copy and the h3ro.ai domain; ALLOWS github.com/h3ro-dev/* and h3ro-dev.github.io/* (org infrastructure URLs are facts) plus the two social profile URLs (x.com/h3roai, tiktok.com/@h3ro.ai).
 
+- 2026-08-12 — /now describes current work as research projects, not the site rebuild. — James
+
 ## Open items
 
 - James locks v2 (or marks it up).

@@ -1,4 +1,8 @@
 export const helpTypes = [
+  // Added wave 3 with the /work-with-me path. A local-service owner arriving
+  // from "Get my business found" was previously offered nothing that described
+  // what they came for, and picked "AI strategy" or "Something else".
+  "get_found",
   "ai_strategy",
   "production_build",
   "agent_architecture",
@@ -24,13 +28,60 @@ export const budgetRanges = [
   "prefer_not_to_say",
 ] as const;
 
+export type HelpType = (typeof helpTypes)[number];
+export type Timeline = (typeof timelines)[number];
+export type BudgetRange = (typeof budgetRanges)[number];
+
+/**
+ * The visible labels, here rather than in the form component.
+ *
+ * The offer pages print budget bands beside their calls to action, and the
+ * form offers the same bands a click later. Two copies of "$15k – $50k" is a
+ * pair that drifts, and the one that drifts is the one on the page nobody
+ * edited. One list, two readers.
+ */
+export const HELP_LABEL: Record<HelpType, string> = {
+  get_found: "Get found in search and AI answers",
+  ai_strategy: "AI strategy",
+  production_build: "Production build",
+  agent_architecture: "Agent architecture",
+  integration: "Integration",
+  speaking_media: "Speaking or media",
+  partnership: "Partnership",
+  other: "Something else",
+};
+
+export const TIMELINE_LABEL: Record<Timeline, string> = {
+  immediate: "Immediately",
+  one_month: "Within a month",
+  one_quarter: "Within a quarter",
+  exploring: "Still exploring",
+};
+
+export const BUDGET_LABEL: Record<BudgetRange, string> = {
+  under_5k: "Under $5k",
+  "5k_15k": "$5k – $15k",
+  "15k_50k": "$15k – $50k",
+  "50k_plus": "$50k+",
+  not_applicable: "Not applicable",
+  prefer_not_to_say: "Prefer not to say",
+};
+
+/** Query key the offer pages use to preselect an enquiry type on /contact. */
+export const INQUIRY_PARAM = "inquiry";
+
+/** A URL-supplied enquiry type, or undefined when it is absent or unknown. */
+export function parseHelpType(raw: string | undefined): HelpType | undefined {
+  return helpTypes.includes(raw as HelpType) ? (raw as HelpType) : undefined;
+}
+
 export type ContactLead = {
   name: string;
   email: string;
   company: string;
-  helpType: (typeof helpTypes)[number];
-  timeline: (typeof timelines)[number];
-  budgetRange: (typeof budgetRanges)[number];
+  helpType: HelpType;
+  timeline: Timeline;
+  budgetRange: BudgetRange;
   message: string;
 };
 

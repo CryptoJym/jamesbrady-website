@@ -13,6 +13,7 @@ export const NEW_REWARD_ID = `${SITE.host}/#new-reward`;
 export const WEBSITE_ID = `${SITE.host}/#website`;
 export const THEORY_GLOSSARY_ID = `${SITE.host}/#theory-glossary`;
 export const WORK_GLOSSARY_ID = `${SITE.host}/#work-glossary`;
+export const OFFER_GLOSSARY_ID = `${SITE.host}/#offer-glossary`;
 
 /**
  * Exact list, ordered, no additions without a ruling. The X and TikTok entries

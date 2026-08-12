@@ -1,4 +1,4 @@
-import { discoverableTheories, lab, learn, work } from "@/lib/content";
+import { discoverableTheories, lab, learn, offers, work } from "@/lib/content";
 import { indexableRoutes } from "@/lib/seo/routes";
 import { NEW_REWARD_ID, PERSON_ID, UTLYZE_ID } from "@/lib/schema/entities";
 import { gitShortSha } from "@/lib/seo/git";
@@ -32,6 +32,7 @@ export function GET() {
       collection: r.collection,
     })),
     collections: [
+      { name: "offers", count: offers.length },
       { name: "work", count: work.length },
       { name: "theories", count: discoverableTheories.length },
       { name: "lab", count: lab.filter((l) => !l.noindex).length },

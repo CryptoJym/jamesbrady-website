@@ -79,19 +79,39 @@ export function SiteNav() {
   );
 }
 
+/**
+ * Footer socials.
+ *
+ * All six profiles, not three. X, TikTok, YouTube and Bluesky existed only
+ * inside the JSON-LD `sameAs` array: a machine reading the entity graph could
+ * see them and a person reading the page could not, which is exactly backwards
+ * for accounts whose whole job is to bring people here.
+ *
+ * X and TikTok print their FULL URL as the visible handle. The retired brand
+ * token is permitted as those two exact URLs and in no other shape, so a
+ * prettier "@handle" label would be a violation rather than a nicety.
+ */
 const SOCIAL = [
   { label: "GitHub", handle: "github.com/CryptoJym", href: SAME_AS[0] },
   { label: "LinkedIn", handle: "/in/jamesbrady1", href: SAME_AS[1] },
+  { label: "X", handle: SAME_AS[2], href: SAME_AS[2] },
+  { label: "TikTok", handle: SAME_AS[3], href: SAME_AS[3] },
+  { label: "Bluesky", handle: "bsky.app/profile/utlyzeit.bsky.social", href: SAME_AS[4] },
+  { label: "YouTube", handle: "youtube.com/channel/UCA_9udyLWeGoJy12vc5TmfA", href: SAME_AS[5] },
   { label: "Email", handle: SITE.email, href: `mailto:${SITE.email}` },
 ];
 
 const FOOTER_NAV = [
+  { href: "/work-with-me", label: "Work with me" },
   { href: "/work", label: "Work" },
   { href: "/theories", label: "Theories" },
   { href: "/lab", label: "Lab" },
   { href: "/learn", label: "Learn" },
   { href: "/about", label: "About" },
   { href: "/now", label: "Now" },
+  // The bridge from the social accounts, previously reachable from no page on
+  // the site that linked to it.
+  { href: "/links", label: "Links" },
   { href: "/contact", label: "Contact" },
   { href: "/feed.xml", label: "RSS" },
   { href: "/llms.txt", label: "llms.txt" },
@@ -117,15 +137,15 @@ export function SiteFooter() {
               </a>
             ))}
           </div>
-          <div className="who">
-            {/* BUILD-GATE (punch list 19): a real photo asset replaces this box. */}
-            <div className="who__ph" aria-hidden="true">
-              <span>
-                PHOTO
-                <br />
-                PENDING
-              </span>
-            </div>
+          {/*
+            The photo slot is gone from the footer, and stays on /about.
+            An empty labelled box is honest once, on the page whose job is the
+            person. Repeated in the footer of all 30 routes it stopped reading
+            as candour and started reading as an unfinished template, which is
+            the opposite of what the label was for. The build gate is unchanged:
+            /about still shows the gap, and a real asset still closes it.
+          */}
+          <div className="who who--nophoto">
             <p className="colophon">
               <b>One person, operating at fleet scale.</b>
               Every figure on this site is counted from a public repo or a live page when
@@ -139,9 +159,22 @@ export function SiteFooter() {
           source="Public repos · live pages · the typed content source"
           method="Counted at build, never rounded up"
         />
+        {/* The entity line, with both entities now reachable. New Reward
+            delivers the visibility engagement and had no link from any page on
+            this site, which made "the agency that does it" an assertion rather
+            than a destination. */}
         <div className="foot__stamp">
           <span>© {new Date().getFullYear()} James Brady</span>
-          <span>Utlyze (studio) · New Reward (agency) — James operates both</span>
+          <span>
+            <a href="https://utlyze.com" rel="noopener noreferrer">
+              Utlyze
+            </a>{" "}
+            (studio) ·{" "}
+            <a href="https://newreward.com" rel="noopener noreferrer">
+              New Reward
+            </a>{" "}
+            (agency) — James operates both
+          </span>
         </div>
       </div>
     </footer>

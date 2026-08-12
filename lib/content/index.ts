@@ -12,6 +12,7 @@ import { theories as theoriesRaw } from "@/content/theories";
 import { lab as labRaw } from "@/content/lab";
 import { learn as learnRaw } from "@/content/learn";
 import { now as nowRaw } from "@/content/now/now";
+import { offers as offersRaw } from "@/content/offers";
 import { validateAll } from "./validate";
 import {
   MATURITY_ORDER,
@@ -20,6 +21,7 @@ import {
   type LearnEntry,
   type Maturity,
   type NowEntry,
+  type OfferEntry,
   type TheoryEntry,
   type WorkEntry,
 } from "./types";
@@ -30,6 +32,7 @@ const validated = validateAll({
   lab: labRaw,
   learn: learnRaw,
   now: [nowRaw],
+  offers: offersRaw,
 });
 
 export const work: WorkEntry[] = validated.work;
@@ -37,8 +40,9 @@ export const theories: TheoryEntry[] = validated.theories;
 export const lab: LabEntry[] = validated.lab as LabEntry[];
 export const learn: LearnEntry[] = validated.learn as LearnEntry[];
 export const now: NowEntry = validated.now[0];
+export const offers: OfferEntry[] = validated.offers;
 
-export const collections = { work, theories, lab, learn, now: [now] };
+export const collections = { work, theories, lab, learn, now: [now], offers };
 
 // ---------------------------------------------------------------------------
 // Derived values. Nothing below may be typed into a template.
@@ -103,6 +107,10 @@ export function theoryBySlug(slug: string): TheoryEntry | undefined {
   return theories.find((t) => t.slug === slug);
 }
 
+export function offerBySlug(slug: string): OfferEntry | undefined {
+  return offers.find((o) => o.slug === slug);
+}
+
 /** Every entry across every collection, for the generated artifacts. */
 export const allEntries: AnyEntry[] = [
   ...work,
@@ -110,6 +118,7 @@ export const allEntries: AnyEntry[] = [
   ...lab,
   ...learn,
   now,
+  ...offers,
 ];
 
 /** Route path for any entry. Index routes are listed separately in lib/seo/routes.ts. */
@@ -125,6 +134,8 @@ export function entryPath(entry: AnyEntry): string {
       return (entry as LearnEntry).volumeRoute;
     case "now":
       return "/now";
+    case "offers":
+      return `/work-with-me/${entry.slug}`;
   }
 }
 

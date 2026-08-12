@@ -12,7 +12,17 @@ const REQUEST_TIMEOUT_MS = 5_000;
 const DEFAULT_LEAD_INGEST_URL =
   "https://api.utlyze.ai/api/trpc/leads.create?batch=1";
 
+/**
+ * The gateway's own engagement vocabulary, which this site does not own.
+ *
+ * `get_found` has no counterpart in it, and inventing one is how a lead gets
+ * rejected at the far end for an enum the receiver never defined. It maps to
+ * the gateway's neutral value; the distinction survives in `role`, which
+ * already carries the site's own help type verbatim, so a visibility enquiry
+ * arrives labelled "JamesBrady.org / get_found" and nothing is lost.
+ */
 const engagementTypeMap = {
+  get_found: "not_sure",
   ai_strategy: "not_sure",
   production_build: "build_sprint",
   agent_architecture: "systems_integration",

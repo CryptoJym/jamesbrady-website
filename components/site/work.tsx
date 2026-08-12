@@ -93,6 +93,20 @@ export function WorkCard({
     .map((f) => footFactText(f, entry))
     .filter((t): t is string => Boolean(t))
     .join(" · ");
+
+  /**
+   * The repository, one click away.
+   *
+   * The card used to print "3 stars" as text and link only to the case study,
+   * so a builder who wanted the source had to open the case study, scroll to
+   * the proof block, and follow a link from there. Three clicks to reach the
+   * thing the card was already boasting about. The star count is the SAME
+   * `repo.stars` the homepage readout sums and JSON-LD publishes, from the
+   * same dated snapshot — not a second number fetched a different way.
+   */
+  const repo = entry.repo?.public ? entry.repo : undefined;
+  const stars = repo?.stars;
+
   return (
     <article className="card" data-cat={cats}>
       <div className="card__top">
@@ -109,6 +123,27 @@ export function WorkCard({
       <p className="card__foot">
         <span>{foot}</span> <span className="arw" aria-hidden="true">→</span>
       </p>
+      {repo ? (
+        <p className="card__repo">
+          <a
+            href={`https://github.com/${repo.owner}/${repo.name}`}
+            rel="noopener noreferrer"
+          >
+            <span className="card__repo-k">Code</span>
+            <span className="card__repo-v">
+              {repo.owner}/{repo.name}
+            </span>
+            {typeof stars === "number" ? (
+              <span className="card__repo-s">
+                {stars} {stars === 1 ? "star" : "stars"} · Star it
+              </span>
+            ) : null}
+            <span className="arw" aria-hidden="true">
+              →
+            </span>
+          </a>
+        </p>
+      ) : null}
     </article>
   );
 }

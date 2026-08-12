@@ -5,12 +5,15 @@
 // lib/content/index.ts, which means `next build` cannot produce a page from
 // content that breaks a contract.
 
+import { budgetRanges, helpTypes } from "@/lib/contact";
+import { extractGaps } from "./markdown";
 import {
   MATURITY_ORDER,
   type AnyEntry,
   type LabEntry,
   type LearnEntry,
   type NowEntry,
+  type OfferEntry,
   type TheoryEntry,
   type WorkEntry,
 } from "./types";
@@ -109,6 +112,25 @@ function validateBase(entry: AnyEntry) {
     where,
     `answerCapsule first sentence must be pronoun-free and self-contained; it starts "${firstSentence.slice(0, 40)}…"`,
   );
+
+  // Buyer render mode. One third-person note per gap, in gap order.
+  //
+  // Both failure directions are checked, because both are silent: too few
+  // notes and the render throws mid-page or a gap loses its statement of
+  // absence; too many and a note has been written for a gap somebody deleted,
+  // which shifts every note after it onto the wrong hole.
+  if (entry.publicNotes) {
+    const gaps = extractGaps(entry.body);
+    assert(
+      entry.publicNotes.length === gaps.length,
+      where,
+      `publicNotes has ${entry.publicNotes.length} note(s) for ${gaps.length} pending gap(s). ` +
+        `The buyer render pairs them by position, so the counts have to match exactly.`,
+    );
+    entry.publicNotes.forEach((note, i) => {
+      assert(note.trim(), where, `publicNotes[${i}] is empty — a gap still has to say it is a gap`);
+    });
+  }
 
   // Proof sources.
   for (const p of entry.proof) {
@@ -221,6 +243,51 @@ function validateTheory(entry: TheoryEntry) {
   }
 }
 
+/**
+ * An offer is the one collection a buyer reads before deciding to pay, so the
+ * fields that would let it overstate are the ones checked hardest: the budget
+ * bands and the enquiry type must be real members of the /contact allowlists,
+ * or the page prints a band the form cannot offer and a call to action that
+ * preselects nothing.
+ */
+function validateOffer(entry: OfferEntry) {
+  const where = `offers/${entry.slug}`;
+  assertNoNumeral(entry.kicker, where, "kicker");
+  assert(entry.body.trim().length > 0, where, "body is required — offer prose is static HTML");
+  assert(
+    entry.capsuleQuestion.trim().endsWith("?"),
+    where,
+    "capsuleQuestion must be question-shaped: the answer capsule sits directly under it (geo-seo-spec §4.1)",
+  );
+  assert(entry.audience.length > 0, where, "audience is required — who the engagement is for");
+  assert(entry.steps.length > 0, where, "steps is required — what an engagement looks like");
+  assert(
+    entry.deliverables.length > 0,
+    where,
+    "deliverables is required — what the client is left holding",
+  );
+  assert(entry.deliveredBy.url.startsWith("https://"), where, "deliveredBy.url must be absolute");
+  assert(
+    helpTypes.includes(entry.inquiryType),
+    where,
+    `inquiryType "${entry.inquiryType}" is not in the /contact allowlist — the call to action would preselect nothing`,
+  );
+  assert(entry.budgetBands.length > 0, where, "budgetBands is required");
+  for (const band of entry.budgetBands) {
+    assert(
+      budgetRanges.includes(band),
+      where,
+      `budget band "${band}" is not one the /contact form offers`,
+    );
+  }
+  entry.steps.forEach((s, i) => {
+    assertNoNumeral(s.label, where, `steps[${i}].label`);
+  });
+  entry.deliverables.forEach((d, i) => {
+    assertNoNumeral(d.label, where, `deliverables[${i}].label`);
+  });
+}
+
 function validateLab(entry: LabEntry) {
   const where = `lab/${entry.slug}`;
   assertNoNumeral(entry.stateWord, where, "stateWord");
@@ -276,6 +343,7 @@ export function validateAll(input: {
   lab: LabEntry[];
   learn: AnyEntry[];
   now: NowEntry[];
+  offers: OfferEntry[];
 }) {
   const all: AnyEntry[] = [
     ...input.work,
@@ -283,12 +351,14 @@ export function validateAll(input: {
     ...input.lab,
     ...input.learn,
     ...input.now,
+    ...input.offers,
   ];
   all.forEach(validateBase);
   input.work.forEach(validateWork);
   input.theories.forEach(validateTheory);
   input.lab.forEach(validateLab);
   (input.learn as LearnEntry[]).forEach(validateLearn);
+  input.offers.forEach(validateOffer);
   validateNow(input.now);
   validateUniqueSlugs(all);
   return { ...input, lab: input.lab.map(normalizeLab) };

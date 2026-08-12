@@ -6,44 +6,44 @@ import type { NowEntry } from "@/lib/content/types";
  * (geo-seo-spec §6) — a stale /now is a defect, not a warning.
  *
  * No auto-generation from GitHub activity. This is written by hand, monthly.
+ *
+ * OWNER DIRECTIVE, 2026-08-12: this page describes the current work as
+ * research projects, not as rebuilding this site. James's words were "currently
+ * working on a number of different research projects at this time". He named no
+ * projects, so none are named here, and the earlier copy naming the rebuild,
+ * the platform in production and the collector heading toward release came out
+ * rather than being reworded. What is not stated is stated as not stated.
  */
 export const now: NowEntry = {
   collection: "now",
   slug: "now",
-  title: "What I'm working on now",
-  updated: "2026-08-11",
+  title: "Research projects",
+  updated: "2026-08-12",
   answerCapsule:
-    "James Brady is currently rebuilding jamesbrady.org from the ground up, with the content pipeline and the page skeleton landing first and the grounded Ask dock following. Alongside that, the visibility platform is running in production for client accounts, and plimsoll is being prepared for release signing and npm publication. This page is hand-edited monthly; the age indicator beside it is computed from the date the file itself carries.",
+    "James Brady is currently working on a number of different research projects. Which projects those are is not published here yet, and what ships from them will appear on this site with its numbers and its method when it is ready. This page is hand-edited rather than generated from repository activity, the age indicator beside it is computed from the date the file itself carries, and the open questions the whole site is still carrying are listed below.",
   summary:
-    "Hand-edited monthly: the site rebuild, the visibility platform in production, and plimsoll heading toward release.",
+    "Research projects are the current work. This page is hand-edited monthly, and the open questions the rest of the site is carrying are listed below.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-08-12",
   entities: ["person:james", "org:utlyze", "org:new-reward"],
   proof: [
     {
       label: "This page",
       artifact: "/now",
       method: "Hand-edited. The age indicator is computed from the entry's own `updated` field at render time.",
-      capturedAt: "2026-08-11",
+      capturedAt: "2026-08-12",
     },
   ],
   og: {
     image: "/og/default.png",
     imageAlt: "James Brady — what I'm working on now",
   },
-  body: `## Rebuilding this site
+  // No opening heading: the H1 is already "Research projects", and a heading
+  // that restates the one above it is the fragmented-header pattern the
+  // content register names (pattern 29).
+  body: `James is currently working on a number of different research projects.
 
-The site you are reading is being rebuilt from the ground up. Wave one is the foundation: a typed content source that every page, feed and machine-readable file reads from, the design system, and the page skeleton. The grounded Ask dock comes after, and until it does the dock states its terms and offers email instead of pretending to answer.
+Which ones they are is not published here yet. What ships from them will be published on this site, with its numbers and the method behind them, when it is ready. Nothing goes up before that: a project described before it exists is a promise, and this site publishes results.
 
-## In production
-
-The visibility platform is running for client accounts, measuring how findable a business is in search and inside AI assistants. Client work stays anonymized by default here; industries are named, companies are not.
-
-## Heading toward release
-
-plimsoll, the collector that ties AI coding spend to merged pull requests, has release signing and npm publication outstanding. Background service mode for npm installs is not fitted yet, and the README says so.
-
-## Open on my desk
-
-The largest gap on this site is the human story on the about page, and it is mine to write. Several pages carry marked questions that only I can answer; they are shown on the page rather than filled in with something plausible.`,
+The rest of this page is the work log.`,
 };
