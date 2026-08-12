@@ -8,15 +8,18 @@
 // hexes, because a browser fetching an icon has never seen the stylesheet —
 // and "add it to the lint's allowlist" turned out to mean "write the lint".
 //
-// SCOPE, stated rather than implied. This gate covers the DIRECTION B
-// surfaces. It does NOT cover:
-//   · the LEGACY SKIN block at the foot of globals.css, and the five archived
-//     routes it paints. Those keep their old gold palette on purpose until
-//     they are reskinned, and a gate that went red on them from day one would
-//     be a gate everyone learned to ignore.
-//   · components/ outside components/site/ — the same archived surfaces.
-// Wave 2 is not the wave that reskins them. When it happens, delete the
-// exclusions below and this gate covers the whole repo with no other change.
+// SCOPE — WHOLE REPO AS OF WAVE 4. This gate used to carry two exclusions:
+// the LEGACY SKIN block at the foot of globals.css, and components/ outside
+// components/site/. Both existed for the same reason: the archived routes kept
+// their old gold palette on purpose, and a gate that went red on them from day
+// one would be a gate everyone learned to ignore.
+//
+// Wave 4 reskinned /primer, /manuscript, /workshop and /watch onto Direction B
+// at their original URLs. The LEGACY SKIN block is deleted, the (legacy) route
+// group is deleted, and the components that painted the old palette are
+// deleted. So the exclusions are gone and this gate now reads every stylesheet
+// rule and every component in the repo — which is what the wave-2 note said
+// would happen, and it took no other change.
 //
 // The allowlist has TWO halves. A file on it may repeat a token value; it may
 // not invent a colour. Every literal in an exempted file is then checked
@@ -29,8 +32,6 @@ import { parseRootTokens, scanForLiterals, scanFrozen } from "./lib/token-gate.m
 import { APPLE_OUT, ICO_OUT, ROOT, renderIcons } from "./lib/icon-raster.mjs";
 
 const CSS = join(ROOT, "app", "globals.css");
-/** Everything from here down in globals.css is the archived skin. */
-const LEGACY_MARKER = "LEGACY SKIN";
 
 /**
  * Files that may carry a colour literal, each with the reason it must.
@@ -67,13 +68,13 @@ report("1. :root declares a token palette", tokens.size > 0, `${tokens.size} col
 
 /* --------------------------------------------- 2. globals.css, Direction B */
 
-const cssHits = scanForLiterals(cssText, { css: true, stopAt: LEGACY_MARKER });
+const cssHits = scanForLiterals(cssText, { css: true });
 report(
-  "2. globals.css: no colour literal outside :root (Direction B region)",
+  "2. globals.css: no colour literal outside :root",
   cssHits.length === 0,
   cssHits.length
     ? cssHits.map((h) => `line ${h.line}: ${h.literal}`).join(" | ")
-    : `scanned to the "${LEGACY_MARKER}" marker`,
+    : `whole file scanned, ${cssText.split("\n").length} lines`,
 );
 
 /* -------------------------------------------- 3. Direction B TS/TSX + SVG */
@@ -82,21 +83,16 @@ const walk = (dir, out = []) => {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (name === "node_modules" || name === ".next") continue;
-    if (statSync(p).isDirectory()) {
-      // The archived routes keep their own skin this wave.
-      if (name === "(legacy)") continue;
-      walk(p, out);
-    } else if (/\.(tsx?|svg)$/.test(name)) {
-      out.push(p);
-    }
+    if (statSync(p).isDirectory()) walk(p, out);
+    else if (/\.(tsx?|svg)$/.test(name)) out.push(p);
   }
   return out;
 };
 
-const sourceFiles = [
-  ...walk(join(ROOT, "app")),
-  ...walk(join(ROOT, "components", "site")),
-];
+// components/, not components/site/. The wave-2 exclusion existed for the
+// archived skin's components; they are deleted, so the whole directory is in
+// scope and a new component cannot paint a literal by living one level up.
+const sourceFiles = [...walk(join(ROOT, "app")), ...walk(join(ROOT, "components"))];
 
 const srcHits = [];
 for (const file of sourceFiles) {

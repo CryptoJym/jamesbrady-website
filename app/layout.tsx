@@ -1,20 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
 
 import { SITE } from "@/lib/seo/site";
 import "./globals.css";
 
 /**
  * Root layout. Holds only the document and the skip link — nothing that
- * paints. Page chrome lives in the route-group layouts: app/(site) carries
- * Direction B (grain, console rail, nav, footer, Ask dock), app/(legacy)
- * keeps the archived volumes on their existing skin at their existing URLs.
+ * paints. Page chrome lives in app/(site)/layout.tsx, which carries Direction
+ * B: grain, console rail, nav, footer, Ask dock.
  *
- * The grain overlay and the Ask dock used to live here. Both painted on the
- * five archived routes, which main does not have (independent review, P1-2) —
- * they moved into app/(site)/layout.tsx and the legacy pixel-diff gate in
- * verify-visual keeps them there.
+ * The (legacy) route group is gone as of wave 4. /primer, /manuscript,
+ * /workshop and /watch were the last routes on the old skin; they now render
+ * on Direction B at the same URLs, so there is one chrome for the whole site
+ * and no second layout for a change to leak across.
+ *
+ * NO WEBFONT. GeistSans and GeistMono were mounted here and consumed only by
+ * the archived skin. Direction B is a system stack by design (design-system-
+ * spec §1.5: "no webfont, no CLS"), so the fonts left with the skin that used
+ * them.
  *
  * Every route's own metadata comes from lib/seo/metadata.ts. Nothing here sets
  * a canonical, because a layout-level canonical is exactly how the live site
@@ -48,11 +50,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      data-scroll-behavior="smooth"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
-    >
+    <html lang="en" data-scroll-behavior="smooth">
       <body>
         <a className="skip" href="#main">
           Skip to content

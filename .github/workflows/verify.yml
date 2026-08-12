@@ -42,11 +42,14 @@ jobs:
 
       - run: npm ci
 
-      # NOTE: `npm run lint` is deliberately NOT a gate yet. The base branch
-      # carries 33 pre-existing eslint errors in untouched legacy components;
-      # wiring lint in now would make this workflow red for a reason wave 1 did
-      # not cause, and a permanently-red gate teaches people to ignore red.
-      # Wave 2 clears those and turns it on.
+      # LINT IS A GATE AS OF WAVE 4, which is what the note that used to sit
+      # here promised. It was off because the base branch carried 30 eslint
+      # errors and 15 warnings in untouched legacy components, and a
+      # permanently-red gate teaches people to ignore red. Those components are
+      # deleted; the repo lints at zero problems, so the gate goes on before
+      # anything has a chance to accumulate against it again.
+      - name: Lint
+        run: npm run lint
 
       # ---------------------------------------------------------------------
       # The client-name denylist. FAIL-CLOSED, and closed means RED.
@@ -133,28 +136,19 @@ jobs:
       - name: Install the headless browser
         run: npx playwright install --with-deps chromium
 
-      # Legacy parity needs a second server running a build of the base branch,
-      # so the two /primer renders can be pixel-diffed. Built into a worktree so
-      # the working tree is untouched.
-      - name: Build main into a worktree for the legacy pixel-diff
-        run: |
-          git worktree add ../main-baseline origin/${{ github.event.pull_request.base.ref || 'main' }}
-          cd ../main-baseline
-          npm ci
-          npm run build
-          npx next start -p 4124 &
-          cd -
-          for _ in $(seq 1 90); do
-            curl -sfo /dev/null http://localhost:4124 && exit 0
-            sleep 2
-          done
-          echo "::error::the main baseline never answered on :4124"; exit 1
-
-      - name: verify-visual (incl. legacy pixel-diff against main)
-        run: |
-          node scripts/verify-visual.mjs \
-            --base http://localhost:4123 \
-            --legacy-base http://localhost:4124
+      # THE SECOND SERVER IS GONE. This workflow used to build the base branch
+      # into a worktree and serve it on :4124 so verify-visual could pixel-diff
+      # the four archived routes against it and require zero differing pixels.
+      # Wave 4 reskinned those routes onto Direction B at the same URLs, so
+      # they are now INTENDED to differ from main in every pixel and the diff
+      # would fail by design. The gate is replaced inside verify-visual by the
+      # checks every other Direction B route answers to; the full reasoning,
+      # including what the retirement costs, is at the head of that script.
+      #
+      # A whole `npm ci` and `npm run build` of a second checkout goes with it,
+      # which is several minutes back on every run.
+      - name: verify-visual
+        run: node scripts/verify-visual.mjs --base http://localhost:4123
 
       # Wave 2 acceptance: frame rate, field-vs-h1 luminance, the living mark,
       # reduced motion and the icon set. Kept out of verify-visual so the
@@ -172,8 +166,7 @@ jobs:
             out/verify-chrome/
           if-no-files-found: warn
 
-      - name: Stop servers
+      - name: Stop the server
         if: always()
         run: |
           [ -f .next-server.pid ] && kill "$(cat .next-server.pid)" || true
-          pkill -f "next start -p 4124" || true

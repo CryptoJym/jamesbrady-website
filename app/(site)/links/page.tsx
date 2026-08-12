@@ -88,7 +88,10 @@ const ON_THIS_SITE: { href: string; label: string; note: string }[] = [
   { href: "/theories", label: "Theories", note: "Open questions, labelled by how far along they are." },
   { href: "/lab", label: "Lab", note: "Things you can poke at in a browser." },
   { href: "/learn", label: "Learn", note: "Three archived volumes, kept at their original URLs." },
-  { href: "/watch", label: "Watch", note: "Recorded walkthroughs, narrated, with transcripts." },
+  // "written summary", not "transcript" — wave 4 relabelled the text block
+  // under each recording for what it is, and this is one of the two other
+  // places the old claim was repeated.
+  { href: "/watch", label: "Watch", note: "Recorded walkthroughs, narrated, each with a written summary." },
   { href: "/now", label: "Now", note: "What is actually happening this month, including what is stuck." },
   { href: "/about", label: "About", note: "Who does what, and how the work gets checked." },
   { href: "/contact", label: "Contact", note: "The enquiry form, and what makes a strong fit." },
@@ -158,7 +161,7 @@ export default function LinksPage() {
                 label: "Watch one get built",
                 who: "For anyone who would rather see it than read it",
                 detail:
-                  "Narrated walkthroughs with transcripts, kept at their original URL alongside the archive.",
+                  "Narrated walkthroughs, each with a written summary, kept at their original URL alongside the archive.",
                 href: "/watch",
               },
             ]}

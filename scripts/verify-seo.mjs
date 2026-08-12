@@ -85,8 +85,8 @@ const STATIC_ROUTES = [
   // Reskinned in wave 3 onto Direction B, at the SAME URL. It is no longer a
   // legacy route, so every check below applies to it with no deferral.
   "/links",
-  // Legacy routes. URLs preserved; they are in the battery because a
-  // canonical regression on an archived page is still a canonical regression.
+  // The dated archives. URLs preserved, reskinned onto Direction B in wave 4,
+  // and held to every check below with no deferral.
   "/primer",
   "/manuscript",
   "/workshop",
@@ -94,13 +94,21 @@ const STATIC_ROUTES = [
 ];
 
 /**
- * The archived routes. URLs preserved; skin and copy still out of scope.
+ * THE DEFERRAL LIST, NOW EMPTY.
  *
- * /links left this list in wave 3 when it was reskinned. It was the site's
- * bridge from the social accounts and it was the one archived page a stranger
- * was most likely to land on first, so it graduated ahead of the volumes.
+ * This held the routes whose defects were real, named and out of scope: the
+ * five pages still wearing the old skin. /links left in wave 3; /primer,
+ * /manuscript, /workshop and /watch left in wave 4, when they were reskinned
+ * onto Direction B at the same URLs. Every check in this file now applies to
+ * every route in STATIC_ROUTES.
+ *
+ * The array and the machinery below it stay rather than being deleted, and
+ * that is deliberate: an empty exclusion list is a claim a reader can check in
+ * one line, and the next route that needs a named, temporary exemption gets a
+ * mechanism that has already been exercised instead of one invented under
+ * deadline. If it is still empty several waves from now, delete it then.
  */
-const LEGACY_ROUTES = ["/primer", "/manuscript", "/workshop", "/watch"];
+const LEGACY_ROUTES = [];
 
 /**
  * Buyer routes — check 17.
@@ -123,10 +131,9 @@ const BUYER_ROUTES = [
 ];
 
 /**
- * Defects that live ONLY on the five archived routes. Wave 1 was scoped to
- * leave those pages untouched, so they are collected and printed as a named
- * block instead of being swept under a narrowed check. Run with
- * --strict-legacy to make them hard failures; wave 2 flips that on for good.
+ * Defects on a route named in LEGACY_ROUTES — currently none, see above. The
+ * flag is kept so the escape hatch cannot be reached by accident: with the
+ * list empty, `--strict-legacy` changes nothing, and that is the point.
  */
 const STRICT_LEGACY = process.argv.includes("--strict-legacy");
 const deferredLegacy = [];
@@ -675,10 +682,11 @@ async function checkOg(pages) {
   const deferred = [];
   const images = new Set();
   for (const [path, html] of pages) {
-    // The five archived routes inherit OG from app/(legacy)/layout.tsx, which
-    // cannot know the pathname, so og:url is a NAMED, DEFERRED gap on those
-    // five until they are reskinned onto pageMetadata() in wave 2. It is
-    // reported rather than quietly dropped from the requirement.
+    // og:url used to be a named, deferred gap on the archived routes: they
+    // inherited one OG block from app/(legacy)/layout.tsx, which could not
+    // know which page it was describing. That layout is gone as of wave 4 and
+    // all four declare their own metadata through pageMetadata(), so the gap
+    // is closed and this branch is now unreachable.
     const isLegacy = LEGACY_ROUTES.includes(path);
     for (const prop of ["og:title", "og:description", "og:image", "og:url"]) {
       if (html.includes(`property="${prop}"`)) continue;
@@ -817,10 +825,20 @@ function checkDenylist(pages, artifacts) {
 /**
  * Check 11 — register rule.
  *
- * The scan set now includes app/api/**, lib/catalog.ts, app/layout.tsx and
+ * The scan set includes app/api/**, lib/catalog.ts, app/layout.tsx and
  * app/globals.css (P2-11). `/api/catalog` shipped the retired job title in its
  * `name` string through every previous green run precisely because the scan
  * stopped at the HTML-rendering surfaces.
+ *
+ * WAVE 4 — EVERY ROUTE, NO DEFERRAL. The volumes and /watch carried the last
+ * of the banned register: sacred-geometry divider variants, the retired
+ * mystical framing in a recording's title and text, and that framing again in
+ * two asset FILE NAMES. A file path inside a `src` attribute is rendered HTML
+ * and this check reads rendered HTML, so renaming the assets was part of the
+ * copy fix, not decoration. The components that carried the rest of it
+ * (AlchemyCanvas, SectionDivider, BootSequence, ChatPanel and the manifold
+ * demo) are deleted — the scan set never reached them, which is precisely why
+ * dead code with a banned register is worth removing rather than tolerating.
  */
 function checkRegister(pages) {
   const BANNED = /alchemist|alchemy|metatron|vesica|neural link|semantic input/i;
@@ -839,7 +857,7 @@ function checkRegister(pages) {
     bad.length === 0,
     bad.length
       ? bad.join(" | ")
-      : `${newSurfaceFiles().length} source files + ${NEW_ROUTES.length} routes · DEFERRED (wave 2): components/AlchemyCanvas.tsx, legacy volume copy`,
+      : `${newSurfaceFiles().length} source files + ${NEW_ROUTES.length} routes, no route deferred`,
   );
 }
 
@@ -1129,13 +1147,20 @@ if (unproven && !IN_CI) {
 
 if (deferredLegacy.length) {
   console.log(
-    `\nDEFERRED — defects on the ${LEGACY_ROUTES.length} archived routes (${LEGACY_ROUTES.join(" ")}),\n` +
-      `which are still scoped to keep their existing skin. These are REAL and they are\n` +
-      `not fixed. Re-run with --strict-legacy to fail on them; each one clears when its\n` +
-      `route is reskinned, the way /links cleared in wave 3.\n`,
+    `\nDEFERRED — defects on ${LEGACY_ROUTES.length} named route(s) (${LEGACY_ROUTES.join(" ")}).\n` +
+      `These are REAL and they are not fixed. Re-run with --strict-legacy to fail on them.\n`,
   );
   for (const d of deferredLegacy) console.log(`  · ${d}`);
   console.log("");
+} else {
+  // Say it out loud. "No deferred block printed" and "nothing was deferred"
+  // look identical in a log, and the difference is the whole point of the
+  // block existing.
+  console.log(
+    `\nNo deferred routes. Every check above ran against all ${STATIC_ROUTES.length} routes.\n` +
+      `/links cleared in wave 3; /primer, /manuscript, /workshop and /watch cleared in\n` +
+      `wave 4 when they were reskinned onto Direction B at the same URLs.\n`,
+  );
 }
 
 process.exit(failed ? 1 : 0);

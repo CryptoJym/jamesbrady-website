@@ -56,13 +56,18 @@ export default function LearnPage() {
           <Tally />
           {/* The recorded walkthroughs were reachable from no page on this
               site. Same archive, same decision to keep them at their URL, and
-              now with a way in. */}
+              now with a way in.
+
+              "written summary", not "transcript": wave 4 established that the
+              text block under each recording is a description someone wrote,
+              not a record of what is said, and relabelled it on /watch. This
+              sentence is the other place that claim was made. */}
           <p className="sec-aside" style={{ marginTop: "var(--s-5)", maxWidth: "72ch" }}>
             Some of the same ground is covered out loud. The{" "}
-            <Link href="/watch">recorded walkthroughs</Link> are narrated, carry
-            transcripts, and are archived at their original URL alongside these three
-            volumes. Everything else on this site is linked from{" "}
-            <Link href="/links">the links page</Link>.
+            <Link href="/watch">recorded walkthroughs</Link> are narrated, each
+            carries a written summary, and they are archived at their original URL
+            alongside these three volumes. Everything else on this site is linked
+            from <Link href="/links">the links page</Link>.
           </p>
           <PageNameplate
             source="The typed content source"

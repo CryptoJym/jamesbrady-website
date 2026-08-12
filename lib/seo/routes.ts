@@ -166,37 +166,56 @@ export function buildRoutes(): RouteRecord[] {
     collection: "site",
   });
 
-  // The volumes and /watch keep their URLs and their existing skin (ruling G).
-  // No moves, no redirects — a redirect on any of them is a defect. /links
-  // left this list in wave 3 when it was reskinned; its URL did not change.
-  const legacy: { path: string; files: string[]; title: string; capsule: string }[] = [
+  // The three volumes and /watch. THE URLS ARE THE POINT: they have never
+  // moved and are not redirected (ruling G, link equity). Wave 4 reskinned all
+  // four onto Direction B in place, the way /links was reskinned in wave 3, so
+  // "archive" now describes the CONTENT — frozen, dated, no longer maintained —
+  // and no longer describes the design they happen to be wearing.
+  //
+  // The git path list carries the historical locations as well as the current
+  // one, so `lastModified` does not reset to the content floor on the commit
+  // that moved the file between route groups.
+  const archive: { path: string; files: string[]; title: string; capsule: string }[] = [
     {
       path: "/primer",
-      files: ["app/(legacy)/primer/page.tsx", "app/primer/page.tsx"],
+      files: ["app/(site)/primer/page.tsx", "app/(legacy)/primer/page.tsx", "app/primer/page.tsx"],
       title: "The Primer",
       capsule: learn[0].answerCapsule,
     },
     {
       path: "/manuscript",
-      files: ["app/(legacy)/manuscript/page.tsx", "app/manuscript/page.tsx"],
+      files: [
+        "app/(site)/manuscript/page.tsx",
+        "app/(legacy)/manuscript/page.tsx",
+        "app/manuscript/page.tsx",
+      ],
       title: "The Manuscript",
       capsule: learn[1].answerCapsule,
     },
     {
       path: "/workshop",
-      files: ["app/(legacy)/workshop/page.tsx", "app/workshop/page.tsx"],
+      files: [
+        "app/(site)/workshop/page.tsx",
+        "app/(legacy)/workshop/page.tsx",
+        "app/workshop/page.tsx",
+      ],
       title: "The Workshop",
       capsule: learn[2].answerCapsule,
     },
     {
       path: "/watch",
-      files: ["app/(legacy)/watch/page.tsx", "app/watch/page.tsx"],
+      files: [
+        "app/(site)/watch/page.tsx",
+        "content/watch/index.ts",
+        "app/(legacy)/watch/page.tsx",
+        "app/watch/page.tsx",
+      ],
       title: "Watch",
       capsule:
         "The watch page holds recorded walkthroughs, frozen with the archive and kept at its original URL.",
     },
   ];
-  for (const l of legacy) {
+  for (const l of archive) {
     rows.push({
       path: l.path,
       lastModified: gitOr(l.files, CONTENT_FLOOR),

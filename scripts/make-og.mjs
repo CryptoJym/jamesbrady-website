@@ -108,6 +108,13 @@ const PLATES = [
   { file: "about.png", label: "About · Lehi, Utah" },
   { file: "work-with-me.png", label: "Work with me · two engagements" },
   { file: "links.png", label: "Links · profiles and starting points" },
+  // Wave 4. The four archived routes inherited one shared plate from the
+  // (legacy) layout, which could not know which page it was describing. Each
+  // one declares its own now, like every other template.
+  { file: "primer.png", label: "The Primer · archived · how systems work" },
+  { file: "manuscript.png", label: "The Manuscript · archived · tool catalog" },
+  { file: "workshop.png", label: "The Workshop · archived · three guides" },
+  { file: "watch.png", label: "Watch · archived · recorded walkthroughs" },
 ];
 
 mkdirSync(OUT, { recursive: true });

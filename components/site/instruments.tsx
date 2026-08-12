@@ -160,6 +160,35 @@ export function ArchivedBadge({ date }: { date: string }) {
   return <span className="badge-archived">Archived {date}</span>;
 }
 
+/**
+ * The archive band (wave 4).
+ *
+ * /primer, /manuscript, /workshop and /watch are frozen as dated archives at
+ * their original URLs. A reader arriving from a search result cannot tell that
+ * from the content, so the page states it before the content rather than after
+ * it, and points at where the maintained version of the same ground lives.
+ *
+ * The date is a prop because it comes from the content source — the same
+ * `archivedDate` the /learn card prints, so the hub and the volume can never
+ * disagree about when a volume stopped being maintained.
+ */
+export function ArchiveBand({
+  date,
+  children,
+}: {
+  date: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="archive">
+      <div className="wrap archive__in">
+        <ArchivedBadge date={date} />
+        <p className="archive__note">{children}</p>
+      </div>
+    </div>
+  );
+}
+
 /* -------------------------------------------------------------- json-ld */
 
 export function JsonLd({ json }: { json: string }) {
