@@ -23,6 +23,22 @@ gitignored and this machine has no `CLIENT_DENYLIST`. Both gates fail closed and
 both fail the run under `CI=true`, where the workflow materializes the file from
 the repository secret first. UNPROVEN is not a pass.
 
+### The pack's denylist gate, shown refusing
+
+A gate verified only on the permitted case has not been verified. This one was
+driven through all three of its states before it was trusted, by swapping
+`.seo-denylist.txt` and re-running:
+
+| `.seo-denylist.txt` | Result |
+|---|---|
+| absent, or 0 terms with the placeholder marker | **UNPROVEN** — never a pass, and fatal under `CI=true` |
+| one term that does not appear in the pack | **PASS** — 25/25 |
+| one term that does appear in the pack | **FAIL** — `pack matched denylist entry #1 (sha256:f1750a3fbed7)` |
+
+The failing run prints the entry number and a hash. The term itself never
+reaches the log, which is the whole point of hashing it: a CI log is a public
+surface too.
+
 `verify-seo` grew a check in this wave: **16. No title repeats "James Brady"**.
 The home route's `<title>` said the name twice, because its title IS the site
 title and the root layout's template appended the name again.
