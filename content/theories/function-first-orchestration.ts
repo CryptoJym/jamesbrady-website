@@ -14,7 +14,7 @@ export const entry: TheoryEntry = {
   abstract:
     "Function-First Orchestration puts proof of function ahead of proof of thoroughness, keeps refusal tests mandatory, and requires every deferral to be written down rather than felt.",
   answerCapsule:
-    "Function-First Orchestration is an operating rule that puts proof of function ahead of proof of thoroughness. Under the rule, a piece of work ships with one honest happy-path test plus the specific refusals that protect money, custody, and truth, and nothing else. Broader test coverage is deliberately deferred rather than skipped, and the deferral is written into a parking file that turns later into a real entry on a list.",
+    "Function-First Orchestration is an operating rule that puts proof of function ahead of proof of thoroughness. Under the rule, a piece of work ships with one honest happy-path test plus the specific refusals that protect money, custody, and truth, and nothing else. Broader test coverage is deliberately deferred rather than skipped. Each deferral is written into a parking file, so “later” becomes a concrete list entry instead of a vague intention.",
   summary:
     "Prove function first: one honest happy path plus mandatory refusal tests, with every deferral written down.",
   datePublished: "2026-07-28",
