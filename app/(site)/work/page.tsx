@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/work",
   title: "Work",
   description:
-    "Products, open source, client work and experiments — each with the proof attached and the method stated.",
+    "Products, open source, client work and experiments, each with the proof attached and the method stated.",
   og: { image: "/og/work.png", imageAlt: "James Brady — work index" },
 });
 
@@ -42,8 +42,8 @@ export default function WorkIndexPage() {
             className="sec-aside"
             style={{ marginTop: "var(--s-4)", maxWidth: "72ch" }}
           >
-            {CAPSULE} Repo signals — stars, last push — are a dated snapshot taken from
-            the GitHub API on {repoSnapshotDate}, across {publicRepos.length} public
+            {CAPSULE} Repo signals (stars, last push) are a dated snapshot taken from the
+            GitHub API on {repoSnapshotDate}, across {publicRepos.length} public
             repositories, and each card&rsquo;s foot line prints the unit it is showing.
           </p>
           <WorkFilters />

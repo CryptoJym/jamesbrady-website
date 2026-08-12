@@ -6,7 +6,7 @@ export const entry: TheoryEntry = {
   name: "Question–Answer Dynamics",
   title: "Why should a useful-looking finding get more scrutiny, not less?",
   flagLabel: "In daily use",
-  what: "What an answer does to the next question. The loop, measured — because most of the value in a conversation lives in how the second question moved.",
+  what: "What an answer does to the next question. The loop, measured: most of the value in a conversation lives in how the second question moved.",
   maturity: "developed",
   paused: false,
   claim:
@@ -54,23 +54,23 @@ An audit finished its task list, declared completion, and was asked one more que
 
 ## So the method has two halves
 
-**The battery**, run on every finding. Is it real, and was it measured or inferred? When did it start, and which way is it moving? Why would a rational actor produce this state, on purpose, by accident, or through neglect? What else is on this same surface? How does it read from four other viewpoints? What would make this misleading? Where does it lead next? Unknown is a permitted answer. Skipping is not.
+**The battery**, run on every finding. Is it real, and was it measured or inferred? When did it start, and which way is it moving? Why would a rational actor produce this state, on purpose, by accident, or through neglect? What else is on this same surface? How does it read from four other viewpoints? What would make this misleading? Where does it lead next? Unknown is a permitted answer. Skipping the question is not permitted.
 
-**The scheduler.** Every interrogated finding ends with either a list of next questions or a written reason for stopping. Never neither. All open next-questions from all findings go into one queue, ranked by value divided by cost. The top one gets pulled, the answer comes back, and it re-enters the battery. That queue is the research plan. Not a plan written on day one, but a frontier that regrows from every answer.
+**The scheduler.** Every interrogated finding ends with either a list of next questions or a written reason for stopping, and never with neither. All open next-questions from all findings go into one queue, ranked by value divided by cost. The top one gets pulled, the answer comes back, and it re-enters the battery. That queue is the research plan. It is not written on day one; it regrows from every answer.
 
 ## When research ends
 
-Research ends when every finding has been interrogated, every remaining question has a written stop reason, no contradictions are left unresolved, and beliefs are strong enough for the use they are being put to. Not when the researcher feels done.
+Research ends when every finding has been interrogated, every remaining question has a written stop reason, no contradictions are left unresolved, and beliefs are strong enough for the use they are being put to. It does not end when the researcher feels done.
 
-The asymmetry is the whole point. A finding that contradicts the plan gets challenged automatically, because someone has an interest in challenging it. A finding that flatters the plan has no natural opponent in the room. The battery is that opponent, applied evenly, so the level of scrutiny stops depending on whether anyone in the room wanted the answer.
+The asymmetry is what the battery is for. A finding that contradicts the plan gets challenged automatically, because someone has an interest in challenging it. A finding that flatters the plan has no natural opponent in the room. The battery is that opponent, applied evenly, so the level of scrutiny stops depending on whether anyone in the room wanted the answer.
 
 There is a second-order effect worth naming. Once every finding ends in either questions or a written stop reason, the shape of the research changes. A plan written on day one is a guess about what will be worth knowing; a queue that regrows from every answer is a record of what turned out to be worth knowing. The two produce very different documents at the end, and only one of them can be audited afterwards by someone who was not there.
 
-The battery also survives being applied to itself, which is the test I care about most. Ask of the method: is it real, or inferred? It is inferred — two cases is an origin story, not evidence. Which way is it moving? Toward more use, not more proof. What would make it misleading? A team that runs the battery as a form to fill in rather than as questions to answer would produce the paperwork of scrutiny with none of the substance, and the logs would look identical.
+The battery also survives being applied to itself, which is the test I care about most. Ask of the method: is it real, or inferred? It is inferred: two cases is an origin story, not evidence. Which way is it moving? Toward more use, not more proof. What would make it misleading? A team that runs the battery as a form to fill in rather than as questions to answer would produce the paperwork of scrutiny with none of the substance, and the logs would look identical.
 
 ## Where this stands
 
-Developed and in daily use. The method is written as an executable skill and runs on live competitive-intelligence work. Its two founding cases are real engagements, described here by industry only. The stop and continue decisions are logged so they can be scored over time, but that scoring has not been published — so the claim on this page is that the method is in use, not that it has been proven to produce better research.
+Developed and in daily use. The method is written as an executable skill and runs on live competitive-intelligence work. Its two founding cases are real engagements, described here by industry only. The stop and continue decisions are logged so they can be scored over time, but that scoring has not been published. The claim on this page is that the method is in use, not that it has been proven to produce better research.
 
 ## Artifacts
 

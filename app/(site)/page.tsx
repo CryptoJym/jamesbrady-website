@@ -84,8 +84,8 @@ export default function HomePage() {
               </DockTrigger>
             </div>
             <p className="hero__terms rise d5">
-              The assistant is grounded only in what&rsquo;s published here — it says when
-              it doesn&rsquo;t know.
+              The assistant is grounded only in what&rsquo;s published here, and it says
+              when it doesn&rsquo;t know.
             </p>
           </div>
 
@@ -133,7 +133,7 @@ export default function HomePage() {
                   <span className="v">{pad(theoriesListed)}</span>
                 </span>
                 <span className="sub">
-                  {theoriesActive} active, {theoriesPaused} paused — and it says which
+                  {theoriesActive} active, {theoriesPaused} paused, and it says which
                 </span>
               </li>
             </ul>
@@ -153,7 +153,7 @@ export default function HomePage() {
               num="01"
               eyebrow="Proof"
               heading={`${proofSlots.length} things you can go look at right now.`}
-              aside="Each one links to the thing itself — a repo, a doc site, a running product. Not a case study about it. Every value and every last-active date is read from the content source when the page is built."
+              aside="Each one links to the thing itself: a repo, a doc site, a running product, and not a case study about it. Every value and every last-active date is read from the content source when the page is built."
             />
             <ProofBank entries={proofSlots} />
           </div>
@@ -166,7 +166,7 @@ export default function HomePage() {
               num="02"
               eyebrow="Work"
               heading="Products, open source, client work, experiments."
-              aside="Filter the shelf. The count below updates with it — it is read from what is on screen, not typed in, and there is no denominator to fall out of date."
+              aside="Filter the shelf. The count below updates with it. The number is read from what is on screen, not typed in, and there is no denominator to fall out of date."
             />
             <WorkFilters />
             <WorkGrid entries={work} />

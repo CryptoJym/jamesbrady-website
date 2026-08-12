@@ -86,7 +86,7 @@ Teams spend real money on AI coding agents and cannot say what they got. Vendor 
 
 ## What I built
 
-Plimsoll is a local-first collector that watches Claude Code and Codex on your own machine, records what each session cost, and joins those sessions to shipped outcomes: merged pull requests and passing checks. Then it does the division. Tokens per merged pull request. Cost per validated outcome. Where the spend produced nothing.
+Plimsoll is a local-first collector that watches Claude Code and Codex on your own machine, records what each session cost, and joins those sessions to shipped outcomes: merged pull requests and passing checks. Then it does the division: tokens per merged pull request, cost per validated outcome, and where the spend produced nothing.
 
 The name comes from Samuel Plimsoll, who in 1876 forced shipowners to paint a load line on every hull. Deaths from overloading fell, not because the rule was clever, but because the limit became visible to anyone standing on the dock.
 

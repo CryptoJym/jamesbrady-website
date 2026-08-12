@@ -15,7 +15,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/about",
   title: "About",
   description:
-    "Who does what across James Brady, Utlyze and New Reward — and how one person checks work before it ships.",
+    "Who does what across James Brady, Utlyze and New Reward, and how one person checks work before it ships.",
   og: { image: "/og/about.png", imageAlt: "James Brady — about" },
   type: "profile",
 });
@@ -30,7 +30,7 @@ const FAQ = [
     question:
       "If most of the building is done by AI agents running in parallel, what stops bad work from reaching a client?",
     answer:
-      "A claim is not proof. An agent saying it finished is a report, not a result, so the finished thing gets checked at the place it actually lives — not in the chat that produced it. If a change is supposed to be on the site, the site is what gets read. If a report is supposed to have gone out, the sent folder is what gets read.",
+      "A claim is not proof. An agent saying it finished is a report, not a result, so the finished thing gets checked at the place it actually lives, not in the chat that produced it. If a change is supposed to be on the site, the site is what gets read. If a report is supposed to have gone out, the sent folder is what gets read.",
   },
   {
     question: "What does “done” mean here?",
@@ -90,7 +90,7 @@ const DOCTRINE = `**Machines hold the gates, not memory.** Required checks run o
 
 **Numbers are computed, not typed.** Every number on this site is derived from its source when the page is built. The old version of this site displayed a hand-typed count that was wrong by a factor of eight. That class of mistake is now impossible here, by construction.
 
-**Irreversible things stop for a human.** Sending a client message, spending money, publishing, deploying, deleting data. Agents prepare those. A person approves them. That is not a limitation I am working around. It is the design.
+**Irreversible things stop for a human.** Sending a client message, spending money, publishing, deploying, deleting data. Agents prepare those. A person approves them. That gate is the design, and not something I am working around.
 
 [JAMES: one measured throughput number would make this section land, with its method and window. Something in the shape of "N changes merged in a 7-day window, every one through the same required checks". You have measured this. Approve a figure and a window, or this section stays qualitative.]
 

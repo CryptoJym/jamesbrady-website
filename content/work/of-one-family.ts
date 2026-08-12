@@ -7,7 +7,7 @@ export const entry: WorkEntry = {
   kicker: "A thesis in progress",
   categories: ["experiments", "products"],
   answerCapsule:
-    "The Of One family is a thesis being tested, not a finished product line: a governed set of domains and applications that each name a single company role and ask what that role looks like as one person plus AI. Two of them are live applications. The rest is staked ground — domains and landing pages that exist to find which role-shaped problem pulls interest before anything gets built. The page labels which is which, every time.",
+    "The Of One family is a thesis being tested, not a finished product line: a governed set of domains and applications that each name a single company role and ask what that role looks like as one person plus AI. Two of them are live applications. The rest is staked ground: domains and landing pages that exist to find which role-shaped problem pulls interest before anything gets built. The page labels which is which, every time.",
   summary:
     "A governed family of role-shaped domains for one-person businesses: two live applications, the rest deliberately staked ground.",
   datePublished: "2026-08-11",
