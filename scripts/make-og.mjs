@@ -106,6 +106,8 @@ const PLATES = [
   { file: "lab.png", label: "Lab · things you can poke at" },
   { file: "learn.png", label: "Learn · three archived volumes" },
   { file: "about.png", label: "About · Lehi, Utah" },
+  { file: "work-with-me.png", label: "Work with me · two engagements" },
+  { file: "links.png", label: "Links · profiles and starting points" },
 ];
 
 mkdirSync(OUT, { recursive: true });

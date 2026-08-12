@@ -25,8 +25,10 @@ import {
   lab,
   learn,
   now,
+  offers,
   work,
 } from "@/lib/content";
+import { BUDGET_LABEL } from "@/lib/contact";
 import { toPlainText } from "@/lib/content/markdown";
 import { CATEGORY_LABEL, MATURITY_LABEL } from "@/lib/content/types";
 import type { AnyEntry, ProofSource } from "@/lib/content/types";
@@ -133,6 +135,7 @@ export function buildGroundingPack(): string {
   const entryPaths = new Set([
     ...work.map((w) => `/work/${w.slug}`),
     ...discoverableTheories.map((t) => `/theories/${t.slug}`),
+    ...offers.map((o) => `/work-with-me/${o.slug}`),
   ]);
   const sitePages = routes.filter((r) => !entryPaths.has(r.path));
 
@@ -140,6 +143,34 @@ export function buildGroundingPack(): string {
     [
       "## Pages",
       ...sitePages.map((r) => section(r.title, r.path, [...field("What it covers", r.capsule)])),
+    ].join("\n\n"),
+  );
+
+  // ---- Work with me -----------------------------------------------------
+  // The two engagements, ahead of the portfolio. A visitor asking what they
+  // can hire should get an engagement and the entity that delivers it, not a
+  // list of repositories. Budget bands come from the /contact allowlist, so
+  // the assistant cannot state a band the form does not offer.
+  parts.push(
+    [
+      "## Work with me",
+      `Engagements offered: ${offers.length}. Both are described at ${absolute("/work-with-me")}.`,
+      ...offers.map((entry) =>
+        section(entry.title, `/work-with-me/${entry.slug}`, [
+          `Delivered by: ${entry.deliveredBy.name}, ${toPlainText(entry.deliveredBy.role)}. ${entry.deliveredBy.url}`,
+          ...commonLines(entry),
+          `Who it is for: ${entry.audience.join(", ")}`,
+          "What an engagement looks like:",
+          ...entry.steps.map((s) => `  - ${s.label}: ${sentence(s.detail)}`),
+          "What the client is left holding:",
+          ...entry.deliverables.map((d) => `  - ${d.label}: ${sentence(d.detail)}`),
+          `Budget bands, from the enquiry form's own list: ${entry.budgetBands
+            .map((b) => BUDGET_LABEL[b])
+            .join(", ")}. These are orientation, not a quote.`,
+          ...proofLines(entry.proof),
+          ...bodyBlock(entry),
+        ]),
+      ),
     ].join("\n\n"),
   );
 

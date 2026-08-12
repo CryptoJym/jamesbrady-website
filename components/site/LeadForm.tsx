@@ -5,37 +5,15 @@ import { useActionState } from "react";
 import { submitContact, type ContactFormState } from "@/app/(site)/contact/actions";
 import {
   budgetRanges,
+  BUDGET_LABEL,
   helpTypes,
+  HELP_LABEL,
   timelines,
+  TIMELINE_LABEL,
+  type HelpType,
 } from "@/lib/contact";
 
 const initialState: ContactFormState = { status: "idle", message: "" };
-
-const HELP_LABEL: Record<(typeof helpTypes)[number], string> = {
-  ai_strategy: "AI strategy",
-  production_build: "Production build",
-  agent_architecture: "Agent architecture",
-  integration: "Integration",
-  speaking_media: "Speaking or media",
-  partnership: "Partnership",
-  other: "Something else",
-};
-
-const TIMELINE_LABEL: Record<(typeof timelines)[number], string> = {
-  immediate: "Immediately",
-  one_month: "Within a month",
-  one_quarter: "Within a quarter",
-  exploring: "Still exploring",
-};
-
-const BUDGET_LABEL: Record<(typeof budgetRanges)[number], string> = {
-  under_5k: "Under $5k",
-  "5k_15k": "$5k – $15k",
-  "15k_50k": "$15k – $50k",
-  "50k_plus": "$50k+",
-  not_applicable: "Not applicable",
-  prefer_not_to_say: "Prefer not to say",
-};
 
 function Err({ message }: { message?: string }) {
   if (!message) return null;
@@ -48,7 +26,16 @@ function Err({ message }: { message?: string }) {
  * new. Failure surfaces visibly and always names the email fallback; it must
  * never fail silently.
  */
-export function LeadForm() {
+export function LeadForm({
+  /**
+   * Set from ?inquiry= on /contact, so an offer page's call to action arrives
+   * with the right kind of enquiry already chosen. Resolved on the server and
+   * passed down, which keeps the whole form in the server response.
+   */
+  preselectedHelpType,
+}: {
+  preselectedHelpType?: HelpType;
+} = {}) {
   const [state, formAction, pending] = useActionState(submitContact, initialState);
 
   if (state.status === "success") {
@@ -102,7 +89,12 @@ export function LeadForm() {
 
         <div className="field">
           <label htmlFor="helpType">What kind of help</label>
-          <select id="helpType" name="helpType" defaultValue="" required>
+          <select
+            id="helpType"
+            name="helpType"
+            defaultValue={preselectedHelpType ?? ""}
+            required
+          >
             <option value="" disabled>
               Choose one
             </option>

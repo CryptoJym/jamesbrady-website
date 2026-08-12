@@ -4,11 +4,18 @@
 // {"@context":…, "@graph":[…]}. Serialization escapes "<" per the repo pattern.
 
 import { absolute } from "@/lib/seo/site";
-import type { LabEntry, LearnEntry, TheoryEntry, WorkEntry } from "@/lib/content/types";
+import type {
+  LabEntry,
+  LearnEntry,
+  OfferEntry,
+  TheoryEntry,
+  WorkEntry,
+} from "@/lib/content/types";
 import { MATURITY_LABEL } from "@/lib/content/types";
 import {
   ENTITY_NODE_ID,
   identityNodes,
+  OFFER_GLOSSARY_ID,
   personRef,
   THEORY_GLOSSARY_ID,
   WORK_GLOSSARY_ID,
@@ -167,6 +174,56 @@ export function theoryGraph(entry: TheoryEntry): Node[] {
       "@type": "DefinedTermSet",
       "@id": THEORY_GLOSSARY_ID,
       name: "Theory glossary",
+    },
+  ]);
+}
+
+/**
+ * An offer page.
+ *
+ * `Service`, with the delivering organisation as `provider`, is the type that
+ * matches what the page is: work someone can commission. What is deliberately
+ * NOT emitted is `Offer` with a `priceSpecification`. The budget bands on the
+ * page are the /contact form's own ranges, printed so a reader can size the
+ * engagement before writing in; publishing them as structured prices would
+ * turn an orientation into a quote, and a quote is a number this site has no
+ * source for. Missing is not zero, and it is not a price either.
+ */
+export function offerGraph(entry: OfferEntry): Node[] {
+  const url = absolute(`/work-with-me/${entry.slug}`);
+  return withIdentity([
+    {
+      "@type": "Service",
+      "@id": `${url}#service`,
+      url,
+      name: entry.title,
+      description: entry.summary,
+      abstract: entry.answerCapsule,
+      serviceType: entry.kicker,
+      provider: publisherRef(entry.entities),
+      author: personRef,
+      isPartOf: { "@id": websiteNode["@id"] },
+      audience: entry.audience.map((a) => ({ "@type": "Audience", audienceType: a })),
+      citation: entry.proof.map((p) => ({
+        "@type": "CreativeWork",
+        name: p.label,
+        ...(p.url ? { url: p.url } : {}),
+        description: p.method,
+        dateCreated: p.capturedAt,
+      })),
+    },
+    {
+      "@type": "DefinedTerm",
+      "@id": `${url}#term`,
+      name: entry.title,
+      description: entry.answerCapsule,
+      termCode: entry.slug,
+      inDefinedTermSet: { "@id": OFFER_GLOSSARY_ID },
+    },
+    {
+      "@type": "DefinedTermSet",
+      "@id": OFFER_GLOSSARY_ID,
+      name: "Engagement glossary",
     },
   ]);
 }

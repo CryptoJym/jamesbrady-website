@@ -26,6 +26,8 @@
 //   script 13 robots .......................... ruling (B), §7.6
 //   script 14 heading outline ................. §7.5
 //   script 15 no unsourced numerals in display strings ............. P0-1
+//   script 16 no title repeats the site name .................. wave-2 fix
+//   script 17 pending-mark placement .......................... wave-3 audit
 //
 // §8.9 (proof-link liveness) is NOT implemented and is not claimed. It needs
 // network egress at verify time; it is named in the PR as an open gap.
@@ -55,6 +57,9 @@ const IN_CI = process.env.CI === "true";
  *  not the other is itself a failure. */
 const STATIC_ROUTES = [
   "/",
+  "/work-with-me",
+  "/work-with-me/get-found",
+  "/work-with-me/build-a-system",
   "/work",
   "/work/ofone",
   "/work/plimsoll",
@@ -76,17 +81,42 @@ const STATIC_ROUTES = [
   "/about",
   "/contact",
   "/now",
+  // Reskinned in wave 3 onto Direction B, at the SAME URL. It is no longer a
+  // legacy route, so every check below applies to it with no deferral.
+  "/links",
   // Legacy routes. URLs preserved; they are in the battery because a
   // canonical regression on an archived page is still a canonical regression.
   "/primer",
   "/manuscript",
   "/workshop",
-  "/links",
   "/watch",
 ];
 
-/** The five archived routes. URLs preserved; skin and copy out of scope this wave. */
-const LEGACY_ROUTES = ["/primer", "/manuscript", "/workshop", "/links", "/watch"];
+/**
+ * The archived routes. URLs preserved; skin and copy still out of scope.
+ *
+ * /links left this list in wave 3 when it was reskinned. It was the site's
+ * bridge from the social accounts and it was the one archived page a stranger
+ * was most likely to land on first, so it graduated ahead of the volumes.
+ */
+const LEGACY_ROUTES = ["/primer", "/manuscript", "/workshop", "/watch"];
+
+/**
+ * Buyer routes — check 17.
+ *
+ * The routes someone reads while deciding whether to hire James. None of them
+ * may render a second-person pending mark; each states the same absence in the
+ * third person instead, and the full owner-facing register lives on /now.
+ */
+const BUYER_ROUTES = [
+  "/",
+  "/about",
+  "/contact",
+  "/work/visibility-platform",
+  "/work-with-me",
+  "/work-with-me/get-found",
+  "/work-with-me/build-a-system",
+];
 
 /**
  * Defects that live ONLY on the five archived routes. Wave 1 was scoped to
@@ -270,6 +300,7 @@ function checkCanonicals(pages) {
 const SCHEMA_TYPES = new Set([
   "Answer",
   "Article",
+  "Audience",
   "Claim",
   "CollectionPage",
   "ContactPage",
@@ -285,6 +316,7 @@ const SCHEMA_TYPES = new Set([
   "PostalAddress",
   "ProfilePage",
   "Question",
+  "Service",
   "SoftwareSourceCode",
   "WebApplication",
   "WebPage",
@@ -945,6 +977,73 @@ function checkTitleStutter(pages) {
   );
 }
 
+/**
+ * Check 17 — pending-mark placement (wave 3).
+ *
+ * The register was never dishonest; it was mis-addressed. A buyer reading
+ * /about met four questions written TO James, in the imperative, about things
+ * he still had to supply, and read the page as unfinished rather than as
+ * candid. So buyer routes render the same absences in the third person and the
+ * owner-facing register moved to /now.
+ *
+ * The check has BOTH directions, because a one-directional version passes
+ * trivially the day somebody deletes the marks:
+ *   · no buyer route renders a second-person mark, AND
+ *   · at least one builder route still does, AND
+ *   · /now carries the consolidated block with real items in it.
+ * Deleting the register to satisfy the first clause fails the other two.
+ */
+function checkPendingPlacement(pages) {
+  const html = new Map(pages);
+  const bad = [];
+  const MARK = /class="pending"|Pending from James/;
+
+  for (const path of BUYER_ROUTES) {
+    const body = html.get(path);
+    if (body === undefined) {
+      bad.push(`${path}: not fetched, so placement is unverified`);
+      continue;
+    }
+    const hits = (body.match(new RegExp(MARK.source, "g")) ?? []).length;
+    if (hits > 0) bad.push(`${path}: ${hits} second-person pending mark(s) on a buyer route`);
+  }
+
+  // Positive control: the builder reading must survive. A theory or case study
+  // that drops its inline questions has lost the thing P4 reads as trust.
+  const builderRoutes = [...html.keys()].filter(
+    (p) => !BUYER_ROUTES.includes(p) && !LEGACY_ROUTES.includes(p),
+  );
+  const stillInline = builderRoutes.filter((p) => MARK.test(html.get(p)));
+  if (stillInline.length === 0) {
+    bad.push(
+      "no builder route renders an inline pending mark — the register was deleted rather than moved",
+    );
+  }
+
+  // The consolidated block, with items in it.
+  const nowHtml = html.get("/now") ?? "";
+  if (!/id="open-items"/.test(nowHtml)) {
+    bad.push('/now: no "Open items" block — the owner-facing register has nowhere to live');
+  } else {
+    const items = (nowHtml.match(/class="open-items__q"/g) ?? []).length;
+    if (items === 0) bad.push("/now: the Open items block rendered with no items");
+  }
+
+  // A raw marker reaching any page is the older defect and stays checked.
+  for (const [path, body] of pages) {
+    if (body.includes("[JAMES:")) bad.push(`${path}: a raw [JAMES: bracket reached the page`);
+  }
+
+  const items = (nowHtml.match(/class="open-items__q"/g) ?? []).length;
+  report(
+    "17. Pending marks: third person on buyer routes, inline on builder routes, register on /now",
+    bad.length === 0,
+    bad.length
+      ? bad.join(" | ")
+      : `${BUYER_ROUTES.length} buyer routes clean · ${stillInline.length} builder routes keep theirs · /now lists ${items} open items`,
+  );
+}
+
 /* ================================================================== main */
 
 const buildStartIso = new Date().toISOString();
@@ -1006,6 +1105,7 @@ checkRobots(robots);
 checkHeadings(pages);
 checkDisplayNumerals();
 checkTitleStutter(pages);
+checkPendingPlacement(pages);
 
 console.log("─".repeat(72));
 const passed = results.filter((r) => r.state === "PASS").length;
@@ -1025,10 +1125,10 @@ if (unproven && !IN_CI) {
 
 if (deferredLegacy.length) {
   console.log(
-    `\nDEFERRED — defects on the five archived routes (/primer /manuscript /workshop\n` +
-      `/links /watch), which wave 1 was scoped to leave untouched. These are REAL and\n` +
-      `they are not fixed. Re-run with --strict-legacy to fail on them; wave 2 turns\n` +
-      `that on permanently as part of reskinning those pages.\n`,
+    `\nDEFERRED — defects on the ${LEGACY_ROUTES.length} archived routes (${LEGACY_ROUTES.join(" ")}),\n` +
+      `which are still scoped to keep their existing skin. These are REAL and they are\n` +
+      `not fixed. Re-run with --strict-legacy to fail on them; each one clears when its\n` +
+      `route is reskinned, the way /links cleared in wave 3.\n`,
   );
   for (const d of deferredLegacy) console.log(`  · ${d}`);
   console.log("");

@@ -34,13 +34,21 @@ const BASE = arg("--base") ?? "http://localhost:4123";
 /** A server running a build of `main`, for the legacy pixel-diff. */
 const LEGACY_BASE = arg("--legacy-base");
 const UPDATE_EVIDENCE = process.argv.includes("--update-evidence");
+/** Which packet --update-evidence writes into. Defaults to the wave-1 set. */
+const EVIDENCE_WAVE = arg("--wave") ?? "wave-1";
 const OUT = UPDATE_EVIDENCE
-  ? join(process.cwd(), "docs", "evidence", "wave-1")
+  ? join(process.cwd(), "docs", "evidence", EVIDENCE_WAVE)
   : join(process.cwd(), "out", "verify-visual");
 mkdirSync(OUT, { recursive: true });
 
-/** The five archived routes, which must render exactly as they do on main. */
-const LEGACY_ROUTES = ["/primer", "/manuscript", "/workshop", "/links", "/watch"];
+/**
+ * The archived routes, which must render exactly as they do on main.
+ *
+ * /links left this list in wave 3: it was reskinned onto Direction B at the
+ * same URL, so a pixel diff against main is now guaranteed to differ and
+ * proves nothing. The other four are untouched and stay at zero.
+ */
+const LEGACY_ROUTES = ["/primer", "/manuscript", "/workshop", "/watch"];
 
 let failed = 0;
 const report = (name, ok, detail) => {
@@ -252,6 +260,10 @@ report("No horizontal overflow at 1440", overflow1440 <= 0, `${overflow1440}px`)
 /* ---------------------------------------------------------- inner surfaces */
 
 for (const [path, file] of [
+  ["/work-with-me", "work-with-me-1440.png"],
+  ["/work-with-me/get-found", "offer-get-found-1440.png"],
+  ["/work-with-me/build-a-system", "offer-build-a-system-1440.png"],
+  ["/links", "links-1440.png"],
   ["/work", "work-1440.png"],
   ["/work/plimsoll", "work-plimsoll-1440.png"],
   ["/theories", "theories-1440.png"],
@@ -266,15 +278,79 @@ for (const [path, file] of [
   await page.screenshot({ path: join(OUT, file), fullPage: true });
 }
 
-// The pending-from-James marks must be visible, not hidden.
+// PENDING-MARK PLACEMENT (wave 3). The gaps must still be VISIBLE — the
+// original assertion — and they must now be visible in the right voice on the
+// right page. A buyer page shows the absence in the third person; a builder
+// page keeps the owner-facing question; /now carries the whole register.
 await page.goto(`${BASE}/about`, { waitUntil: "networkidle" });
-const pending = await page.evaluate(() =>
+const aboutPending = await page.evaluate(() => ({
+  secondPerson: document.querySelectorAll("mark.pending").length,
+  notes: [...document.querySelectorAll(".pending-note")].map(
+    (n) => getComputedStyle(n).display,
+  ),
+}));
+report(
+  "Buyer page /about: absences stated in the third person, and visible",
+  aboutPending.secondPerson === 0 &&
+    aboutPending.notes.length > 0 &&
+    aboutPending.notes.every((d) => d !== "none"),
+  `${aboutPending.secondPerson} owner-facing marks · ${aboutPending.notes.length} third-person notes`,
+);
+
+await page.goto(`${BASE}/theories/architect-loop`, { waitUntil: "networkidle" });
+const builderPending = await page.evaluate(() =>
   [...document.querySelectorAll("mark.pending")].map((m) => getComputedStyle(m).display),
 );
 report(
-  "Pending-from-James gaps render visibly",
-  pending.length > 0 && pending.every((d) => d !== "none"),
-  `${pending.length} marks on /about`,
+  "Builder page keeps its inline questions, rendered visibly",
+  builderPending.length > 0 && builderPending.every((d) => d !== "none"),
+  `${builderPending.length} marks on /theories/architect-loop`,
+);
+
+await page.goto(`${BASE}/now`, { waitUntil: "networkidle" });
+const openItems = await page.evaluate(() => {
+  const block = document.querySelector("#open-items");
+  return {
+    present: Boolean(block),
+    count: document.querySelectorAll(".open-items__q").length,
+    visible: block ? getComputedStyle(block).display !== "none" : false,
+  };
+});
+report(
+  "/now carries the consolidated Open items register",
+  openItems.present && openItems.visible && openItems.count > 0,
+  `${openItems.count} open items listed`,
+);
+await page.screenshot({ path: join(OUT, "now-open-items-1440.png"), fullPage: true });
+
+// The homepage door row: three doors, each a real link, each naming a visitor.
+await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+const doors = await page.evaluate(() =>
+  [...document.querySelectorAll(".doors .door")].map((d) => ({
+    href: d.getAttribute("href"),
+    label: d.querySelector(".door__label")?.textContent?.trim(),
+    who: d.querySelector(".door__who")?.textContent?.trim(),
+  })),
+);
+report(
+  "Homepage sorts visitors: three doors, each a link that names who it is for",
+  doors.length === 3 && doors.every((d) => d.href && d.label && d.who),
+  doors.map((d) => `${d.label} → ${d.href}`).join(" · "),
+);
+await page.screenshot({ path: join(OUT, "home-1440-doors.png") });
+
+// The work cards' repository link — one click from home to the source.
+const cardRepos = await page.evaluate(() =>
+  [...document.querySelectorAll(".work .card__repo a")].map((a) => ({
+    href: a.getAttribute("href"),
+    text: a.textContent.replace(/\s+/g, " ").trim(),
+  })),
+);
+report(
+  "Work cards link straight to the repository, with the star count beside it",
+  cardRepos.length > 0 &&
+    cardRepos.every((r) => r.href?.startsWith("https://github.com/") && /star/i.test(r.text)),
+  cardRepos.map((r) => r.text).join(" | "),
 );
 
 /* ----------------------------------------------------------- legacy render */
@@ -439,6 +515,31 @@ report(
 await mpage.screenshot({ path: join(OUT, "home-375-hero.png") });
 await mpage.screenshot({ path: join(OUT, "home-375-full.png"), fullPage: true });
 
+// The wave-3 surfaces at 375, and the overflow assertion on each of them. A
+// three-across door row and a two-across offer grid are exactly the shapes
+// that break a phone, so they are measured rather than eyeballed.
+const narrowOverflow = [];
+for (const [path, file] of [
+  ["/work-with-me", "work-with-me-375.png"],
+  ["/work-with-me/get-found", "offer-get-found-375.png"],
+  ["/work-with-me/build-a-system", "offer-build-a-system-375.png"],
+  ["/links", "links-375.png"],
+  ["/now", "now-375.png"],
+]) {
+  await mpage.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+  await mpage.waitForTimeout(300);
+  const over = await mpage.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  if (over > 0) narrowOverflow.push(`${path}: ${over}px`);
+  await mpage.screenshot({ path: join(OUT, file), fullPage: true });
+}
+report(
+  "No horizontal overflow at 375 on the wave-3 routes",
+  narrowOverflow.length === 0,
+  narrowOverflow.length ? narrowOverflow.join(" | ") : "5 routes measured",
+);
+
 /* ------------------------------------------- reduced motion + no-JS fallback */
 
 const rm = await browser.newContext({
@@ -490,6 +591,6 @@ await browser.close();
 console.log("─".repeat(72));
 console.log(failed ? `${failed} visual check(s) FAILED` : "all visual checks passed");
 console.log(
-  `screenshots → ${UPDATE_EVIDENCE ? "docs/evidence/wave-1/ (tracked evidence REFRESHED)" : "out/verify-visual/ (untracked; pass --update-evidence to refresh the committed set)"}`,
+  `screenshots → ${UPDATE_EVIDENCE ? `docs/evidence/${EVIDENCE_WAVE}/ (tracked evidence REFRESHED)` : "out/verify-visual/ (untracked; pass --update-evidence to refresh the committed set)"}`,
 );
 process.exit(failed ? 1 : 0);

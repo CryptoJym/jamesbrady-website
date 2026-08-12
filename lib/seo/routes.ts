@@ -9,6 +9,7 @@ import {
   indexableLab,
   maxModified,
   now,
+  offers,
   theories,
   discoverableTheories,
   work,
@@ -26,7 +27,11 @@ export type RouteRecord = {
 };
 
 /** Fallback when git history is unavailable — the newest content date. */
-const CONTENT_FLOOR = maxModified([...work, ...theories, ...learn, ...lab, now]);
+const CONTENT_FLOOR = maxModified([...work, ...theories, ...learn, ...lab, ...offers, now]);
+
+/** The hub capsule, shared by the route table and the page that renders it. */
+export const WORK_WITH_ME_CAPSULE =
+  "Work with me splits into two engagements: getting a business found in search and inside AI answers, delivered by the agency New Reward, and building a system that ships in verified waves, delivered by the studio Utlyze. Each page states what the engagement measures or produces, who delivers it, and the budget band it normally sits in.";
 
 function gitOr(paths: string[], fallback: string): string {
   return gitLastModified(paths) ?? fallback;
@@ -62,6 +67,26 @@ export function buildRoutes(): RouteRecord[] {
       title: entry.title,
       capsule: entry.answerCapsule,
       collection: "work",
+    });
+  }
+
+  // The services path. Two revenue personas arrived at this site, found proof
+  // of competence and no way to buy any of it, and left. These are the routes
+  // that answer "what can I hire, and from whom".
+  rows.push({
+    path: "/work-with-me",
+    lastModified: maxModified(offers),
+    title: "Work with me",
+    capsule: WORK_WITH_ME_CAPSULE,
+    collection: "offers",
+  });
+  for (const offer of offers) {
+    rows.push({
+      path: `/work-with-me/${offer.slug}`,
+      lastModified: offer.dateModified,
+      title: offer.title,
+      capsule: offer.answerCapsule,
+      collection: "offers",
     });
   }
 
@@ -127,8 +152,23 @@ export function buildRoutes(): RouteRecord[] {
     collection: "now",
   });
 
-  // Volumes and the two profile routes keep their URLs (ruling G). No moves,
-  // no redirects — a redirect on any of these five is a defect.
+  // /links keeps its URL (ruling G) and, from wave 3, its skin is Direction B
+  // like every other live surface. It was the site's only bridge from the
+  // social accounts and it pointed at a design nothing else on the site uses,
+  // so an arrival from a video landed somewhere that looked like a different
+  // person's website.
+  rows.push({
+    path: "/links",
+    lastModified: gitOr(["app/(site)/links/page.tsx"], CONTENT_FLOOR),
+    title: "Links",
+    capsule:
+      "The links page collects James Brady's public profiles, the two ways to work with him, and the recorded walkthroughs, in one place at its original URL. Profiles listed: GitHub, LinkedIn, X, TikTok, YouTube, Bluesky, and a direct email address.",
+    collection: "site",
+  });
+
+  // The volumes and /watch keep their URLs and their existing skin (ruling G).
+  // No moves, no redirects — a redirect on any of them is a defect. /links
+  // left this list in wave 3 when it was reskinned; its URL did not change.
   const legacy: { path: string; files: string[]; title: string; capsule: string }[] = [
     {
       path: "/primer",
@@ -147,13 +187,6 @@ export function buildRoutes(): RouteRecord[] {
       files: ["app/(legacy)/workshop/page.tsx", "app/workshop/page.tsx"],
       title: "The Workshop",
       capsule: learn[2].answerCapsule,
-    },
-    {
-      path: "/links",
-      files: ["app/(legacy)/links/page.tsx", "app/links/page.tsx"],
-      title: "Links",
-      capsule:
-        "The links page collects James Brady's public profiles and project destinations in one place, kept at its original URL.",
     },
     {
       path: "/watch",

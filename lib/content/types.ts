@@ -8,6 +8,8 @@
 // enforces the rules the type system cannot express, and it THROWS — an invalid
 // entry fails the build, it never warns.
 
+import type { BudgetRange, HelpType } from "@/lib/contact";
+
 export type EntityRef = "person:james" | "org:utlyze" | "org:new-reward";
 
 /**
@@ -45,6 +47,17 @@ export type BaseEntry = {
   noindex?: boolean;
   /** Markdown body. Renders as static HTML — chat is never the publishing destination. */
   body: string;
+  /**
+   * Third-person phrasings for the buyer render mode, one per `[JAMES: …]` gap
+   * in `body`, in gap order.
+   *
+   * Presence of this field is what selects the render mode for the entry: an
+   * entry that has it renders its gaps as statements of absence addressed to a
+   * reader, an entry that does not renders the owner-facing question verbatim.
+   * The mark itself is never edited or deleted either way, and the full
+   * second-person register still renders on /now.
+   */
+  publicNotes?: string[];
 };
 
 export type WorkCategory =
@@ -218,9 +231,42 @@ export type NowEntry = BaseEntry & {
   updated: string;
 };
 
+/**
+ * An offer — what someone can actually hire, described in the words the buyer
+ * would use rather than the words the builder would use.
+ *
+ * The five-persona audit found the site could prove competence and could not
+ * be bought from: nothing on it said what an engagement is, who delivers it,
+ * or roughly what it costs. This collection is that path, and it is a typed
+ * collection rather than page prose for the same reason everything else here
+ * is: the budget bands, the delivering entity and the enquiry type each have
+ * exactly one source, and the pages, the JSON-LD, llms.txt, the sitemap and
+ * the Ask pack all read that one.
+ */
+export type OfferEntry = BaseEntry & {
+  collection: "offers";
+  kicker: string;
+  /** The question-shaped heading the answer capsule sits directly under (§4.1). */
+  capsuleQuestion: string;
+  /** Which entity delivers the work, and where a buyer can go look at it. */
+  deliveredBy: { name: string; url: string; role: string };
+  /** Who the engagement is for, written as the reader would say it. */
+  audience: string[];
+  /** The named steps of an engagement, in order. */
+  steps: { label: string; detail: string }[];
+  /** What the client is left holding at the end. */
+  deliverables: { label: string; detail: string }[];
+  /** Budget bands from lib/contact.ts — the same list the enquiry form offers. */
+  budgetBands: BudgetRange[];
+  /** The enquiry type this page's call to action preselects on /contact. */
+  inquiryType: HelpType;
+  ctaLabel: string;
+};
+
 export type AnyEntry =
   | WorkEntry
   | TheoryEntry
   | LabEntry
   | LearnEntry
-  | NowEntry;
+  | NowEntry
+  | OfferEntry;
