@@ -39,6 +39,33 @@ function field(label: string, value: string | undefined | null): string[] {
   return text ? [`${label}: ${text}`] : [];
 }
 
+/**
+ * One sentence, one full stop. Content authors end some `method` strings with a
+ * period and some without, and joining them produced "Last push 2026-07-20..".
+ * Small, but the pack is prose a model reads closely, and doubled punctuation
+ * is the kind of noise that ends up quoted back at a visitor.
+ */
+function sentence(text: string): string {
+  const clean = toPlainText(text).replace(/\.+$/, "");
+  return clean ? `${clean}.` : "";
+}
+
+/**
+ * A measured change, written so a missing half says it is missing.
+ *
+ * "not recorded to $48.46" reads as a claim that the figure moved FROM nothing,
+ * which is a different statement from "one figure exists and the earlier one
+ * was never recorded". Absent evidence is written as absent (SITE-BRIEF house
+ * rule 0.3), because this is the exact text the assistant answers from.
+ */
+function changeSpan(delta: { before?: string; after?: string; range?: string }): string {
+  if (delta.range) return delta.range;
+  if (delta.before && delta.after) return `${delta.before} to ${delta.after}`;
+  if (delta.after) return `${delta.after}, with no earlier figure recorded`;
+  if (delta.before) return `${delta.before}, with no later figure recorded`;
+  return "no figure recorded";
+}
+
 function proofLines(proof: ProofSource[]): string[] {
   if (proof.length === 0) return [];
   return [
@@ -49,7 +76,7 @@ function proofLines(proof: ProofSource[]): string[] {
         : p.artifact
           ? `artifact ${p.artifact}${p.redacted ? " (redacted)" : ""}`
           : "no link recorded";
-      return `  - ${toPlainText(p.label)}. Method: ${toPlainText(p.method)}. Captured ${p.capturedAt}. Where: ${where}`;
+      return `  - ${sentence(p.label)} Method: ${sentence(p.method)} Captured ${p.capturedAt}. Where: ${where}`;
     }),
   ];
 }
@@ -153,9 +180,8 @@ export function buildGroundingPack(): string {
                 "Measured changes:",
                 ...entry.deltas.map(
                   (d) =>
-                    `  - ${toPlainText(d.metric)}: ${
-                      d.range ?? `${d.before ?? "not recorded"} to ${d.after ?? "not recorded"}`
-                    }. Method: ${toPlainText(d.method)}. Timeframe: ${d.timeframe}`,
+                    `  - ${toPlainText(d.metric)}: ${changeSpan(d)}. ` +
+                    `Method: ${sentence(d.method)} Timeframe: ${d.timeframe}`,
                 ),
               ]
             : []),
@@ -166,7 +192,7 @@ export function buildGroundingPack(): string {
                   entry.proofMetric.placeholder || entry.proofMetric.value === undefined
                     ? "no figure derivable yet"
                     : `${entry.proofMetric.prefix ?? ""}${entry.proofMetric.value} ${entry.proofMetric.unit}`
-                }. Method: ${toPlainText(entry.proofMetric.method)}. State: ${entry.proofMetric.state}`,
+                }. Method: ${sentence(entry.proofMetric.method)} State: ${entry.proofMetric.state}`,
               ]
             : []),
           ...(entry.liveUrls?.length
