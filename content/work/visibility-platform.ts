@@ -90,19 +90,17 @@ export const entry: WorkEntry = {
    * One note per gap, in gap order. lib/content/validate.ts fails the build if
    * the counts stop matching.
    *
-   * THE THIRD NOTE CHANGED ON 2026-08-12. It used to read "No client has
-   * cleared their name for publication", which stopped being true the moment
-   * the owner ruled that Vuplicity is named on /work-with-me/background-
-   * screening. That ruling covers the offer surface only, so this case study
-   * is still anonymized and the note now says exactly that, rather than making
-   * a universal claim one page over from the page that contradicts it.
+   * The third note stays scoped to case studies deliberately: being named as
+   * a Work-with-me offer elsewhere on the site is not case-study clearance,
+   * and this page never names or links any company, so no inference from an
+   * anonymization note to an identity is possible here.
    */
   publicNotes: [
     "One client outcome figure, with its method and its window, is not published here yet.",
     "Neither is a recorded walkthrough of a real run.",
-    "One company, Vuplicity, is named on this site, and only on the work-with-me page where background screening can be started. No client has cleared its name for a case study, so this one stays anonymized.",
+    "No client has cleared its name for a case study, so this one stays anonymized.",
   ],
-  body: `> **Anonymization note.** Client names and identifying details are withheld per agreement. Industries are named, specific clients are not, and that holds for every company in this case study. One company is named elsewhere on this site: [Vuplicity](/work-with-me/background-screening) appears as a background screening path a visitor can start, under a separate ruling that covers that page and no other. Screenshots and metrics here are otherwise unaltered. Named case studies get published only when a client gives written clearance.
+  body: `> **Anonymization note.** Client names and identifying details are withheld per agreement. Industries are named, specific clients are not. Screenshots and metrics here are otherwise unaltered. Named case studies get published only when a client gives written clearance.
 
 ## The problem
 

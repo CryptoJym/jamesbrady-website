@@ -21,7 +21,7 @@ material for /work, /lab, and /about. Client names never appear here.
 ## The estate, in one paragraph
 
 Two GitHub identities (h3ro-dev org: 174 repos; CryptoJym user: 139), plus the
-Vuplicity's org (13 repos; client relationship, see the ruling below, and the name is publishable
+Vuplicity's org (13 repos; named Work-with-me option per owner ruling 2026-08-12, and the name is publishable
 only on the Work-with-me surface). The
 Apocaltips account on this machine is ANOTHER USER's (ruled by James
 2026-08-11) — its repos are excluded and never attributed. Three live business fronts (utlyze.com, newreward.com,
@@ -81,7 +81,7 @@ STILL UNDECIDED (small, resolve in Phase 2):
 | adhd-founder.com | 200 live (VERIFIED) | Matches his adhd-founder-planner skill; authorship to confirm |
 | businessofone.ai + family | 21 live of 26 governed domains | Mostly Lovable landing pages; real apps: financeofone.com (CFOofOne), vcofone; audit: `businessofone/research/domain-repository-provider-map.md` |
 | plimsoll.dev / plimsoll-cloud.vercel.app | live | OSS + hosted tier |
-| vuplicity.com | live (200, checked 2026-08-12) | RULED (James, 2026-08-11): client work, New Reward provided SEO/GEO for a background-screening SaaS client; never framed as his venture. AMENDED (James, 2026-08-12): the name may be published as a Work-with-me option, and only there. The case study stays anonymized |
+| vuplicity.com | live (200, checked 2026-08-12) | RULED (James, 2026-08-12): Vuplicity may be named as a Work-with-me option (background screening), and only there; case studies stay anonymized; published facts come only from vuplicity.com |
 | jamesbrady.org | live | This site |
 | royal-rwa.com | DEAD — no response (VERIFIED) | Code exists (6 repos); royalrwa.com (no dash) is an unrelated stub — do not conflate |
 | h3ro.ai | NXDOMAIN (does not resolve) | Social handles (@h3roai, @h3ro.ai, h3ro-dev) imply a domain that doesn't exist |
@@ -124,7 +124,7 @@ STILL UNDECIDED (small, resolve in Phase 2):
 
 ## Open ownership/framing questions (for James)
 
-ANSWERED 2026-08-11: a background-screening SaaS client, named 2026-08-12 as Vuplicity for the
+AMENDED 2026-08-12: Vuplicity is named as a Work-with-me option only; case-study anonymization unchanged.
 Work-with-me surface only, = client work (New Reward SEO/GEO). Royal RWA =
 excluded, not his. Of One = thesis-in-progress case study. Lab picks =
 wrath-shield + games (+ manifold chat); glasses and trading stay off.
