@@ -138,10 +138,31 @@ screenshots. Wave 3's `home-1440-doors.png` was a viewport shot taken at the
 top of the homepage, so it captured the hero and never contained the row it was
 named after.
 
-## What is not proven here
+## CI settled both UNPROVEN checks
 
-- **CI has not run at the time of writing.** These tallies are one machine's.
-  The two UNPROVEN checks can only be settled by the workflow.
+The workflow ran on `0eaa4e9` and again on `d36feb5`, and both were green. The
+line that matters:
+
+```
+denylist materialized: 28 term(s)
+PASS  10. Client-name denylist — 28 terms, 0 matches
+18/18 checks passed
+```
+
+That is the secret's real list, 28 terms, run against built pages that name
+Vuplicity 143 times, finding nothing. Read against the local red-team above,
+where the same gate failed on eight surfaces the moment the term was added, it
+says one thing plainly: **`CLIENT_DENYLIST` no longer carries the name, and the
+gate is still capable of catching it.** `verify-ask --offline` went to 25/25 in
+the same run for the same reason.
+
+CI tallies on `d36feb5`: `verify-seo` 18/18 · `verify-visual` all passed,
+including four doors in one row at 1440, two by two at 375 with the narrowest
+at 160 px, and legacy parity 0 px across all four archived routes ·
+`verify-chrome` all passed · `verify-tokens` 5/5 · `verify-fixtures` 19/19 ·
+`verify-ask --offline` 25/25.
+
+## What is not proven here
 - **`verify-ask --live`** is NOT RUN, unchanged since wave 2.
 - **Proof-link liveness (§8.9)** is still not implemented in `verify-seo`. The
   four Vuplicity URLs on the new page were fetched by hand on 2026-08-12 and
