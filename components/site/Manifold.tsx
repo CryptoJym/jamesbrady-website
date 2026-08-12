@@ -55,6 +55,68 @@ import { MANIFOLD_RULINGS, MANIFOLD_SECTIONS } from "@/lib/manifold/curves";
  * All of it lives in the ONE rAF loop, so every existing suspend path — hidden
  * tab, scrolled off screen, reduced motion — already covers the new layers by
  * construction. There is no second timer to forget about.
+ *
+ * ---------------------------------------------------------------------------
+ * WAVE 2, SECOND PASS — presence tuning (owner, on the LIVE site, 2026-08-12):
+ * the field should be "more visible and noticeable but still not overwhelming".
+ *
+ * FIRST, A MEASUREMENT DEFECT, because it changes what the numbers mean.
+ * The field's brightness is not steady. The surface's slowest term evolves
+ * over ~70s, so the count of lines standing high — and with it the whole
+ * field's brightness — cycles on a minute scale. Sampled every ~230ms for
+ * 37s on `main`, the per-frame peak ran 0.078 to 0.256. Every "the field
+ * measures X" number in this repo before today came from a 2.4s window, which
+ * covers 3% of that cycle: on ONE build, sliding that window across a 43s
+ * capture returned anything from 0.119 to 0.313. The instrument was reporting
+ * where the cycle happened to be, and the 0.45 ceiling it guards could have
+ * been breached at any phase it did not sample. `verify-chrome` now sweeps
+ * ~37s for this reason.
+ *
+ * So the honest before/after is a distribution, not a headline (1440, 160
+ * frames over ~37s, hero copy hidden, mask and scrim composited as shipped):
+ *
+ *                    main      this branch     what it is
+ *     min            0.078        0.126        the field's quietest moment
+ *     median         0.112        0.206        what a visitor typically sees
+ *     max            0.256        0.346        the brightest single pixel
+ *     h1             0.869        0.869        what has to win, and does
+ *     budget          0.45         0.45        never approached
+ *
+ * The median is the number that answers the owner: the typical field is 84%
+ * brighter. The max moved far less, and deliberately — presence came from
+ * lifting the quiet phases, not from a brighter crest. For reference the
+ * static SVG measures 0.363, so the live field now sits just under its own
+ * reduced-motion baseline instead of at half of it.
+ *
+ * Six levers, all structure or motion, none of them "raise the bloom until it
+ * reads as a smudge":
+ *
+ *   - Family alphas .45/.30 -> .66/.50. Both gain, by different amounts, so
+ *     the surface keeps reading as ruled rather than as a net.
+ *   - The height ramp's FLOOR .55 -> .72, top unchanged at 1.0. This is the
+ *     lever that pays out exactly in the cycle's dim phases and pays nothing
+ *     at the peak — compression, not gain, and the reason min moved 61% while
+ *     max moved 35%.
+ *   - The travelling window's floor .72 -> .80, crest unchanged at 1.30: same
+ *     trade, applied to the other modulation.
+ *   - The crest glow becomes a real halo — two passes, tight and wide, from
+ *     k > .70 rather than .78. The single 5px/.14 pass it replaces did not
+ *     move the measured peak at all when switched off.
+ *   - Particles 44 -> 70, ~25% larger, each twinkling on its own seeded clock
+ *     whose multiplier tops out at exactly 1.0 — busier crests, same peak.
+ *   - The travelling window moves 1.5x faster. At 0.085/s a visitor had to
+ *     watch ~12s to see a crest arrive; at 0.128/s the window crosses about a
+ *     quarter of the mesh in the first two seconds, which is the window in
+ *     which someone decides whether a page is alive.
+ *   - The far layer lifts .40 -> .52, because everything in front of it got
+ *     brighter and depth is a RATIO. Left alone it would have flattened.
+ *
+ * The static SVG is deliberately NOT regenerated. It measures 0.363 — inside
+ * the same target band, ahead of where the canvas has now landed — so
+ * reduced-motion visitors have had the stronger field all along, and
+ * `lib/manifold/curves.ts` is a locked audited artifact. The drift this pass
+ * closes is the canvas sitting BELOW its own baseline, not the two drifting
+ * apart.
  */
 export function Manifold() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -113,12 +175,15 @@ export function Manifold() {
       fu: number; fv: number; fsamp: number;  // far layer
       dots: number;
     };
-    const DESKTOP: Density = { nu: 23, nv: 9, samp: 56, fu: 15, fv: 6, fsamp: 40, dots: 44 };
+    const DESKTOP: Density = { nu: 23, nv: 9, samp: 56, fu: 15, fv: 6, fsamp: 40, dots: 70 };
     /* Below 768 every layer stays ON — the point of the cap is to keep the
        same picture at a frame rate a phone can hold, not to quietly ship a
        different one. Line counts and samples per line come down together;
-       measured 60fps at 375 with all four layers running. */
-    const MOBILE: Density = { nu: 15, nv: 6, samp: 34, fu: 9, fv: 4, fsamp: 26, dots: 16 };
+       measured 60fps at 375 with all four layers running. The dot count keeps
+       its ~36% ratio to desktop through the presence pass: a phone shows a
+       smaller slice of the same field, so it needs fewer dots to look as
+       populated, and dots are the cheapest layer to overspend on. */
+    const MOBILE: Density = { nu: 15, nv: 6, samp: 34, fu: 9, fv: 4, fsamp: 26, dots: 26 };
     let D: Density = DESKTOP;
 
     const size = () => {
@@ -171,8 +236,12 @@ export function Manifold() {
     /* Smaller, slower, dimmer, thinner and lifted — five cues that read as
        "further away" without a second palette or a blur pass. At 0.72 the two
        meshes sat on top of each other and read as one blurry mesh; 0.6 with a
-       real lift is where the eye starts seeing two surfaces. */
-    const FAR: Layer = { k: 0.6, dy: -74, clock: 0.55, alpha: 0.4, w: 1.1 };
+       real lift is where the eye starts seeing two surfaces.
+       Depth is a RATIO, not an absolute: the presence pass raised the near
+       layer, so holding .40 here would have read as the far layer receding
+       further rather than as the field getting stronger. .52 keeps the same
+       gap between the two surfaces that was tuned in the first pass. */
+    const FAR: Layer = { k: 0.6, dy: -74, clock: 0.55, alpha: 0.52, w: 1.1 };
 
     const P = (
       u: number,
@@ -190,11 +259,15 @@ export function Manifold() {
     };
 
     /* ----------------------------------------------------- travelling wave */
-    /* A window that walks the line index. Floor 0.72, crest 1.30: the crest
-       is where the eye goes, and the floor is what keeps the mean — and so
-       the average luminance of the whole field — below where it started. */
-    const WAVE_FLOOR = 0.72;
-    const WAVE_GAIN = 0.58;
+    /* A window that walks the line index. Floor 0.80, crest 1.30. The crest is
+       where the eye goes; the floor is what the REST of the mesh is worth
+       while it waits its turn, and at 0.72 the lines off the crest had gone
+       quiet enough that the field read as "one bright wire and some ghosts".
+       Raising the floor and leaving the crest alone is the cheapest presence
+       in the file: it lifts every line that is not currently peaking and it
+       cannot move the peak pixel, because the peak pixel is on the crest. */
+    const WAVE_FLOOR = 0.8;
+    const WAVE_GAIN = 0.5;
     const WAVE_WIDTH = 0.17;
     const wave = (idx: number, count: number, t: number, speed: number) => {
       const p = idx / count;
@@ -214,7 +287,20 @@ export function Manifold() {
       for (let i = 0; i < pts.length; i++) zm += pts[i][2];
       zm /= pts.length;
       const k = Math.max(0, Math.min(1, (zm + 1.6) / 3.2)); // height 0..1
-      const a = fam * (0.55 + 0.45 * k) * L.alpha; // audited ramp
+      /* Height ramp — and the most load-bearing number in this file, for a
+         reason that only shows up in a long capture.
+         The surface's own slowest term evolves over ~70s, so the number of
+         lines standing HIGH varies over a minute-scale cycle, and the field's
+         brightness varies with it: measured across 170 frames / 43s, the
+         per-frame peak ran 0.105 to 0.313. A visitor who lands in the wrong
+         half of that cycle sees the faint field the owner complained about,
+         whatever the headline number says.
+         The ramp floor is the knob that fixes exactly that phase: it pays out
+         when k is LOW everywhere, and at k=1 it pays nothing (0.72 + 0.28 =
+         1.0, the brightest line is untouched). Raising it .55 -> .72 across
+         this wave lifts the field's quiet minutes by ~30% and its loud ones by
+         nothing at all, which is compression, not gain. */
+      const a = fam * (0.72 + 0.28 * k) * L.alpha;
       ctx.strokeStyle = `${mix(0.25 + 0.75 * k)}${a})`;
       /* Tier-1 parity: the SVG strokes 1.55 viewBox units, which the slice
          scale S turns into device pixels. Stroking a flat 1px here is what
@@ -224,10 +310,20 @@ export function Manifold() {
       ctx.moveTo(pts[0][0] * DPR, pts[0][1] * DPR);
       for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0] * DPR, pts[i][1] * DPR);
       ctx.stroke();
-      if (glow && k > 0.78) {
-        // crest glow: one wide faint pass, no shadowBlur cost
-        ctx.strokeStyle = `${mix(1)}${a * 0.14})`;
-        ctx.lineWidth = 5 * DPR;
+      /* CREST GLOW. Two passes over the path already in the context — tight
+         and bright, then wide and faint — which is what makes a halo instead
+         of a slightly thicker line. The single 5px/.14 pass this replaces was
+         invisible: captured with it forced off, the field's peak luminance did
+         not move. It starts at k > .70 rather than .78 so the shoulder of a
+         crest lights before its very top, and the high ground reads as a ridge
+         rather than as a handful of glowing segments. Still no shadowBlur —
+         that is a per-pixel filter and this is two more strokes. */
+      if (glow && k > 0.7) {
+        ctx.strokeStyle = `${mix(1)}${a * 0.28})`;
+        ctx.lineWidth = 7 * DPR;
+        ctx.stroke();
+        ctx.strokeStyle = `${mix(1)}${a * 0.11})`;
+        ctx.lineWidth = 14 * DPR;
         ctx.stroke();
       }
     };
@@ -265,15 +361,22 @@ export function Manifold() {
         const u = U0 + ((U1 - U0) * i) / (nu - 1);
         const pts: [number, number, number][] = [];
         for (let j = 0; j < samp; j++) pts.push(P(u, V0 + ((V1 - V0) * j) / (samp - 1), t, L));
-        line(pts, 0.45 * wave(i, nu, t, 0.085), L, L === NEAR);
+        line(pts, 0.66 * wave(i, nu, t, 0.128), L, L === NEAR);
       }
       /* Opposite direction, different speed: two windows crossing each other
-         is what makes the motion read as travelling rather than pulsing. */
+         is what makes the motion read as travelling rather than pulsing.
+         Both speeds are 1.5x the first pass's. The ratio between them is
+         unchanged, so the interference pattern is the same picture played at
+         a rate a visitor actually catches: the window used to need ~12s to
+         cross the mesh, and nobody waits 12s to decide whether a page is
+         alive. The cross-sections gain more alpha than the rulings (.30->.45
+         against .45->.60) because at the old numbers they had faded to a
+         wash, and the surface stopped reading as ruled in two directions. */
       for (let i = 0; i < nv; i++) {
         const v = V0 + ((V1 - V0) * i) / (nv - 1);
         const pts: [number, number, number][] = [];
         for (let j = 0; j < samp; j++) pts.push(P(U0 + ((U1 - U0) * j) / (samp - 1), v, t, L));
-        line(pts, 0.3 * wave(i, nv, t, -0.062), L, L === NEAR);
+        line(pts, 0.5 * wave(i, nv, t, -0.093), L, L === NEAR);
       }
     };
 
@@ -297,12 +400,19 @@ export function Manifold() {
         const h = (zz - 0.35) / 0.9;
         if (h <= 0) continue;
         const vis = Math.min(1, h) ** 1.5;
-        const r = (1.1 + seed(i, 4) * 1.1) * DPR;
-        ctx.fillStyle = `${mix(1)}${0.62 * vis})`;
+        /* TWINKLE. Each dot breathes on its own seeded period (~4.2-9.5s) and
+           its own phase, so the crests shimmer instead of sitting still. The
+           multiplier is built to top out at exactly 1.0 — .78 + .22 — which is
+           the whole trick: the field gets busier and the BRIGHTEST PIXEL DOES
+           NOT MOVE. Presence here is bought with count and size, both of which
+           the luminance budget does not charge for. */
+        const tw = 0.78 + 0.22 * Math.sin(t * (0.66 + seed(i, 5) * 0.83) + seed(i, 6) * 6.283);
+        const r = (1.35 + seed(i, 4) * 1.35) * DPR;
+        ctx.fillStyle = `${mix(1)}${0.62 * vis * tw})`;
         ctx.beginPath();
         ctx.arc(x * DPR, y * DPR, r, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = `${mix(0.8)}${0.12 * vis})`;
+        ctx.fillStyle = `${mix(0.8)}${0.12 * vis * tw})`;
         ctx.beginPath();
         ctx.arc(x * DPR, y * DPR, r * 2.8, 0, Math.PI * 2);
         ctx.fill();

@@ -47,8 +47,15 @@ const LABEL = arg("--label") ?? "after";
  */
 const BASELINE = process.argv.includes("--baseline");
 const UPDATE_EVIDENCE = process.argv.includes("--update-evidence");
+/**
+ * Which evidence packet --update-evidence writes into. Defaults to the packet
+ * this script was built for, so existing invocations are unchanged; a later
+ * wave passes its own name rather than overwriting an earlier wave's record.
+ * Evidence is dated proof, not a mutable folder.
+ */
+const EVIDENCE_DIR = arg("--evidence-dir") ?? "wave-2-chrome";
 const OUT = UPDATE_EVIDENCE
-  ? join(process.cwd(), "docs", "evidence", "wave-2-chrome")
+  ? join(process.cwd(), "docs", "evidence", EVIDENCE_DIR)
   : join(process.cwd(), "out", "verify-chrome");
 mkdirSync(OUT, { recursive: true });
 
@@ -176,24 +183,54 @@ writeFileSync(join(OUT, `field-1440-${LABEL}-t1.png`), fieldT1);
 
 /* -------------------------------------------------------- field luminance */
 //
-// Sampled across FRAMES, not from one. A window of brightness travels through
-// the mesh, so a single capture measures whatever the wave happened to be
-// doing — two runs of the earlier one-frame version read 0.095 and 0.084 off
-// the same build. Twelve frames spread over ~2.4s cover a full pass, and the
-// number reported is the peak of all of them.
-let fieldPeak = 0;
-const fieldFrames = [fieldT0, fieldT1];
-for (let i = 0; i < 10; i++) {
-  await page.waitForTimeout(240);
-  fieldFrames.push(await page.screenshot({ clip: fieldClip }));
-}
+// Sampled across FRAMES, not from one — and across ENOUGH frames, which is the
+// part this wave had to fix.
+//
+// The first version measured one capture. Two runs read 0.095 and 0.084 off
+// the same build, so it went to twelve frames over ~2.4s and the travelling
+// wave was declared covered. It was not. The manifold surface's slowest term
+// evolves over ~70s, so the number of lines standing high — and the whole
+// field's brightness with it — cycles on a minute scale underneath the wave.
+// Measured on one unchanged build, 170 captures over 43s: sliding a 2.4s
+// window across that series returns anything from 0.119 to 0.313. The window
+// was not measuring the field, it was measuring which minute it was.
+//
+// That is a SAFETY hole, not just a noisy number: a 2.4s window samples 3% of
+// the cycle, so a build that breaches the 0.45 ceiling at some other phase
+// passes this gate on luck. The window is now ~150 captures over ~35s, which
+// covers the cycle; measured spread across sliding windows of that length is
+// a few percent rather than 62%.
+//
+// The distribution is reported alongside the peak because they answer
+// different questions. The peak is what the 0.45 ceiling and the h1 comparison
+// are about — one pixel, at the field's brightest instant. The MEDIAN is what
+// a visitor actually sees, and it is the number that moved when the owner
+// asked for a more present field.
+const FIELD_SAMPLES = 150;
+const framePeaks = [];
 let fieldPx = 0;
-for (const shot of fieldFrames) {
+const lumStart = Date.now();
+for (const shot of [fieldT0, fieldT1]) {
   const r = await peakLuminance(page, shot.toString("base64"));
-  fieldPeak = Math.max(fieldPeak, r.peak);
+  framePeaks.push(r.peak);
   fieldPx = r.px;
 }
-const fieldLum = { peak: fieldPeak, px: fieldPx, frames: fieldFrames.length };
+while (framePeaks.length < FIELD_SAMPLES) {
+  // Back to back: the capture+decode cadence (~230ms) is the sampling rate.
+  const r = await peakLuminance(page, (await page.screenshot({ clip: fieldClip })).toString("base64"));
+  framePeaks.push(r.peak);
+  fieldPx = r.px;
+}
+const lumSpanSec = (Date.now() - lumStart) / 1000;
+const ranked = [...framePeaks].sort((a, b) => a - b);
+const fieldLum = {
+  peak: ranked[ranked.length - 1],
+  median: ranked[Math.floor(ranked.length / 2)],
+  min: ranked[0],
+  px: fieldPx,
+  frames: framePeaks.length,
+  spanSec: lumSpanSec,
+};
 await hider.evaluate((el) => el.remove());
 await page.waitForTimeout(200);
 
@@ -204,19 +241,36 @@ const h1Shot = await page.screenshot({
 const h1Lum = await peakLuminance(page, h1Shot.toString("base64"));
 
 measured.fieldPeak = fieldLum.peak.toFixed(3);
+measured.fieldMedian = fieldLum.median.toFixed(3);
+measured.fieldMin = fieldLum.min.toFixed(3);
 measured.h1Peak = h1Lum.peak.toFixed(3);
 report(
   "Field peak luminance stays BELOW the h1's",
   fieldLum.peak < h1Lum.peak,
   `field ${measured.fieldPeak} vs h1 ${measured.h1Peak} ` +
-    `(${fieldLum.px} px x ${fieldLum.frames} frames, h1 ${h1Lum.px} px)`,
+    `(${fieldLum.px} px x ${fieldLum.frames} frames over ${fieldLum.spanSec.toFixed(0)}s, h1 ${h1Lum.px} px)`,
 );
 /* The ceiling the wave was given: presence through structure, not brightness. */
 report(
   "Field peak stays inside its 0.45 budget",
   fieldLum.peak <= 0.45,
-  `${measured.fieldPeak} of 0.45`,
+  `${measured.fieldPeak} of 0.45 · median ${measured.fieldMedian} · min ${measured.fieldMin}`,
 );
+/* The FLOOR, added by the presence pass (owner: the field should be "more
+   visible and noticeable"). A ceiling on its own only ever says the field is
+   not too bright — it passed happily on a build whose field the owner could
+   not see. This is the other side of the same budget, and it is why the two
+   numbers are reported together: the field lives in a band, not under a cap.
+   Skipped under --baseline for the reason given at the top of this file: `main`
+   does not have this wave, so a red line here would only mean "this is the old
+   build". The baseline's number is still printed in `measured`, which is what
+   the before/after table is built from. */
+if (!BASELINE)
+  report(
+    "Field peak reaches its presence floor (>= 0.30)",
+    fieldLum.peak >= 0.3,
+    `${measured.fieldPeak} of 0.30 floor / 0.45 ceiling`,
+  );
 
 /* ------------------------------------------------------- the mark is alive */
 
@@ -230,6 +284,10 @@ const markState = await page.evaluate(() => {
     cells: cells.length,
     breathing: cells.map(nameOf),
     ticking: squares.map(nameOf).filter((n) => n !== "none"),
+    // The presence pass's two additions, read off computed style rather than
+    // assumed from the stylesheet.
+    cycling: cells.map(nameOf).filter((n) => n.includes("mark-cycle")).length,
+    glint: squares.map((b) => getComputedStyle(b, "::after").animationName).filter((n) => n !== "none"),
     running: document.getAnimations().filter((a) => a.playState === "running").length,
     // Nothing may move that could push the wordmark: transform only.
     props: cells.map((c) => getComputedStyle(c).animationName !== "none"),
@@ -243,6 +301,35 @@ report(
     markState.breathing.every((n) => n !== "none") &&
     markState.ticking.length === 1,
   `cells ${markState.breathing.join(", ")} · tick ${markState.ticking.join(",") || "none"}`,
+);
+report(
+  "Mark: all three cells carry the 8.1s activity cycle, and the ticking cell alone carries the glint",
+  markState.cycling === 3 && markState.glint.length === 1 && markState.glint[0] === "mark-glint",
+  `cycling ${markState.cycling}/3 · glint on ${markState.glint.length} cell(s): ${markState.glint.join(",") || "none"}`,
+);
+
+/* THE ACTIVE CELL MOVES. The cycle is the claim a still frame cannot settle,
+   so it is sampled: read all three cells' computed opacity now and again 4s
+   later, and require the brightest one to be a DIFFERENT cell. With a 2.7s
+   hand-off a 4s gap can never land on the same cell twice, so this is
+   deterministic rather than hopeful. Screenshots of both moments ship with the
+   evidence for anyone who wants to see it rather than read it. */
+const activeCell = () =>
+  page.evaluate(() =>
+    [...document.querySelectorAll(".mark__glyph i")].map((el) => Number(getComputedStyle(el).opacity)),
+  );
+const markClip = { x: 0, y: 34, width: 420, height: 70 };
+const opacityA = await activeCell();
+await page.screenshot({ path: join(OUT, `mark-cycle-1440-${LABEL}-t0.png`), clip: markClip });
+await page.waitForTimeout(4000);
+const opacityB = await activeCell();
+await page.screenshot({ path: join(OUT, `mark-cycle-1440-${LABEL}-t4.png`), clip: markClip });
+const brightest = (o) => o.indexOf(Math.max(...o));
+report(
+  "Mark: the active cell hands off — a different cell is brightest 4s later",
+  brightest(opacityA) !== brightest(opacityB),
+  `t0 [${opacityA.map((v) => v.toFixed(2)).join(", ")}] cell ${brightest(opacityA) + 1} · ` +
+    `t+4s [${opacityB.map((v) => v.toFixed(2)).join(", ")}] cell ${brightest(opacityB) + 1}`,
 );
 
 // No layout shift: the glyph's box must be identical before and after a full
@@ -279,6 +366,49 @@ report(
   `animation ${hover.converge} · cell fill ${hover.fill}`,
 );
 await page.mouse.move(1200, 700);
+
+/* MAGNIFIED MARK EVIDENCE. The gate above is assertions, and the pair of
+   420x70 crops beside it is honest but nearly useless to a human: the glyph is
+   15 CSS pixels, and a .58-to-1.0 brightness hand-off inside it does not
+   survive a 1x screenshot. The previous packet said as much — "the mark's own
+   motion is not screenshottable" — and then asked the reader to trust the
+   assertions. A 4x context costs about three seconds and closes that gap.
+   Its own context, so the measured page is never mutated for a photograph. */
+const zoomCtx = await browser.newContext({
+  viewport: { width: 1440, height: 900 },
+  deviceScaleFactor: 4,
+});
+const zoom = await zoomCtx.newPage();
+await zoom.goto(`${BASE}/`, { waitUntil: "networkidle" });
+const gbox = await zoom.locator(".mark__glyph").boundingBox();
+const gclip = { x: gbox.x - 7, y: gbox.y - 7, width: gbox.width + 14, height: gbox.height + 14 };
+/* THE GLINT FIRST, and that ordering is the whole trick. It runs on a 20s
+   clock with a 4s delay from load, so there is one ~4s after this page opened
+   and then nothing for twenty seconds. Shooting the rotation first burns 5.4s
+   and walks straight past it — measured, and it cost a red line before the
+   order was swapped. Poll the pseudo-element's own opacity and shoot the frame
+   it is actually lit; never infer a flash from the stylesheet. */
+let glintShot = 0;
+for (let i = 0; i < 200 && !glintShot; i++) {
+  const o = await zoom.evaluate(() =>
+    Number(getComputedStyle(document.querySelector(".mark__glyph i:nth-child(3) b"), "::after").opacity),
+  );
+  if (o > 0.25) {
+    await zoom.screenshot({ path: join(OUT, `mark-zoom-glint-${LABEL}.png`), clip: gclip });
+    glintShot = o;
+  } else await zoom.waitForTimeout(40);
+}
+/* Then the rotation, one frame per hand-off. */
+for (const [i, label] of ["a", "b", "c"].entries()) {
+  await zoom.screenshot({ path: join(OUT, `mark-zoom-cycle-${label}-${LABEL}.png`), clip: gclip });
+  if (i < 2) await zoom.waitForTimeout(2700);
+}
+report(
+  "Mark: the tick's glint was captured lit (not asserted from the stylesheet)",
+  glintShot > 0.25,
+  glintShot ? `caught at opacity ${glintShot.toFixed(2)} → mark-zoom-glint-${LABEL}.png` : "never lit within 12s",
+);
+await zoomCtx.close();
 }
 
 await page.evaluate(() => window.scrollTo(0, 0));
@@ -391,7 +521,16 @@ const rmState = await rmPage.evaluate(() => {
       getComputedStyle(glyph).animationName,
       ...names(".mark__glyph i"),
       ...names(".mark__glyph b"),
+      // The glint is on a pseudo-element. A selector list that forgets it
+      // leaves a 20s animation running on a page that promised none.
+      ...[...document.querySelectorAll(".mark__glyph b")].map(
+        (el) => getComputedStyle(el, "::after").animationName,
+      ),
     ],
+    // ...and the overlay must be invisible, not merely stopped.
+    glintOpacity: [...document.querySelectorAll(".mark__glyph b")].map(
+      (el) => getComputedStyle(el, "::after").opacity,
+    ),
     markTransforms: names(".mark__glyph i").length
       ? [...document.querySelectorAll(".mark__glyph i, .mark__glyph b")].map(
           (el) => getComputedStyle(el).transform,
@@ -407,10 +546,12 @@ report(
 );
 if (!BASELINE)
   report(
-  "Reduced motion: the mark is fully static",
+  "Reduced motion: the mark is fully static, glint included",
   rmState.markNames.every((n) => n === "none") &&
-    rmState.markTransforms.every((t) => t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)"),
-  `animations ${[...new Set(rmState.markNames)].join(",")} · transforms ${[...new Set(rmState.markTransforms)].join(" ")}`,
+    rmState.markTransforms.every((t) => t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)") &&
+    rmState.glintOpacity.every((o) => Number(o) === 0),
+  `animations ${[...new Set(rmState.markNames)].join(",")} · transforms ${[...new Set(rmState.markTransforms)].join(" ")}` +
+    ` · glint opacity ${[...new Set(rmState.glintOpacity)].join(",")}`,
 );
 report(
   "Reduced motion: ZERO animations running anywhere on the page",
@@ -425,6 +566,6 @@ console.log("─".repeat(72));
 console.log(`measured: ${JSON.stringify(measured)}`);
 console.log(failed ? `${failed} chrome check(s) FAILED` : "all chrome checks passed");
 console.log(
-  `screenshots → ${UPDATE_EVIDENCE ? "docs/evidence/wave-2-chrome/" : "out/verify-chrome/ (untracked)"}`,
+  `screenshots → ${UPDATE_EVIDENCE ? `docs/evidence/${EVIDENCE_DIR}/` : "out/verify-chrome/ (untracked)"}`,
 );
 process.exit(failed ? 1 : 0);
