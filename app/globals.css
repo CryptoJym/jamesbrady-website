@@ -746,9 +746,13 @@ main:focus{outline:none}
   letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-lo);
   font-weight:400;line-height:1.4;
 }
+/* Four doors from wave 3b. Four across at the full measure, two by two from
+   1180 down, including the phone: a door carries a label, a who-line and two
+   sentences, and four of those stacked in one column pushed the proof section
+   below three screens of scrolling on a 375 viewport. */
 .doors{
   margin-top:var(--s-4);
-  display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-4);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-4);
 }
 .door{
   display:flex;flex-direction:column;gap:var(--s-2);
@@ -1567,7 +1571,7 @@ main:focus{outline:none}
       var(--scrim-42) 62%, var(--scrim-10) 84%,
       var(--scrim-85) 100%)}
   .grid-work,.grid-work--3{grid-template-columns:repeat(2,1fr)}
-  .doors{grid-template-columns:repeat(3,1fr);gap:var(--s-3)}
+  .doors{grid-template-columns:repeat(2,1fr);gap:var(--s-3)}
   .bank{grid-template-columns:repeat(2,1fr)}
   .slot:nth-child(2n){border-right:0}
   .slot:nth-child(-n+2){border-bottom:1px solid var(--c-line)}
@@ -1593,7 +1597,14 @@ main:focus{outline:none}
 @media (max-width:620px){
   :root{--gutter:22px;--s-9:64px;--s-10:80px;--dock-gap:16px}
   .grid-work,.grid-work--3,.grid-work--2{grid-template-columns:1fr}
-  .doors{grid-template-columns:1fr}
+  /* The door row stays two by two on a phone. It is the only grid on the site
+     that does: a card carries a title and a paragraph and needs the width, but
+     a door is a signpost, and four signposts in one column is a scroll rather
+     than a choice. Padding and the label size come down with the column so the
+     text still has a line to sit on. */
+  .doors{grid-template-columns:repeat(2,1fr);gap:var(--s-3)}
+  .door{padding:var(--s-4);gap:6px}
+  .door__label{font-size:var(--ts-body);letter-spacing:0}
   .linklist a{gap:var(--s-2)}
   .linklist__label{min-width:0}
   .bank{grid-template-columns:1fr}

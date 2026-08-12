@@ -25,7 +25,7 @@ const LINKS: { href: string; label: string; hint: string }[] = [
   {
     href: "/work-with-me",
     label: "Work with me",
-    hint: "Work with me: the two engagements you can hire, and what each costs",
+    hint: "Work with me: the engagements you can hire, who delivers each, and what each costs",
   },
   {
     href: "/work",

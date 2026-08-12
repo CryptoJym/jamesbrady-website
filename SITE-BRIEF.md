@@ -129,6 +129,10 @@ Flagship: Universal Question Geometry (OfOne). Then: Question-Answer Dynamics, C
 
 - 2026-08-12 — /now describes current work as research projects, not the site rebuild. — James
 
+- 2026-08-12 — Vuplicity listed as a named Work-with-me option (owner ruling; supersedes anonymized treatment for the offer surface; denylist updated same day). — James
+
+- 2026-08-12 — Scope of the ruling above, as built (lead agent). The name renders on exactly five routes, counted from the built pages rather than from intent: `/work-with-me/background-screening` (the offer), `/work-with-me` (the hub card), `/` and `/links` (the door rows), and `/work/visibility-platform` (twice: the anonymization note states the one exception and links to it, and the third `publicNote` no longer claims that no client has been named anywhere). It also reaches `/now`, because the offer carries a `[JAMES: …]` mark asking for his exact relationship to Vuplicity and `/now` is the register of every open mark. Zero occurrences on `/about`, `/contact`, `/work`, `/theories`, `/lab`, `/learn`, and on the other two offer pages. `/work/visibility-platform` stays `anonymized: true`: it may name the exception and link to it, and it may not claim Vuplicity as a credential. Every fact about Vuplicity on the new page came from www.vuplicity.com on 2026-08-12 and is listed with its URL and method in `content/offers/background-screening.ts`; the two JSON-LD blocks on that site tagged `data-newrewards-edge` were deliberately NOT used as sources, because the agency injected them. James's title and ownership position at Vuplicity are unstated in public sources, so they are carried as two `[JAMES: …]` marks and render to a buyer as third-person statements of absence.
+
 ## Open items
 
 - James locks v2 (or marks it up).

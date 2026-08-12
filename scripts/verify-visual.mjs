@@ -263,6 +263,7 @@ for (const [path, file] of [
   ["/work-with-me", "work-with-me-1440.png"],
   ["/work-with-me/get-found", "offer-get-found-1440.png"],
   ["/work-with-me/build-a-system", "offer-build-a-system-1440.png"],
+  ["/work-with-me/background-screening", "offer-background-screening-1440.png"],
   ["/links", "links-1440.png"],
   ["/work", "work-1440.png"],
   ["/work/plimsoll", "work-plimsoll-1440.png"],
@@ -323,19 +324,33 @@ report(
 );
 await page.screenshot({ path: join(OUT, "now-open-items-1440.png"), fullPage: true });
 
-// The homepage door row: three doors, each a real link, each naming a visitor.
+// The homepage door row: four doors from wave 3b, each a real link, each
+// naming a visitor. The count is asserted rather than described, because the
+// row's whole job is that a reader sees every way in; a door that silently
+// stopped rendering would leave the page looking finished.
+//
+// The row must also BE a row: four cells on one line at 1440. A door that
+// wrapped onto a second line under a three-across rule would still pass a
+// count check and would look like a mistake.
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
 const doors = await page.evaluate(() =>
   [...document.querySelectorAll(".doors .door")].map((d) => ({
     href: d.getAttribute("href"),
     label: d.querySelector(".door__label")?.textContent?.trim(),
     who: d.querySelector(".door__who")?.textContent?.trim(),
+    top: Math.round(d.getBoundingClientRect().top),
   })),
 );
 report(
-  "Homepage sorts visitors: three doors, each a link that names who it is for",
-  doors.length === 3 && doors.every((d) => d.href && d.label && d.who),
+  "Homepage sorts visitors: four doors, each a link that names who it is for",
+  doors.length === 4 && doors.every((d) => d.href && d.label && d.who),
   doors.map((d) => `${d.label} → ${d.href}`).join(" · "),
+);
+const doorRows1440 = new Set(doors.map((d) => d.top)).size;
+report(
+  "Door row is one row at 1440",
+  doorRows1440 === 1,
+  `${doors.length} doors across ${doorRows1440} row(s)`,
 );
 await page.screenshot({ path: join(OUT, "home-1440-doors.png") });
 
@@ -516,16 +531,18 @@ await mpage.screenshot({ path: join(OUT, "home-375-hero.png") });
 await mpage.screenshot({ path: join(OUT, "home-375-full.png"), fullPage: true });
 
 // The wave-3 surfaces at 375, and the overflow assertion on each of them. A
-// three-across door row and a two-across offer grid are exactly the shapes
+// four-across door row and a three-across offer grid are exactly the shapes
 // that break a phone, so they are measured rather than eyeballed.
 const narrowOverflow = [];
-for (const [path, file] of [
+const NARROW_ROUTES = [
   ["/work-with-me", "work-with-me-375.png"],
   ["/work-with-me/get-found", "offer-get-found-375.png"],
   ["/work-with-me/build-a-system", "offer-build-a-system-375.png"],
+  ["/work-with-me/background-screening", "offer-background-screening-375.png"],
   ["/links", "links-375.png"],
   ["/now", "now-375.png"],
-]) {
+];
+for (const [path, file] of NARROW_ROUTES) {
   await mpage.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
   await mpage.waitForTimeout(300);
   const over = await mpage.evaluate(
@@ -537,8 +554,30 @@ for (const [path, file] of [
 report(
   "No horizontal overflow at 375 on the wave-3 routes",
   narrowOverflow.length === 0,
-  narrowOverflow.length ? narrowOverflow.join(" | ") : "5 routes measured",
+  narrowOverflow.length
+    ? narrowOverflow.join(" | ")
+    : `${NARROW_ROUTES.length} routes measured`,
 );
+
+// The door row at 375: four doors in two rows of two, and every door still
+// wide enough to be a tap target rather than a sliver. Two rows is the claim
+// the CSS makes, so it is the claim that gets measured.
+await mpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await mpage.waitForTimeout(300);
+const doors375 = await mpage.evaluate(() =>
+  [...document.querySelectorAll(".doors .door")].map((d) => {
+    const r = d.getBoundingClientRect();
+    return { top: Math.round(r.top), width: Math.round(r.width) };
+  }),
+);
+const rows375 = new Set(doors375.map((d) => d.top)).size;
+const narrowest = Math.min(...doors375.map((d) => d.width));
+report(
+  "Door row is two by two at 375, and no door is narrower than 140px",
+  doors375.length === 4 && rows375 === 2 && narrowest >= 140,
+  `${doors375.length} doors · ${rows375} rows · narrowest ${narrowest}px`,
+);
+await mpage.screenshot({ path: join(OUT, "home-375-doors.png") });
 
 /* ------------------------------------------- reduced motion + no-JS fallback */
 
