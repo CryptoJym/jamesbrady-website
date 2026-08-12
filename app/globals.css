@@ -1087,6 +1087,148 @@ main:focus{outline:none}
   .dock__t{white-space:normal}
 }
 
+/* ============================================================ ASK PANEL
+   The conversation surface. Mounts ONLY when GET /api/ask reports the route is
+   switched on; with the keys absent the dock keeps its terms disclosure above
+   and none of this renders.
+
+   It is a sibling of the pill rather than a growth of it, for two reasons: the
+   pill's geometry is pinned by verify-visual, and this box is modal while the
+   disclosure never is. Same corner, same fill, same edge treatment. */
+.askp{
+  position:fixed;right:var(--dock-gap);bottom:calc(var(--dock-gap) + var(--dock-size) + var(--s-2));
+  z-index:81;
+  width:min(420px,calc(100vw - var(--dock-gap) * 2));
+  max-height:min(70vh,620px);
+  display:flex;flex-direction:column;
+  border:1px solid var(--sig-edge);border-radius:var(--r-md);
+  background:var(--dock-fill);
+  backdrop-filter:blur(10px);
+  box-shadow:0 14px 40px var(--dock-shadow);
+  overflow:hidden;
+}
+@media (prefers-reduced-motion:no-preference){
+  .askp{animation:rise 220ms var(--ease) both}
+}
+.askp__head{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);
+  padding:var(--s-3) var(--s-4);
+  border-bottom:1px solid var(--c-line);
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-lo);
+}
+.askp__x{
+  display:inline-flex;align-items:center;gap:var(--s-2);
+  min-height:32px;padding:0 var(--s-2);
+  border:1px solid var(--c-edge-int);border-radius:var(--r-sm);
+  background:none;color:var(--t-mid);cursor:pointer;
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;
+}
+.askp__x:hover{border-color:var(--sig-edge);color:var(--t-hi)}
+.askp__x kbd{font-family:inherit;font-size:inherit;color:var(--t-faint)}
+
+.askp__log{
+  flex:1 1 auto;min-height:120px;overflow-y:auto;
+  padding:var(--s-4);
+  display:flex;flex-direction:column;gap:var(--s-4);
+  font-size:var(--ts-small);line-height:1.6;color:var(--t-mid);
+}
+.askp__hint,.askp__wait{
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  letter-spacing:var(--track-data);color:var(--t-lo);margin:0;
+}
+.askp__wait{display:flex;align-items:center;gap:var(--s-2)}
+
+.askq{margin:0;color:var(--t-hi)}
+.askq__k{
+  display:block;margin-bottom:var(--s-1);
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-faint);
+}
+.aska{display:flex;flex-direction:column;gap:var(--s-3)}
+.askm > :first-child{margin-top:0}
+.askm > :last-child{margin-bottom:0}
+.askm p{margin:0 0 var(--s-3)}
+.askm ul,.askm ol{margin:0 0 var(--s-3) var(--s-5)}
+.askm a{color:var(--sig);text-decoration:underline;text-underline-offset:3px}
+.askm code{font-family:var(--f-mono);font-size:var(--ts-micro);color:var(--t-hi)}
+
+/* Citations. Every factual answer carries one; it is the whole contract. */
+.asksrc{
+  border-left:2px solid var(--sig-edge);padding-left:var(--s-3);
+}
+.asksrc__lab{
+  display:block;margin-bottom:var(--s-1);
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-faint);
+}
+.asksrc ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.asksrc a{color:var(--sig);text-decoration:underline;text-underline-offset:3px}
+
+.askchip{
+  display:flex;align-items:baseline;gap:var(--s-2);
+  padding:var(--s-2) var(--s-3);
+  border:1px solid var(--c-edge-int);border-radius:var(--r-sm);
+  background:var(--c-raised);color:var(--t-mid);text-decoration:none;
+}
+.askchip:hover{border-color:var(--sig-edge);color:var(--t-hi)}
+.askchip__k{
+  flex:0 0 auto;
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--sig);
+}
+.askchip__b{min-width:0}
+
+/* A decline is a real answer, so it is styled as one. Amber, never error red:
+   the assistant declining is the system working. */
+.askdec{
+  margin:0;padding:var(--s-3);
+  border:1px solid var(--warn);border-radius:var(--r-sm);
+  background:var(--warn-wash);color:var(--t-mid);
+}
+
+.askcard{
+  padding:var(--s-4);
+  border:1px solid var(--sig-edge);border-radius:var(--r-sm);
+  background:var(--c-raised);
+}
+.askcard__why{margin:0 0 var(--s-3);color:var(--t-hi)}
+.askcard .field{margin-bottom:var(--s-3)}
+.askcard .field textarea{min-height:76px}
+.askconsent{display:flex;gap:var(--s-2);align-items:flex-start;margin-bottom:var(--s-3)}
+.askconsent input{margin-top:3px;accent-color:var(--sig)}
+.askconsent label{font-size:var(--ts-micro);line-height:1.5;color:var(--t-mid)}
+
+.askp__form{
+  display:grid;grid-template-columns:1fr auto;gap:var(--s-2);align-items:end;
+  padding:var(--s-3) var(--s-4);border-top:1px solid var(--c-line);
+}
+.askp__lab{
+  grid-column:1 / -1;
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-faint);
+}
+.askp__in{
+  width:100%;padding:var(--s-2) var(--s-3);resize:vertical;
+  border:1px solid var(--c-edge-int);border-radius:var(--r-sm);
+  background:var(--c-inset);color:var(--t-hi);
+  font-family:inherit;font-size:var(--ts-small);line-height:1.5;
+}
+.askp__in:hover{border-color:var(--c-line-hot)}
+.askp__go{min-height:44px}
+.askp__go:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.askp__terms{
+  margin:0;padding:0 var(--s-4) var(--s-3);
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-data);line-height:1.5;color:var(--t-faint);
+}
+
+/* Coarse pointer: the panel takes the width it needs and sits above the pill. */
+@media (hover:none),(pointer:coarse){
+  .askp{width:calc(100vw - var(--dock-gap) * 2);max-height:72vh}
+}
+
 /* ============================================================ LOAD CHOREOGRAPHY
    One orchestrated reveal beats scattered micro-animations.
    Order matters: the evidence panel (d4) arrives before the ask (d5).
@@ -1188,7 +1330,7 @@ main:focus{outline:none}
     --sig:#0E6B4C; --sig-wash:transparent; --sig-edge:#0E6B4C; --sig-under:transparent;
     --ink-on-sig:#FFFFFF;
   }
-  .mf,.grain,.hero__scrim,.dock,.skip,.ask,.filters{display:none !important}
+  .mf,.grain,.hero__scrim,.dock,.askp,.skip,.ask,.filters{display:none !important}
   .panel{background:none;border:1px solid var(--c-line)}
   .b-foot{padding-bottom:0}
   .prose a[href^="http"]::after{content:" (" attr(href) ")";font-size:var(--ts-nano);

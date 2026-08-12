@@ -98,6 +98,19 @@ jobs:
       - name: Gate fixtures (red-team the gates themselves)
         run: npm run verify:fixtures
 
+      # Wave 2. Needs no server, no browser and no API key: it red-teams the
+      # Ask dock's own code — the grounding pack, prompt assembly, the reply
+      # validator, the block renderer, the limiter arithmetic and the
+      # not-configured path. It also regenerates the pack and compares, so a
+      # content change committed without `npm run pack` is caught here.
+      #
+      # The SIX RED-TEAM CATEGORIES in docs/specs/chatbot-spec.md are the
+      # --live mode, which spends real money against the real model. That is a
+      # local pre-launch gate run by a person, and this step does not stand in
+      # for it. `npm run verify:ask` prints NOT_RUN for it, every run.
+      - name: verify-ask --offline (wave 2 — pack, prompt, schema, limits)
+        run: npm run verify:ask
+
       - name: Build
         run: npm run build
 

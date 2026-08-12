@@ -47,6 +47,8 @@ const BASE =
     : "http://localhost:4123";
 const ROOT = process.cwd();
 const CANONICAL_HOST = "https://www.jamesbrady.org";
+/** The site name as the root layout's title template appends it (check 16). */
+const SITE_NAME = "James Brady";
 const IN_CI = process.env.CI === "true";
 
 /** The static route list. Asserted equal to the sitemap: a route in one and
@@ -156,6 +158,7 @@ const SCAN_DIRS = [
   "app/feed.xml",
   "components/site",
   "content",
+  "lib/ask",
   "lib/content",
   "lib/seo",
   "lib/schema",
@@ -912,6 +915,36 @@ function checkDisplayNumerals() {
   );
 }
 
+/**
+ * Check 16 — the site name appears once in a title, not twice.
+ *
+ * The root layout carries `template: "%s — James Brady"`, which is correct for
+ * every route whose title is a page name. The home route's title IS the site
+ * title, so the template appended the name to a string that already ended with
+ * it: "James Brady — builds AI systems that show their work — James Brady".
+ * lib/seo/metadata.ts now returns an absolute title on "/", and this is the
+ * lane that keeps it fixed. A stutter in the one string every search result
+ * shows is not cosmetic.
+ */
+function checkTitleStutter(pages) {
+  const bad = [];
+  for (const [path, html] of pages) {
+    const title = /<title>([\s\S]*?)<\/title>/.exec(html)?.[1];
+    if (!title) {
+      bad.push(`${path}: no <title>`);
+      continue;
+    }
+    const decoded = visibleText(title);
+    const hits = decoded.split(SITE_NAME).length - 1;
+    if (hits > 1) bad.push(`${path}: "${decoded}" names the site ${hits} times`);
+  }
+  report(
+    `16. No title repeats "${SITE_NAME}"`,
+    bad.length === 0,
+    bad.length ? bad.join(" | ") : `${pages.length} titles, each naming the site at most once`,
+  );
+}
+
 /* ================================================================== main */
 
 const buildStartIso = new Date().toISOString();
@@ -937,6 +970,14 @@ const feed = (await get("/feed.xml")).body;
 const robots = (await get("/robots.txt")).body;
 const catalog = (await get("/api/catalog")).body;
 
+// The Ask dock's grounding pack. It is not served at a URL — publishing the
+// exact system prompt would hand an attacker the map — so it is read from the
+// generated module instead of fetched. It goes in `artifacts` rather than
+// beside the source files because it is CONTENT, and the checks that matter
+// for it are the content ones: no client name may appear in it (check 10) and
+// no bare-host URL may be cited out of it (check 12). Wave 2, chatbot-spec.
+const packModule = readFileSync(join(ROOT, "lib", "ask", "grounding-pack.generated.ts"), "utf8");
+
 const artifacts = [
   ["sitemap.xml", sitemapXml],
   ["llms.txt", llms],
@@ -944,6 +985,7 @@ const artifacts = [
   ["feed.xml", feed],
   // The catalog endpoint is public bytes and is held to the same rules.
   ["api/catalog", catalog],
+  ["ask/grounding-pack", packModule],
 ];
 
 const { graphs, problems: graphProblems } = parseGraphs(pages);
@@ -963,6 +1005,7 @@ checkHostDiscipline(pages, artifacts);
 checkRobots(robots);
 checkHeadings(pages);
 checkDisplayNumerals();
+checkTitleStutter(pages);
 
 console.log("─".repeat(72));
 const passed = results.filter((r) => r.state === "PASS").length;
