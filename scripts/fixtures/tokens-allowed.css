@@ -1,0 +1,7 @@
+/* Control — everything here is legal and the gate must stay silent.
+   Literals live in :root, including the @media print re-bind; the component
+   rules name tokens; and a comment is free to quote #3FD9A0 as documentation. */
+:root{ --c-base:#0A0E11; --sig:#3FD9A0; --sig-wash:rgba(63,217,160,.10); }
+@media print{ :root{ --c-base:#FFFFFF; --sig:#0E6B4C } }
+.slot__val{ color:var(--sig) }
+.card:hover{ background:var(--sig-wash); border-color:var(--c-base) }

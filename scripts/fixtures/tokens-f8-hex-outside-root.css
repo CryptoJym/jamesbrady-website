@@ -1,0 +1,4 @@
+/* F8 — a colour literal on a component rule. The exact defect the lint exists
+   for: it looks like every other line of CSS and it forks the palette. */
+:root{ --sig:#3FD9A0; }
+.slot__val{ color:#3FD9A0 }

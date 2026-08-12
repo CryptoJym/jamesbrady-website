@@ -87,6 +87,14 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # Wave 2. Needs no server and no browser: it reads the stylesheet, the
+      # Direction B sources and app/icon.svg, and re-renders the icon's raster
+      # siblings to compare bytes. Runs early because it is the cheapest gate
+      # in the workflow and it catches an edit-the-SVG-forget-the-PNG commit
+      # before anything spends three minutes building.
+      - name: Token discipline (no colour literal outside :root)
+        run: npm run verify:tokens
+
       - name: Gate fixtures (red-team the gates themselves)
         run: npm run verify:fixtures
 
@@ -135,12 +143,20 @@ jobs:
             --base http://localhost:4123 \
             --legacy-base http://localhost:4124
 
+      # Wave 2 acceptance: frame rate, field-vs-h1 luminance, the living mark,
+      # reduced motion and the icon set. Kept out of verify-visual so the
+      # "16/16" that wave 1's evidence packet quotes keeps meaning what it did.
+      - name: verify-chrome (wave 2 — motion, luminance, mark, icons)
+        run: node scripts/verify-chrome.mjs --base http://localhost:4123
+
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: verify-visual-screenshots
-          path: out/verify-visual/
+          path: |
+            out/verify-visual/
+            out/verify-chrome/
           if-no-files-found: warn
 
       - name: Stop servers

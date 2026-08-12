@@ -44,7 +44,26 @@ export function SiteNav() {
     <nav className="nav" aria-label="Primary">
       <div className="wrap nav__in">
         <Link href="/" className="mark">
-          <span className="mark__glyph" aria-hidden="true" />
+          {/*
+            The mark: a 2x2 quad with the bottom-left cell left dark. Three
+            painted cells, and each one is its own element because each one
+            breathes on its own clock (globals.css, "LIVING MARK"). The inner
+            <b> is the painted square; the outer <i> is the cell it moves in,
+            so the tick and the breath are two transform layers that compose
+            instead of one overwriting the other. Decoration, so aria-hidden —
+            the link's accessible name stays "JAMES BRADY".
+          */}
+          <span className="mark__glyph" aria-hidden="true">
+            <i>
+              <b />
+            </i>
+            <i>
+              <b />
+            </i>
+            <i>
+              <b />
+            </i>
+          </span>
           JAMES&nbsp;BRADY
         </Link>
         <NavLinks />

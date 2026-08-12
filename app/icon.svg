@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="James Brady">
+  <!--
+    The site mark, as a browser icon. Next serves this file as <link rel="icon">
+    straight out of app/.
+
+    The annotation lives INSIDE the svg element on purpose: Next probes the file
+    with image-size, which sniffs the first bytes, and a leading XML comment
+    makes it "unsupported file type: undefined" at build time.
+
+    RASTERIZED BRAND ASSET — TOKEN VALUES FROZEN BY HAND, EXEMPT FROM THE
+    NO-HEX LINT (design-system-spec §7.2; allowlisted by name, with the reason,
+    in scripts/verify-tokens.mjs). An icon is fetched as its own file by a
+    browser that has never seen the stylesheet, so var(--sig) resolves to
+    nothing here and the values have to be literals. The exemption is not a
+    free pass: the same gate that allows this file then asserts every literal
+    in it still EQUALS the token it froze, so the icon cannot drift away from
+    the palette in silence.
+
+      #0A0E11  --c-base   the page surface, so the icon is the site's own dark
+      #3FD9A0  --sig      phosphor
+
+    The mark is a 2x2 quad with the bottom-left cell left dark — the negative
+    space IS the mark, and filling it in produces the generic four-square
+    "apps" glyph that every grid icon already is. Cell order follows the nav
+    glyph's brightness ladder (top-left brightest, top-right dimmest), stepped
+    with fill-opacity so one phosphor literal serves all three cells.
+
+    Geometry (64 unit box): 12 padding, 18 cells, 4 gutter. Sharp cell corners:
+    at 16px a rounded 18-unit square turns to mush.
+
+    Regenerate the raster siblings after ANY edit here — this file is the
+    source, and `npm run verify:tokens` fails if they are stale:
+      npm run icons     ->  app/apple-icon.png, app/favicon.ico
+  -->
+  <rect x="0" y="0" width="64" height="64" rx="13" fill="#0A0E11"/>
+  <rect x="12" y="12" width="18" height="18" fill="#3FD9A0" fill-opacity="1"/>
+  <rect x="34" y="12" width="18" height="18" fill="#3FD9A0" fill-opacity="0.52"/>
+  <rect x="34" y="34" width="18" height="18" fill="#3FD9A0" fill-opacity="0.74"/>
+</svg>

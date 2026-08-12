@@ -28,4 +28,22 @@ NOT be flagged, so the fix cannot be "reject everything".
 The `md-*` fixtures cover the markdown renderer: link schemes it must refuse to
 turn into anchors, and the two ways a `[JAMES: …]` gap used to break.
 
+The `tokens-f*` fixtures (wave 2) cover `scripts/lib/token-gate.mjs`, the
+"no colour literal outside `:root`" rule from design-system-spec §7.2. It had
+been prose for a whole wave, which caught nothing; it became code when
+`app/icon.svg` needed the first exemption to it.
+
+| fixture | must be |
+|---|---|
+| F8 a hex on a component rule | caught |
+| F9 an `rgba()` on a component rule | caught |
+| F10 an *allowlisted* asset whose literal drifted one digit off `--sig` | caught |
+| `tokens-allowed.css` (control) | silent — tokens, `:root`, the `@media print` re-bind and a comment quoting a value are all legal |
+
+F10 is the one that matters. An allowlist that only *allows* is how an exempt
+brand asset drifts off the palette with nobody watching; this gate grants the
+exemption and then pins the literal to the token it froze. The shipped
+`app/icon.svg` is asserted clean against the same check, so the control and the
+hostile case are the same code path.
+
 Fixtures are DATA. Nothing here is imported by the app.

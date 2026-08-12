@@ -7,11 +7,16 @@
 //
 // Written with a hand-rolled PNG encoder so the build gains no dependency for
 // five static images. Run: node scripts/make-og.mjs
+//
+// The encoder moved to scripts/lib/png.mjs in wave 2, when scripts/make-icons.mjs
+// needed the same one. Same encoder, same output — nothing about these plates
+// changed with the extraction.
 
-import { deflateSync } from "node:zlib";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { encodePng } from "./lib/png.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "public", "og");
@@ -92,52 +97,6 @@ function text(px, str, x, y, scale, c, tracking = 1) {
   return cx;
 }
 
-/* ------------------------------------------------------------ png encoder */
-
-const CRC_TABLE = (() => {
-  const t = new Int32Array(256);
-  for (let n = 0; n < 256; n++) {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    t[n] = c;
-  }
-  return t;
-})();
-
-function crc32(buf) {
-  let c = -1;
-  for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
-  return (c ^ -1) >>> 0;
-}
-
-function chunk(type, data) {
-  const len = Buffer.alloc(4);
-  len.writeUInt32BE(data.length, 0);
-  const body = Buffer.concat([Buffer.from(type, "ascii"), data]);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(body), 0);
-  return Buffer.concat([len, body, crc]);
-}
-
-function encodePng(px) {
-  const raw = Buffer.alloc(H * (W * 3 + 1));
-  for (let y = 0; y < H; y++) {
-    raw[y * (W * 3 + 1)] = 0; // filter: none
-    px.copy(raw, y * (W * 3 + 1) + 1, y * W * 3, (y + 1) * W * 3);
-  }
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(W, 0);
-  ihdr.writeUInt32BE(H, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 2; // truecolour
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk("IHDR", ihdr),
-    chunk("IDAT", deflateSync(raw, { level: 9 })),
-    chunk("IEND", Buffer.alloc(0)),
-  ]);
-}
-
 /* ------------------------------------------------------------------ plates */
 
 const PLATES = [
@@ -180,6 +139,6 @@ for (const plate of PLATES) {
   text(px, "EVERY NUMBER COUNTED AT BUILD", 72, H - 58, 3, SIG, 2);
   text(px, "WWW.JAMESBRADY.ORG", W - 470, H - 58, 3, T_LO, 2);
 
-  writeFileSync(join(OUT, plate.file), encodePng(px));
+  writeFileSync(join(OUT, plate.file), encodePng(px, W, H, 3));
   console.log(`wrote public/og/${plate.file}`);
 }

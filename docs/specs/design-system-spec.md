@@ -280,6 +280,18 @@ Add as CI checks; each one is cheap and each one has already caught a real defec
 2. **No hex / `rgb()` / `rgba()` color literals outside `:root`, including inside inline
    SVG.** SVG stops must be classed and coloured in CSS. See §8-D: the comp itself has
    12 violations of this rule and cannot pass it without new tokens.
+   **Implemented in wave 2** as `npm run verify:tokens` (`scripts/verify-tokens.mjs`,
+   logic in `scripts/lib/token-gate.mjs`, red-teamed by fixtures F8–F10). Scope is the
+   Direction B surfaces; the LEGACY SKIN block and `components/` outside
+   `components/site/` are excluded **by name in the script** until those routes are
+   reskinned — an excluded region is stated, never quietly narrowed.
+   **Allowlist (2 files, each with its reason recorded in the script):**
+   `app/icon.svg` and `app/layout.tsx`'s `viewport.themeColor` — both are consumed by a
+   browser that has no stylesheet in scope, so `var()` cannot reach them. The allowlist
+   has a second half: every literal in an exempted file is then asserted **equal to the
+   `:root` token it froze**, so an exempt asset cannot drift off the palette. The icon's
+   raster siblings (`app/apple-icon.png`, `app/favicon.ico`) are re-rendered from
+   `app/icon.svg` at verify time and compared byte-for-byte.
 3. **`--sig` three-role budget:** live/computed status · the one primary action ·
    computed values. Nothing decorative wears it. Kickers, section numbers and theory
    flags are `--t-lo`. See §8-B — the comp uses `--sig` for interaction feedback too,
