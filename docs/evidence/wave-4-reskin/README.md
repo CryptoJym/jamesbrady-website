@@ -27,29 +27,39 @@ produces the same bytes and a diff means a real change.
 Horizontal overflow was measured at capture time on all sixteen: **0px on every
 route at both widths**, before and after.
 
-## Gate results on this branch
+## Gate results
 
-| Gate | Result |
-|---|---|
-| `npm run typecheck` | PASS |
-| `npm run lint` | PASS — 0 problems, down from 30 errors + 15 warnings on `main` |
-| `npm run build` | PASS — 41 static pages |
-| `npm run verify:tokens` | 5/5 PASS, and the scope is now the **whole repo** |
-| `npm run verify:fixtures` | 19/19 PASS |
-| `npm run verify:seo` | 17/18 PASS, **1 UNPROVEN** (see below) |
-| `npm run verify:visual` | all PASS, including the new dated-archive gate |
-| `npm run verify:chrome` | 22/22 PASS |
-| `npm run verify:ask` (offline) | 24/25, **1 fail-closed** (see below) |
+CI is the authoritative run, because it is the only place the client-name
+denylist can actually execute: the live list is gitignored and materialized from
+the `CLIENT_DENYLIST` repository secret, so on a laptop that gate is
+fail-closed and proves nothing either way.
 
-### The one gate that is not green, and why
+**GitHub Actions `verify`, run 31649250939 — every gate green:**
 
-`verify-seo` check 10 and its twin in `verify-ask` are the client-name denylist.
-Both fail closed when `.seo-denylist.txt` is absent, which it is on any machine
-without the `CLIENT_DENYLIST` secret. **This is identical on `main`** — verified
-by stashing this branch and re-running. It is not a regression and it is not
-fixed here; CI materializes the file from the secret before the gate runs.
+| Gate | CI | Local |
+|---|---|---|
+| `typecheck` | PASS | PASS |
+| `lint` | PASS — **now a gate**, see below | PASS, 0 problems |
+| `build` | PASS | PASS — 41 static pages |
+| `verify:tokens` | 5/5 — scope is now the **whole repo** | 5/5 |
+| `verify:fixtures` | 19/19 | 19/19 |
+| `verify:seo` | **18/18** | 17/18 · 1 fail-closed |
+| `verify:visual` | all PASS, incl. the new dated-archive gate | same |
+| `verify:chrome` | 22/22 | 22/22 |
+| `verify:ask` (offline) | **25/25** | 24/25 · 1 fail-closed |
 
-Nothing else is deferred. `verify-seo` now prints, on every run:
+The two locally-red results are the same client-name denylist gate in its two
+homes. In CI it ran for real: `PASS 10. Client-name denylist — 28 terms, 0
+matches`. Locally it fails closed with no secret, which is **identical on
+`main`** (verified by stashing this branch and re-running) and is the gate
+behaving as designed rather than a regression.
+
+`lint` was not a CI gate before this wave. The workflow's own note said it was
+off because the base branch carried 30 eslint errors in legacy components and
+"a permanently-red gate teaches people to ignore red". Those components are
+deleted, so the gate is turned on in the same change.
+
+Nothing is deferred. `verify-seo` now prints, on every run:
 
 ```
 No deferred routes. Every check above ran against all 30 routes.
