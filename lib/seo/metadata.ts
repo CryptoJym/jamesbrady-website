@@ -13,6 +13,14 @@ import { SITE } from "./site";
  *
  * `path` is relative and resolves against `metadataBase`, matching PR #2.
  * Trailing slashes are off everywhere except the site root.
+ *
+ * TITLE TEMPLATE. The root layout sets `template: "%s — James Brady"`, which is
+ * right for every page whose title is a page name and wrong for exactly one:
+ * the home route's title IS the site title, so the template turned it into
+ * "James Brady — builds AI systems that show their work — James Brady". The
+ * rule is applied here rather than remembered at the call site, because a rule
+ * a person has to remember is a rule that comes back. verify-seo check 16
+ * asserts no rendered title carries the site name twice.
  */
 export function pageMetadata(input: {
   path: string;
@@ -23,8 +31,11 @@ export function pageMetadata(input: {
   type?: "website" | "article" | "profile";
   publishedTime?: string;
   modifiedTime?: string;
+  /** Defaults to true on "/". Set it when a route's title already names the site. */
+  titleAbsolute?: boolean;
 }): Metadata {
   const { path, title, description, og, noindex, type = "website" } = input;
+  const absoluteTitle = input.titleAbsolute ?? path === "/";
 
   if (!path.startsWith("/")) {
     throw new Error(`[seo] pageMetadata path must be site-relative, got "${path}"`);
@@ -40,7 +51,7 @@ export function pageMetadata(input: {
   const ogDescription = og.description ?? description;
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical: path },
     robots: noindex

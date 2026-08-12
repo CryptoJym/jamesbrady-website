@@ -10,11 +10,14 @@
     "typecheck": "tsc --noEmit",
     "og": "node scripts/make-og.mjs",
     "icons": "node scripts/make-icons.mjs",
+    "pack": "node scripts/build-pack.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
     "verify:visual": "node scripts/verify-visual.mjs",
     "verify:chrome": "node scripts/verify-chrome.mjs",
     "verify:tokens": "node scripts/verify-tokens.mjs",
-    "verify:fixtures": "node scripts/verify-fixtures.mjs"
+    "verify:fixtures": "node scripts/verify-fixtures.mjs",
+    "verify:ask": "node scripts/verify-ask.mjs --offline",
+    "verify:ask:live": "node scripts/verify-ask.mjs --live"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
