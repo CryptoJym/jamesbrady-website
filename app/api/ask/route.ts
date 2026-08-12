@@ -240,7 +240,13 @@ export async function POST(request: Request) {
     reply = decline(STATIC.providerError);
   }
 
-  if (!reply) reply = decline(STATIC.providerError);
+  if (!reply) {
+    // The one case worth a diagnostic line: two attempts, neither usable. The
+    // reason is structural ("block 0: bad slug", "reply was not JSON"), so it
+    // says what to fix without echoing a visitor's words or the model's answer.
+    console.error(`[ask] no usable reply after ${attempts} attempt(s): ${problem ?? "no reason recorded"}`);
+    reply = decline(STATIC.providerError);
+  }
 
   // ---- accounting ---------------------------------------------------------
   let spentToday = gate.spentUsd;
