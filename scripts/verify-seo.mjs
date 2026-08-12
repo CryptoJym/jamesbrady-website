@@ -60,6 +60,7 @@ const STATIC_ROUTES = [
   "/work-with-me",
   "/work-with-me/get-found",
   "/work-with-me/build-a-system",
+  "/work-with-me/background-screening",
   "/work",
   "/work/ofone",
   "/work/plimsoll",
@@ -124,6 +125,9 @@ const BUYER_ROUTES = [
   "/work-with-me",
   "/work-with-me/get-found",
   "/work-with-me/build-a-system",
+  // Wave 3b. It carries two pending marks about James's own position, which is
+  // exactly the kind of question a buyer must not be handed.
+  "/work-with-me/background-screening",
 ];
 
 /**

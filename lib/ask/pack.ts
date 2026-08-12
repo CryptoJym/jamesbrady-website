@@ -147,14 +147,14 @@ export function buildGroundingPack(): string {
   );
 
   // ---- Work with me -----------------------------------------------------
-  // The two engagements, ahead of the portfolio. A visitor asking what they
-  // can hire should get an engagement and the entity that delivers it, not a
-  // list of repositories. Budget bands come from the /contact allowlist, so
-  // the assistant cannot state a band the form does not offer.
+  // The engagements, ahead of the portfolio. A visitor asking what they can
+  // hire should get an engagement and the entity that delivers it, not a list
+  // of repositories. Budget bands come from the /contact allowlist, so the
+  // assistant cannot state a band the form does not offer.
   parts.push(
     [
       "## Work with me",
-      `Engagements offered: ${offers.length}. Both are described at ${absolute("/work-with-me")}.`,
+      `Engagements offered: ${offers.length}. Each is described at ${absolute("/work-with-me")}.`,
       ...offers.map((entry) =>
         section(entry.title, `/work-with-me/${entry.slug}`, [
           `Delivered by: ${entry.deliveredBy.name}, ${toPlainText(entry.deliveredBy.role)}. ${entry.deliveredBy.url}`,

@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/links",
   title: "Links",
   description:
-    "James Brady's public profiles, the two ways to work with him, and the recorded walkthroughs, in one place.",
+    "James Brady's public profiles, every way to work with him, and the recorded walkthroughs, in one place.",
   og: { image: "/og/links.png", imageAlt: "James Brady — links" },
 });
 
@@ -98,7 +98,7 @@ const ON_THIS_SITE: { href: string; label: string; note: string }[] = [
 ];
 
 export default function LinksPage() {
-  const [getFound, buildSystem] = offers;
+  const [getFound, buildSystem, screening] = offers;
 
   return (
     <main id="main" tabIndex={-1}>
@@ -150,6 +150,12 @@ export default function LinksPage() {
                 who: "For a founder or an operator with a build to run",
                 detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
                 href: `/work-with-me/${buildSystem.slug}`,
+              },
+              {
+                label: "Screen your hires",
+                who: "For an employer about to trust a stranger",
+                detail: `${screening.summary} Delivered by ${screening.deliveredBy.name}.`,
+                href: `/work-with-me/${screening.slug}`,
               },
               {
                 label: "Watch one get built",

@@ -49,7 +49,7 @@ function pad(n: number): string {
 // summaries, the slugs and the delivering entity all come from the same
 // entries the offer pages render, so the door and the page it opens cannot
 // describe different things.
-const [getFound, buildSystem] = offers;
+const [getFound, buildSystem, screening] = offers;
 
 export default function HomePage() {
   return (
@@ -183,6 +183,12 @@ export default function HomePage() {
                   who: "For a founder or an operator with a build to run",
                   detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
                   href: `/work-with-me/${buildSystem.slug}`,
+                },
+                {
+                  label: "Screen your hires",
+                  who: "For an employer about to trust a stranger",
+                  detail: `${screening.summary} Delivered by ${screening.deliveredBy.name}.`,
+                  href: `/work-with-me/${screening.slug}`,
                 },
                 {
                   label: "Read the code",

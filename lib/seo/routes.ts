@@ -31,7 +31,7 @@ const CONTENT_FLOOR = maxModified([...work, ...theories, ...learn, ...lab, ...of
 
 /** The hub capsule, shared by the route table and the page that renders it. */
 export const WORK_WITH_ME_CAPSULE =
-  "Work with me splits into two engagements: getting a business found in search and inside AI answers, delivered by the agency New Reward, and building a system that ships in verified waves, delivered by the studio Utlyze. Each page states what the engagement measures or produces, who delivers it, and the budget band it normally sits in.";
+  "Work with me splits into three engagements: getting a business found in search and inside AI answers, delivered by the agency New Reward; building a system that ships in verified waves, delivered by the studio Utlyze; and background screening for new hires, delivered by Vuplicity. Each page states what the engagement measures or produces, who delivers it, and the budget band it normally sits in.";
 
 function gitOr(paths: string[], fallback: string): string {
   return gitLastModified(paths) ?? fallback;
@@ -162,7 +162,7 @@ export function buildRoutes(): RouteRecord[] {
     lastModified: gitOr(["app/(site)/links/page.tsx"], CONTENT_FLOOR),
     title: "Links",
     capsule:
-      "The links page collects James Brady's public profiles, the two ways to work with him, and the recorded walkthroughs, in one place at its original URL. Profiles listed: GitHub, LinkedIn, X, TikTok, YouTube, Bluesky, and a direct email address.",
+      "The links page collects James Brady's public profiles, every way to work with him, and the recorded walkthroughs, in one place at its original URL. Profiles listed: GitHub, LinkedIn, X, TikTok, YouTube, Bluesky, and a direct email address.",
     collection: "site",
   });
 

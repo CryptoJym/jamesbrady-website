@@ -13,14 +13,28 @@ import { pageMetadata } from "@/lib/seo/metadata";
 import { WORK_WITH_ME_CAPSULE } from "@/lib/seo/routes";
 import { SITE } from "@/lib/seo/site";
 
+/**
+ * The engagement count, in words, derived from the collection.
+ *
+ * design-system-spec §6 bans typed figures, and "Two engagements" in an H1 was
+ * one: wave 3b added a third offer and the heading would have gone on saying
+ * two. Words rather than a numeral because the heading is a sentence, and
+ * because §6 also asks that a count spelled into prose stay checkable against
+ * the thing it counts. The map covers the sizes this row can legibly hold; a
+ * fourth engagement past it falls back to the numeral rather than silently
+ * printing the wrong word.
+ */
+const COUNT_WORD = ["no", "one", "Two", "Three", "Four", "Five"];
+const ENGAGEMENT_COUNT_WORD = COUNT_WORD[offers.length] ?? String(offers.length);
+
 export const metadata: Metadata = pageMetadata({
   path: "/work-with-me",
   title: "Work with me",
   description:
-    "Two engagements: getting a business found in search and in AI answers, and building a system that ships in verified waves.",
+    "Three engagements: getting a business found in search and in AI answers, building a system that ships in verified waves, and background screening for your hires.",
   og: {
     image: "/og/work-with-me.png",
-    imageAlt: "James Brady — two ways to work together",
+    imageAlt: "James Brady — three ways to work together",
   },
 });
 
@@ -48,7 +62,10 @@ export default function WorkWithMePage() {
             <i aria-hidden="true">/</i>
             <span>{SITE.location}</span>
           </p>
-          <h1>Two engagements, and the entity that delivers each one.</h1>
+          {/* The count is the collection's length, not a word somebody has to
+              remember to change. Wave 3 shipped "Two engagements" as typed
+              prose and wave 3b added a third one. */}
+          <h1>{ENGAGEMENT_COUNT_WORD} engagements, and the entity that delivers each one.</h1>
           {/* The capsule, as real prose in the body and in the reading size,
               so an engine quoting this page alone gets the whole answer. */}
           <p className="page-lead">{WORK_WITH_ME_CAPSULE}</p>
@@ -60,12 +77,12 @@ export default function WorkWithMePage() {
       <section className="work work--bare">
         <div className="wrap">
           <SectionHead
-            eyebrow="The two doors"
+            eyebrow="The doors"
             heading="Which problem are you solving?"
             aside="The rest of this site is evidence. This page is the part you can hire. Each engagement below says what it measures or produces, who delivers it, what you are left holding, and roughly what it costs, before you write in."
           />
 
-          <div className="grid-work grid-work--2" style={{ marginTop: "var(--s-6)" }}>
+          <div className="grid-work grid-work--3" style={{ marginTop: "var(--s-6)" }}>
             {offers.map((offer) => (
               <article className="card card--offer" key={offer.slug}>
                 <div className="card__top">
@@ -99,7 +116,10 @@ export default function WorkWithMePage() {
                 If the problem is that customers cannot find you, the first engagement
                 measures why and fixes it. If the problem is that something has to get
                 built and you need to be able to check it afterwards, the second one does
-                that. If it is both, say so in the enquiry and the scope covers both.
+                that. If you are about to hire someone and need their record checked, the
+                third one is the screening path, and the checks there are run by Vuplicity
+                rather than by me. If it is more than one of them, say so in the enquiry
+                and the scope covers what you named.
               </p>
             </div>
           </div>

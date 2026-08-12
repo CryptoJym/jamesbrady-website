@@ -11,8 +11,13 @@ import type { OfferEntry } from "@/lib/content/types";
  * personas arrived at the same two buttons, and three of them had no reason to
  * press either. A door names the visitor before it names the destination.
  *
- * Three doors, not four: a row a reader has to choose from stops working when
- * it stops being scannable, and the fourth door on this site is the nav.
+ * Wave 3 said "three doors, not four", on the grounds that a row a reader has
+ * to choose from stops working when it stops being scannable. Wave 3b makes it
+ * four, because the fourth is a real engagement someone can buy and the
+ * alternative was hiding it. Scannability is now a layout problem rather than a
+ * counting rule: four across above 1180, two by two below it, and the row is
+ * measured at 1440 and at 375 rather than trusted. A fifth door would need the
+ * argument made again, and this time with a screenshot.
  */
 export type Door = {
   /** What the visitor came to do, in their words. */
