@@ -52,7 +52,11 @@ export default async function OfferPage({
   const entry = offerBySlug(slug);
   if (!entry) notFound();
 
-  const other = offers.find((o) => o.slug !== entry.slug);
+  // Every OTHER engagement, not just the first one found. With two offers a
+  // singular `other` was the whole rest of the collection; with three it
+  // silently hid one, and the door a reader could not see is the one they
+  // conclude does not exist.
+  const others = offers.filter((o) => o.slug !== entry.slug);
   const cta = `/contact?${INQUIRY_PARAM}=${entry.inquiryType}`;
 
   return (
@@ -83,7 +87,22 @@ export default async function OfferPage({
               <p className="offer__capsule">{entry.answerCapsule}</p>
             </section>
 
-            <Prose html={renderMarkdown(entry.body)} />
+            {/*
+              The render mode is a property of the ENTRY, not of the template,
+              exactly as on /work/[slug]. Every offer page is a buyer page, so
+              an offer that carries an open question carries `publicNotes` too
+              and its gaps render as statements of absence. An offer with no
+              gaps needs neither. verify-seo check 17 is the lane that keeps a
+              second-person mark off these routes.
+            */}
+            <Prose
+              html={renderMarkdown(
+                entry.body,
+                entry.publicNotes
+                  ? { mode: "public", notes: entry.publicNotes }
+                  : { mode: "inline" },
+              )}
+            />
 
             <section aria-labelledby="steps" style={{ marginTop: "var(--s-7)" }}>
               <h2 className="offer__q" id="steps">
@@ -129,14 +148,18 @@ export default async function OfferPage({
                     →
                   </span>
                 </Link>
-                {other ? (
-                  <Link href={`/work-with-me/${other.slug}`} className="btn btn--ghost">
-                    OR: {other.title.toUpperCase()}{" "}
+                {others.map((o) => (
+                  <Link
+                    key={o.slug}
+                    href={`/work-with-me/${o.slug}`}
+                    className="btn btn--ghost"
+                  >
+                    OR: {o.title.toUpperCase()}{" "}
                     <span className="arw" aria-hidden="true">
                       →
                     </span>
                   </Link>
-                ) : null}
+                ))}
               </div>
             </section>
           </div>

@@ -15,9 +15,11 @@ import { MATURITY_LABEL } from "@/lib/content/types";
 import {
   ENTITY_NODE_ID,
   identityNodes,
+  NEW_REWARD_ID,
   OFFER_GLOSSARY_ID,
   personRef,
   THEORY_GLOSSARY_ID,
+  UTLYZE_ID,
   WORK_GLOSSARY_ID,
   websiteNode,
 } from "./entities";
@@ -179,6 +181,46 @@ export function theoryGraph(entry: TheoryEntry): Node[] {
 }
 
 /**
+ * The Service's `provider` — the organisation that actually delivers it.
+ *
+ * `publisherRef(entry.entities)` was right while every offer was delivered by
+ * one of this site's own two entities. It stopped being right the day an offer
+ * was delivered by a company with no node in the identity graph: the entity
+ * list fell through to the Person, and the graph said James Brady provides
+ * background screening. He does not. Vuplicity does, and the page says so in
+ * prose, so the graph has to say the same thing or the two disagree in the one
+ * place a machine reads instead of the prose.
+ *
+ * `deliveredBy` is the single source for who delivers an engagement, so it is
+ * the field this reads. A known org resolves to its identity node; anyone else
+ * gets an inline Organization node with a resolvable @id, matching the shape of
+ * the `#organization` id that company publishes on its own site.
+ */
+const OFFER_PROVIDER_ID: Record<string, string> = {
+  Utlyze: UTLYZE_ID,
+  "New Reward": NEW_REWARD_ID,
+};
+
+function offerProviderNodes(entry: OfferEntry): { ref: Node; extra: Node[] } {
+  const known = OFFER_PROVIDER_ID[entry.deliveredBy.name];
+  if (known) return { ref: { "@id": known }, extra: [] };
+
+  const id = `${entry.deliveredBy.url.replace(/\/+$/, "")}/#organization`;
+  return {
+    ref: { "@id": id },
+    extra: [
+      {
+        "@type": "Organization",
+        "@id": id,
+        name: entry.deliveredBy.name,
+        url: entry.deliveredBy.url,
+        description: entry.deliveredBy.role,
+      },
+    ],
+  };
+}
+
+/**
  * An offer page.
  *
  * `Service`, with the delivering organisation as `provider`, is the type that
@@ -191,7 +233,9 @@ export function theoryGraph(entry: TheoryEntry): Node[] {
  */
 export function offerGraph(entry: OfferEntry): Node[] {
   const url = absolute(`/work-with-me/${entry.slug}`);
+  const provider = offerProviderNodes(entry);
   return withIdentity([
+    ...provider.extra,
     {
       "@type": "Service",
       "@id": `${url}#service`,
@@ -200,7 +244,7 @@ export function offerGraph(entry: OfferEntry): Node[] {
       description: entry.summary,
       abstract: entry.answerCapsule,
       serviceType: entry.kicker,
-      provider: publisherRef(entry.entities),
+      provider: provider.ref,
       author: personRef,
       isPartOf: { "@id": websiteNode["@id"] },
       audience: entry.audience.map((a) => ({ "@type": "Audience", audienceType: a })),

@@ -15,14 +15,17 @@ const DEFAULT_LEAD_INGEST_URL =
 /**
  * The gateway's own engagement vocabulary, which this site does not own.
  *
- * `get_found` has no counterpart in it, and inventing one is how a lead gets
- * rejected at the far end for an enum the receiver never defined. It maps to
- * the gateway's neutral value; the distinction survives in `role`, which
- * already carries the site's own help type verbatim, so a visibility enquiry
- * arrives labelled "JamesBrady.org / get_found" and nothing is lost.
+ * `get_found` and `background_screening` have no counterpart in it, and
+ * inventing one is how a lead gets rejected at the far end for an enum the
+ * receiver never defined. Both map to the gateway's neutral value; the
+ * distinction survives in `role`, which already carries the site's own help
+ * type verbatim, so a visibility enquiry arrives labelled
+ * "JamesBrady.org / get_found", a screening enquiry arrives labelled
+ * "JamesBrady.org / background_screening", and nothing is lost.
  */
 const engagementTypeMap = {
   get_found: "not_sure",
+  background_screening: "not_sure",
   ai_strategy: "not_sure",
   production_build: "build_sprint",
   agent_architecture: "systems_integration",

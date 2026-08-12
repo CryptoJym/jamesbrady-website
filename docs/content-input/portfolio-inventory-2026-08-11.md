@@ -3,6 +3,14 @@
 > **Redaction, 2026-08-11.** This repository is public. Client names are
 > withheld here under the anonymized-client policy: the industry stays, the
 > name and the domain go. Nothing else in this file was altered.
+>
+> **Amended 2026-08-12.** One name is no longer withheld. James ruled that
+> Vuplicity is listed as a named Work-with-me option, and the CLIENT_DENYLIST
+> secret was updated the same day to permit it. The ruling covers the offer
+> surface: `/work-with-me/background-screening` and the door rows that point at
+> it. Every other client in this file stays anonymized, and the case study at
+> `/work/visibility-platform` stays anonymized too. The lines below are updated
+> to that state rather than rewritten.
 
 Sources: three read-only research lanes (h3ro-dev census: 174 repos, 20 inspected;
 CryptoJym census: 139 repos, 21 inspected; beyond-GitHub sweep: domains, papers,
@@ -13,7 +21,8 @@ material for /work, /lab, and /about. Client names never appear here.
 ## The estate, in one paragraph
 
 Two GitHub identities (h3ro-dev org: 174 repos; CryptoJym user: 139), plus the
-A background-screening SaaS client's org (13 repos; client relationship — see ruling below). The
+Vuplicity's org (13 repos; named Work-with-me option per owner ruling 2026-08-12, and the name is publishable
+only on the Work-with-me surface). The
 Apocaltips account on this machine is ANOTHER USER's (ruled by James
 2026-08-11) — its repos are excluded and never attributed. Three live business fronts (utlyze.com, newreward.com,
 seopr1.com) and a personal-methodology product (of1.ai). A governed 26-domain
@@ -72,7 +81,7 @@ STILL UNDECIDED (small, resolve in Phase 2):
 | adhd-founder.com | 200 live (VERIFIED) | Matches his adhd-founder-planner skill; authorship to confirm |
 | businessofone.ai + family | 21 live of 26 governed domains | Mostly Lovable landing pages; real apps: financeofone.com (CFOofOne), vcofone; audit: `businessofone/research/domain-repository-provider-map.md` |
 | plimsoll.dev / plimsoll-cloud.vercel.app | live | OSS + hosted tier |
-| (client domain withheld) | live | RULED (James, 2026-08-11): client work — New Reward provided SEO/GEO for a background-screening SaaS client. Anonymized-client policy applies; never framed as his venture |
+| vuplicity.com | live (200, checked 2026-08-12) | RULED (James, 2026-08-12): Vuplicity may be named as a Work-with-me option (background screening), and only there; case studies stay anonymized; published facts come only from vuplicity.com |
 | jamesbrady.org | live | This site |
 | royal-rwa.com | DEAD — no response (VERIFIED) | Code exists (6 repos); royalrwa.com (no dash) is an unrelated stub — do not conflate |
 | h3ro.ai | NXDOMAIN (does not resolve) | Social handles (@h3roai, @h3ro.ai, h3ro-dev) imply a domain that doesn't exist |
@@ -103,10 +112,20 @@ STILL UNDECIDED (small, resolve in Phase 2):
     medical/health services, HVAC, roofing, concrete, gutters,
     financial/commercial lending, custom software/IT staffing, pet breeding,
     background screening, promo products, call-center software.
+    ONE EXCEPTION, ruled by James 2026-08-12: Vuplicity is named on
+    `/work-with-me/background-screening` and in the door rows that point at it,
+    because it is an option a visitor can take rather than a client being
+    claimed as a credential. The exception does not travel. A case study may
+    name it only to state that the exception exists and link to it, which is
+    what the anonymization note on `/work/visibility-platform` now does; no
+    case study, proof slot, delta or homepage stat may claim it as a client
+    credential. Every fact published about it must come from vuplicity.com with
+    its URL and capture date recorded.
 
 ## Open ownership/framing questions (for James)
 
-ANSWERED 2026-08-11: a background-screening SaaS client = client work (New Reward SEO/GEO). Royal RWA =
+AMENDED 2026-08-12: Vuplicity is named as a Work-with-me option only; case-study anonymization unchanged.
+Work-with-me surface only, = client work (New Reward SEO/GEO). Royal RWA =
 excluded, not his. Of One = thesis-in-progress case study. Lab picks =
 wrath-shield + games (+ manifold chat); glasses and trading stay off.
 

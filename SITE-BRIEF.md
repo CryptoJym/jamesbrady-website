@@ -129,6 +129,10 @@ Flagship: Universal Question Geometry (OfOne). Then: Question-Answer Dynamics, C
 
 - 2026-08-12 — /now describes current work as research projects, not the site rebuild. — James
 
+- 2026-08-12 — Vuplicity listed as a named Work-with-me option (owner ruling; supersedes anonymized treatment for the offer surface; denylist updated same day). — James
+
+- 2026-08-12 — Scope of the ruling above, as built and lead-trimmed: the name renders on exactly four routes — /work-with-me/background-screening (the offer), /work-with-me (hub card), / and /links (door rows) — plus /now's open-items register. The anonymized case study does NOT name or link Vuplicity (a named offer is not case-study clearance, and the lead removed the lane's cross-reference to keep the inference door shut). Every published fact about Vuplicity comes from vuplicity.com (2026-08-12); agency-injected JSON-LD on that site was deliberately not used; James's role there renders as third-person absence pending his word.
+
 ## Open items
 
 - James locks v2 (or marks it up).

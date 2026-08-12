@@ -3,6 +3,12 @@ export const helpTypes = [
   // from "Get my business found" was previously offered nothing that described
   // what they came for, and picked "AI strategy" or "Something else".
   "get_found",
+  // Added wave 3b with /work-with-me/background-screening. Same reasoning as
+  // get_found one line above: an employer arriving from "Screen your hires"
+  // would otherwise have to file the enquiry under "Something else", and the
+  // one fact that routes it — what they actually came for — is lost at the
+  // first field.
+  "background_screening",
   "ai_strategy",
   "production_build",
   "agent_architecture",
@@ -42,6 +48,7 @@ export type BudgetRange = (typeof budgetRanges)[number];
  */
 export const HELP_LABEL: Record<HelpType, string> = {
   get_found: "Get found in search and AI answers",
+  background_screening: "Background screening",
   ai_strategy: "AI strategy",
   production_build: "Production build",
   agent_architecture: "Agent architecture",
