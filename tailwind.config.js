@@ -10,28 +10,21 @@
 // Use the pre-mixed --sig-wash / --sig-edge / --warn-wash. A new alpha means a
 // new named token in :root, never an inline rgba().
 //
-// LEGACY ISOLATION (independent review, P1-2). This file is shared with the
-// five archived routes, which are built entirely out of Tailwind utilities.
-// Any key here that COLLIDES with a Tailwind default silently re-renders those
-// pages. The colliding keys are therefore banned outright:
+// WAVE 4 — THE LEGACY HALF IS GONE. This file used to carry a second palette
+// (`gold`, `surface`), a Geist font stack and a warning that certain keys were
+// banned because they COLLIDED with Tailwind defaults the archived routes were
+// built out of. /primer, /manuscript, /workshop and /watch were reskinned onto
+// Direction B at the same URLs, so nothing in this repo renders from a bare
+// Tailwind utility any more and there is no second design for a key to
+// re-render.
 //
-//   spacing 1..10        → would move p-8 from 32px to 64px, mb-10 40px → 128px
-//   borderRadius sm/md   → would move rounded-sm 2px → 3px, rounded-md 6px → 5px
-//   letterSpacing tight  → would move tracking-tight -.025em → -.032em
-//   transitionDuration.DEFAULT / transitionTimingFunction.DEFAULT
-//                        → would move every bare `transition` off 150ms/ease
-//   fontFamily.mono      → must stay on the Geist stack the legacy footer uses
-//   colors.base          → CROSS-SCALE: `text-base` is a default FONT SIZE, so
-//                          a colour named `base` emits a second `.text-base`
-//                          rule that repaints every heading using it
-//
-// Direction B needs none of them: every new surface is styled from
-// app/globals.css against var(--*) directly and uses ZERO Tailwind utilities.
-//
-// The gate that actually holds this is verify-visual's legacy pixel-diff: it
-// builds `main` in a worktree and requires ZERO differing pixels on all five
-// archived routes. Reading this file is not how the colours.base collision was
-// found — the pixel diff found it, in a 16px band on /manuscript.
+// The namespacing STAYS anyway, and the reason is worth keeping: `colors.base`
+// emits a second `.text-base` rule, because `text-base` is Tailwind's default
+// 1rem FONT SIZE. A cross-scale collision like that is invisible in a diff —
+// this one repainted every `text-base` heading on /manuscript and was caught by
+// a pixel gate, not by reading. `canvas`, `s1..s10`, `bSm/bMd` and `dispTight`
+// cost nothing and keep that class of defect impossible rather than merely
+// unlikely.
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -42,12 +35,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // NOT `base`. `text-base` is Tailwind's default 1rem FONT SIZE, and a
-        // colour named `base` generates a second `.text-base` rule that wins
-        // on source order — measured: it repainted every `text-base` heading
-        // on the archived routes from #E8E4DD to #0A0E11, invisible in a diff
-        // and caught only by the legacy pixel gate. Cross-SCALE collisions are
-        // the ones that hide.
+        // NOT `base`. See the cross-scale note above.
         canvas: 'var(--c-base)',
         panel: 'var(--c-panel)',
         raised: 'var(--c-raised)',
@@ -68,12 +56,6 @@ module.exports = {
         warn: 'var(--warn)',
         warnWash: 'var(--warn-wash)',
         inkOnSig: 'var(--ink-on-sig)',
-
-        // LEGACY — consumed only by /primer, /manuscript, /workshop, /links
-        // and /watch, which keep their current skin this wave. New Direction B
-        // surfaces must not reference these.
-        gold: { DEFAULT: '#D4A853', light: '#E5C87A', dark: '#B8923D' },
-        surface: { DEFAULT: '#0A0A0A', raised: '#141414', border: '#1E1E1E' },
       },
       fontSize: {
         nano: 'var(--ts-nano)',
@@ -91,12 +73,11 @@ module.exports = {
         label: 'var(--track-label)',
         data: 'var(--track-data)',
         display: 'var(--track-display)',
-        // NOT `tight` — that is a Tailwind default the legacy footer uses.
+        // NOT `tight` — that is a Tailwind default.
         dispTight: 'var(--track-tight)',
       },
       // Namespaced away from Tailwind's own spacing scale: `s1`..`s10`, never
-      // `1`..`10`. A Direction B utility would read `p-s8`; the legacy `p-8`
-      // keeps Tailwind's 32px.
+      // `1`..`10`.
       spacing: {
         s1: 'var(--s-1)',
         s2: 'var(--s-2)',
@@ -119,14 +100,6 @@ module.exports = {
         inst: ['var(--f-inst)'],
         instMono: ['var(--f-mono)'],
         paper: ['var(--f-paper)'],
-        // LEGACY only — the archived routes' footer stamp uses `font-mono`.
-        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-geist-mono)', 'monospace'],
-      },
-      transitionDuration: { 600: '600ms', 800: '800ms' },
-      transitionTimingFunction: {
-        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
-        'out-quint': 'cubic-bezier(0.22, 1, 0.36, 1)',
       },
     },
   },

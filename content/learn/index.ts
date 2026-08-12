@@ -14,7 +14,7 @@ export const learn: LearnEntry[] = [
     volumeRoute: "/primer",
     archivedDate: "2026-08-11",
     answerCapsule:
-      "The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Nothing in it has been rewritten to match the current site; the archive date says when it stopped being maintained.",
+      "The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Its prose was not rewritten when the page moved onto the current design; the archive date says when it stopped being maintained.",
     summary:
       "Code, the stack, AI agents, skills and MCP, explained for humans. Archived, kept at its original URL.",
     datePublished: "2026-02-01",

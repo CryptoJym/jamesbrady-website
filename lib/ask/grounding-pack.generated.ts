@@ -9,7 +9,7 @@
 // site moved, not one changed megabyte.
 
 /** sha256 of the pack text, for the drift check and the health payload. */
-export const GROUNDING_PACK_SHA256 = "e9750b8737f300cb2f41cde4857c4597e82f4456270009fceda049d73e187b8c";
+export const GROUNDING_PACK_SHA256 = "94ed425ad8527b5a074479dc9b28eb4af291f80288bf1668f01fdead58641c42";
 
 export const GROUNDING_PACK = [
   "# James Brady — site content pack",
@@ -67,7 +67,7 @@ export const GROUNDING_PACK = [
   "",
   "### The Primer",
   "Source: https://www.jamesbrady.org/primer",
-  "What it covers: The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Nothing in it has been rewritten to match the current site; the archive date says when it stopped being maintained.",
+  "What it covers: The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Its prose was not rewritten when the page moved onto the current design; the archive date says when it stopped being maintained.",
   "",
   "### The Manuscript",
   "Source: https://www.jamesbrady.org/manuscript",
@@ -426,7 +426,7 @@ export const GROUNDING_PACK = [
   "### The Primer",
   "Source: https://www.jamesbrady.org/primer",
   "Archived 2026-08-11. Kept at its original URL.",
-  "Answer capsule: The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Nothing in it has been rewritten to match the current site; the archive date says when it stopped being maintained.",
+  "Answer capsule: The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Its prose was not rewritten when the page moved onto the current design; the archive date says when it stopped being maintained.",
   "Summary: Code, the stack, AI agents, skills and MCP, explained for humans. Archived, kept at its original URL.",
   "Published 2026-02-01. Last modified 2026-08-11.",
   "Full text:",

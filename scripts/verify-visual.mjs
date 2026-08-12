@@ -17,10 +17,30 @@
 // drift or tampering. Evidence should change when someone decides to refresh
 // it, not as a side effect of verifying.
 //
-// LEGACY PARITY (independent review, P1-2). --legacy-base <url> points at a
-// second server running a build of `main`; the two /primer renders are then
-// pixel-diffed and any difference fails. Without it the legacy check degrades
-// to "still renders", and says so rather than implying parity it did not test.
+// LEGACY PARITY — RETIRED IN WAVE 4, AND HERE IS WHY.
+//
+// The gate was: build `main` in a second worktree, serve it at --legacy-base,
+// and require ZERO differing pixels on /primer, /manuscript, /workshop and
+// /watch. It existed because those four routes shared a stylesheet, a Tailwind
+// config and a root layout with the Direction B build while being explicitly
+// out of scope, so a token change could silently re-render pages nobody had
+// touched. It earned its keep: it caught a `colors.base` cross-scale collision
+// that repainted a heading band on /manuscript, which no amount of reading
+// found.
+//
+// Wave 4 reskinned all four onto Direction B at the same URLs. They are now
+// INTENDED to differ from main in every pixel, so a zero-difference assertion
+// against main would fail by design — and a gate that must be suppressed to
+// pass is a gate that gets deleted for the wrong reason later. It is replaced
+// below by the checks every other Direction B route already answers to:
+// no horizontal overflow at 1440 and 375, a clean heading outline, the archive
+// band present with a real date, and the chrome actually mounted.
+//
+// WHAT THE RETIREMENT COSTS, STATED. Nothing now pins those four routes
+// against a previous build. That protection is no longer meaningful — after
+// this wave they are built from the same components as every other route, so
+// the leak the gate watched for cannot single them out. No other gate is
+// weakened by this change.
 
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -31,8 +51,6 @@ const arg = (flag) =>
   process.argv.includes(flag) ? process.argv[process.argv.indexOf(flag) + 1] : null;
 
 const BASE = arg("--base") ?? "http://localhost:4123";
-/** A server running a build of `main`, for the legacy pixel-diff. */
-const LEGACY_BASE = arg("--legacy-base");
 const UPDATE_EVIDENCE = process.argv.includes("--update-evidence");
 /** Which packet --update-evidence writes into. Defaults to the wave-1 set. */
 const EVIDENCE_WAVE = arg("--wave") ?? "wave-1";
@@ -42,13 +60,12 @@ const OUT = UPDATE_EVIDENCE
 mkdirSync(OUT, { recursive: true });
 
 /**
- * The archived routes, which must render exactly as they do on main.
+ * The dated archives: same URLs, Direction B skin as of wave 4.
  *
- * /links left this list in wave 3: it was reskinned onto Direction B at the
- * same URL, so a pixel diff against main is now guaranteed to differ and
- * proves nothing. The other four are untouched and stay at zero.
+ * They are checked here the way every other Direction B route is checked, not
+ * against a previous build. See the retirement note at the top of this file.
  */
-const LEGACY_ROUTES = ["/primer", "/manuscript", "/workshop", "/watch"];
+const ARCHIVE_ROUTES = ["/primer", "/manuscript", "/workshop", "/watch"];
 
 let failed = 0;
 const report = (name, ok, detail) => {
@@ -353,135 +370,78 @@ report(
   cardRepos.map((r) => r.text).join(" | "),
 );
 
-/* ----------------------------------------------------------- legacy render */
+/* ------------------------------------ THE DATED ARCHIVES, ON THE SYSTEM ---
+   Wave 4. /primer, /manuscript, /workshop and /watch kept their URLs and moved
+   onto Direction B. The pixel-parity-against-main gate that used to live here
+   is retired — the reasoning is at the top of this file — and these are the
+   checks that replace it, the same ones every other Direction B route answers
+   to. They are ASSERTIONS, not screenshots: a screenshot proves a page
+   rendered, not that it rendered correctly. */
 
-await page.goto(`${BASE}/primer`, { waitUntil: "networkidle" });
-const primer = await page.evaluate(() => ({
-  h1: document.querySelector("h1")?.textContent?.trim() ?? "",
-  height: document.body.scrollHeight,
-  nav: Boolean(document.querySelector("nav")),
-}));
-report(
-  "Legacy /primer still renders",
-  primer.h1.length > 0 && primer.height > 2000 && primer.nav,
-  `h1 "${primer.h1.slice(0, 40)}" · ${primer.height}px tall`,
-);
-await page.screenshot({ path: join(OUT, "primer-legacy-1440.png"), fullPage: true });
-
-/* ------------------------------------------- LEGACY PARITY AGAINST main --- */
-//
-// The gate the review asked for. A shared tailwind.config.js, a shared
-// globals.css and a shared root layout mean a Direction B change can re-render
-// five pages nobody touched: a `spacing` key moved p-8 from 32px to 64px, a
-// `body{font-size:15px}` rule re-typeset all five, and the grain overlay and
-// the Ask dock painted on pages that never had them. None of that showed up in
-// a "still renders" assertion, which is why this one compares PIXELS.
-
-if (LEGACY_BASE) {
-  // Both sides are captured the SAME way, and the way removes TIME from the
-  // comparison. The legacy skin's reveal animations run 800ms with staggered
-  // delays, so two screenshots of the same page taken at different moments
-  // differ by thousands of pixels for no reason at all — measured at 7,237 px
-  // between two identical renders. So: settle past the longest reveal, then
-  // freeze animations and transitions at whatever state they reached.
-  //
-  // Do NOT scroll here. Scrolling fires the IntersectionObserver that gates
-  // the below-the-fold reveals, and whether it has fired by screenshot time is
-  // a race — measured at 1,391,008 px of pure noise. A fullPage capture goes
-  // through CDP captureBeyondViewport, which does not fire the observer, so
-  // leaving the page at the top makes both sides deterministic.
-  const FREEZE = `*,*::before,*::after{
-    animation-duration:0s !important; animation-delay:0s !important;
-    transition-duration:0s !important; transition-delay:0s !important;
-  }`;
-  const parityShot = async (base, route) => {
-    const p = await desktop.newPage();
-    await p.goto(`${base}${route}`, { waitUntil: "networkidle" });
-    await p.waitForTimeout(2000);
-    await p.addStyleTag({ content: FREEZE });
-    const buf = await p.screenshot({ fullPage: true });
-    await p.close();
-    return buf;
-  };
-
-  // All FIVE archived routes, not just /primer. They share one layout, one
-  // stylesheet and one tailwind config, so a leak reaches all of them — and a
-  // gate that watches one page while four go unwatched invites the next fix to
-  // land on the page nobody is looking at.
-  const parityFailures = [];
-  const parityDetail = [];
-  for (const route of LEGACY_ROUTES) {
-    const branchShot = await parityShot(BASE, route);
-    const mainShot = await parityShot(LEGACY_BASE, route);
-    if (route === "/primer") {
-      // Keep the pair on disk for the one route the evidence packet names.
-      const { writeFileSync } = await import("node:fs");
-      writeFileSync(join(OUT, "primer-main-1440.png"), mainShot);
+const archiveFailures = [];
+const archiveDetail = [];
+for (const route of ARCHIVE_ROUTES) {
+  await page.goto(`${BASE}${route}`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(400);
+  const state = await page.evaluate(() => {
+    const levels = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")].map((h) =>
+      Number(h.tagName[1]),
+    );
+    let skips = 0;
+    for (let i = 1; i < levels.length; i++) {
+      if (levels[i] > levels[i - 1] + 1) skips++;
     }
+    const badge = document.querySelector(".archive .badge-archived");
+    return {
+      overflow:
+        document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      h1s: levels.filter((l) => l === 1).length,
+      skips,
+      // The band, and a REAL date in it. "Archived" with nothing after it is
+      // the failure this asserts against, not the absence of the element.
+      badge: badge?.textContent?.trim() ?? "",
+      // The chrome the reskin exists to deliver: one nav, one console rail,
+      // one footer, the grain, and the Ask dock. A route that renders on
+      // Direction B but mounts none of it is the old defect in a new palette.
+      chrome: Boolean(
+        document.querySelector(".b-room") &&
+          document.querySelector(".rail") &&
+          document.querySelector(".nav .mark") &&
+          document.querySelector(".b-foot") &&
+          document.querySelector(".dock"),
+      ),
+      // No colour from the retired palette survives anywhere on the page.
+      gold: [...document.querySelectorAll("*")].some((el) => {
+        const s = getComputedStyle(el);
+        return `${s.color}${s.backgroundColor}${s.borderTopColor}`.includes(
+          "212, 168, 83",
+        );
+      }),
+    };
+  });
 
-  const diff = await page.evaluate(
-    async ([a, b]) => {
-      const load = (b64) =>
-        new Promise((res) => {
-          const img = new Image();
-          img.onload = () => res(img);
-          img.src = `data:image/png;base64,${b64}`;
-        });
-      const [ia, ib] = await Promise.all([load(a), load(b)]);
-      if (ia.width !== ib.width || ia.height !== ib.height) {
-        return { sizeMismatch: `${ia.width}x${ia.height} vs ${ib.width}x${ib.height}`, changed: -1, total: 0 };
-      }
-      const c = document.createElement("canvas");
-      c.width = ia.width;
-      c.height = ia.height;
-      const ctx = c.getContext("2d");
-      ctx.drawImage(ia, 0, 0);
-      const da = ctx.getImageData(0, 0, c.width, c.height).data;
-      ctx.clearRect(0, 0, c.width, c.height);
-      ctx.drawImage(ib, 0, 0);
-      const db = ctx.getImageData(0, 0, c.width, c.height).data;
-      let n = 0;
-      for (let i = 0; i < da.length; i += 4) {
-        if (
-          Math.abs(da[i] - db[i]) +
-            Math.abs(da[i + 1] - db[i + 1]) +
-            Math.abs(da[i + 2] - db[i + 2]) >
-          12
-        )
-          n++;
-      }
-      return { changed: n, total: da.length / 4 };
-    },
-    [branchShot.toString("base64"), mainShot.toString("base64")],
-  );
+  const problems = [];
+  if (state.overflow > 0) problems.push(`${state.overflow}px of horizontal overflow`);
+  if (state.h1s !== 1) problems.push(`${state.h1s} h1 elements, expected exactly 1`);
+  if (state.skips > 0) problems.push(`${state.skips} skipped heading level(s)`);
+  if (!/^Archived \d{4}-\d{2}-\d{2}$/.test(state.badge))
+    problems.push(`archive band reads "${state.badge}", expected a dated badge`);
+  if (!state.chrome) problems.push("Direction B chrome is not mounted");
+  if (state.gold) problems.push("a retired-palette colour is still painted");
 
-    if (diff.sizeMismatch) {
-      parityFailures.push(
-        `${route}: page HEIGHT changed, ${diff.sizeMismatch} — a spacing or type token leaked into the archived skin`,
-      );
-    } else if (diff.changed !== 0) {
-      // Zero, not "close enough". These pages were explicitly out of scope, so
-      // any changed pixel is an unintended render change.
-      parityFailures.push(
-        `${route}: ${diff.changed} of ${diff.total} px differ (${((diff.changed / diff.total) * 100).toFixed(4)}%)`,
-      );
-    } else {
-      parityDetail.push(`${route}:0/${diff.total}`);
-    }
-  }
-  report(
-    `Legacy routes are pixel-identical to main (${LEGACY_ROUTES.length} routes)`,
-    parityFailures.length === 0,
-    parityFailures.length ? parityFailures.join(" | ") : `${parityDetail.join(" · ")} vs ${LEGACY_BASE}`,
-  );
-} else {
-  report(
-    "Legacy routes are pixel-identical to main",
-    false,
-    "NOT RUN — pass --legacy-base <url> pointing at a server running a build of " +
-      "main. A legacy check that does not compare against main is not a parity check.",
-  );
+  if (problems.length) archiveFailures.push(`${route}: ${problems.join("; ")}`);
+  else archiveDetail.push(`${route}:${state.badge.toLowerCase().replace(" ", "=")}`);
+
+  await page.screenshot({
+    path: join(OUT, `${route.slice(1)}-1440.png`),
+    fullPage: true,
+  });
 }
+report(
+  `Dated archives on the design system (${ARCHIVE_ROUTES.length} routes: no overflow, one h1, no level skip, dated band, chrome mounted)`,
+  archiveFailures.length === 0,
+  archiveFailures.length ? archiveFailures.join(" | ") : archiveDetail.join(" · "),
+);
 
 /* --------------------------------------------------------------- 375 mobile */
 
@@ -538,6 +498,30 @@ report(
   "No horizontal overflow at 375 on the wave-3 routes",
   narrowOverflow.length === 0,
   narrowOverflow.length ? narrowOverflow.join(" | ") : "5 routes measured",
+);
+
+// The dated archives at 375. These four are the pages most likely to break a
+// phone, because their content is not a card grid: a command line, a JSON
+// config block, a 16:9 video and an install string are all fixed-width things
+// inside a 375px column. Each of them has to scroll inside its own box rather
+// than widen the document, so the measurement is the gate.
+const archiveNarrow = [];
+for (const route of ARCHIVE_ROUTES) {
+  await mpage.goto(`${BASE}${route}`, { waitUntil: "networkidle" });
+  await mpage.waitForTimeout(300);
+  const over = await mpage.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  if (over > 0) archiveNarrow.push(`${route}: ${over}px`);
+  await mpage.screenshot({
+    path: join(OUT, `${route.slice(1)}-375.png`),
+    fullPage: true,
+  });
+}
+report(
+  `No horizontal overflow at 375 on the dated archives (${ARCHIVE_ROUTES.length} routes)`,
+  archiveNarrow.length === 0,
+  archiveNarrow.length ? archiveNarrow.join(" | ") : `${ARCHIVE_ROUTES.length} routes measured`,
 );
 
 /* ------------------------------------------- reduced motion + no-JS fallback */
