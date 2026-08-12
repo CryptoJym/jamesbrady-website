@@ -17,6 +17,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { scanH3ro } from "./lib/h3ro-gate.mjs";
+import { parseRootTokens, scanForLiterals, scanFrozen } from "./lib/token-gate.mjs";
+import { renderIcons } from "./lib/icon-raster.mjs";
 import { renderMarkdown, toPlainText, PENDING_TOKEN } from "../lib/content/markdown.ts";
 
 const FIXTURES = join(process.cwd(), "scripts", "fixtures");
@@ -133,6 +135,54 @@ check("toPlainText emits [pending], never silence", () => {
 check("toPlainText marks EVERY gap, not just the first", () => {
   const plain = toPlainText("A [JAMES: one] B [JAMES: two] C");
   assert.equal((plain.match(/\[pending\]/g) ?? []).length, 2, plain);
+});
+
+/* ------------------------------------------------------------ the token gate */
+//
+// New in wave 2. The rule is old (design-system-spec §7.2) but it was prose
+// until an allowlist was needed for app/icon.svg, and an allowlist with no
+// lint behind it allows everything. Same discipline as above: the gate has to
+// be shown REFUSING, including refusing the exemption it grants.
+
+for (const [fixture, label] of [
+  ["tokens-f8-hex-outside-root.css", "F8 a hex on a component rule"],
+  ["tokens-f9-rgba-outside-root.css", "F9 an rgba() on a component rule"],
+]) {
+  check(`token gate CATCHES ${label}`, () => {
+    const hits = scanForLiterals(read(fixture), { css: true });
+    assert.ok(hits.length > 0, "the literal outside :root was not reported");
+  });
+}
+
+check("token gate ALLOWS tokens, :root, the print re-bind and comments (control)", () => {
+  const hits = scanForLiterals(read("tokens-allowed.css"), { css: true });
+  assert.equal(hits.length, 0, `false positives: ${JSON.stringify(hits)}`);
+});
+
+check("token gate CATCHES F10 an exempt asset that drifted off the palette", () => {
+  const tokens = parseRootTokens(":root{--c-base:#0A0E11;--sig:#3FD9A0}");
+  const bad = scanFrozen(read("tokens-f10-drifted-frozen.svg"), tokens);
+  assert.equal(bad.length, 1, `expected the one drifted literal, got ${JSON.stringify(bad)}`);
+  assert.match(bad[0].literal, /#3FD9A1/i);
+});
+
+check("token gate ALLOWS an exempt asset that froze the real token (control)", () => {
+  const tokens = parseRootTokens(":root{--c-base:#0A0E11;--sig:#3FD9A0}");
+  const bad = scanFrozen(readFileSync(join(process.cwd(), "app", "icon.svg"), "utf8"), tokens);
+  assert.equal(bad.length, 0, `the shipped icon reported drift: ${JSON.stringify(bad)}`);
+});
+
+check("icon raster is a FUNCTION of the SVG, not a memory of it", () => {
+  // Check 5 of verify-tokens compares bytes. Prove the comparison can fail:
+  // change one digit of the source and the raster must change with it.
+  const svg = readFileSync(join(process.cwd(), "app", "icon.svg"), "utf8");
+  const drifted = svg.replace('fill="#3FD9A0" fill-opacity="1"', 'fill="#3FD9A0" fill-opacity="0.5"');
+  assert.notEqual(drifted, svg, "the fixture edit did not apply — the SVG shape changed");
+  assert.notEqual(
+    renderIcons(svg).apple.toString("base64"),
+    renderIcons(drifted).apple.toString("base64"),
+    "a changed SVG rendered identical bytes — the sync check cannot fail",
+  );
 });
 
 console.log("─".repeat(72));

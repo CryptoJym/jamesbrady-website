@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
@@ -26,6 +26,22 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE.host),
   alternates: { types: { "application/rss+xml": "/feed.xml" } },
   robots: { index: true, follow: true },
+};
+
+/**
+ * The icons themselves are file-convention assets, not entries here:
+ * app/icon.svg, app/apple-icon.png and app/favicon.ico are discovered by Next
+ * and emitted as <link rel> tags. Declaring them twice is how one of the two
+ * declarations goes stale.
+ *
+ * RASTERIZED BRAND ASSET — TOKEN VALUE FROZEN BY HAND, EXEMPT FROM THE NO-HEX
+ * LINT (allowlisted by name in scripts/verify-tokens.mjs, which then asserts
+ * this literal still EQUALS --c-base). It cannot be var(--c-base): the browser
+ * paints its own chrome with this value before, and outside, any stylesheet.
+ */
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#0A0E11", // --c-base
 };
 
 export default function RootLayout({

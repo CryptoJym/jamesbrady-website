@@ -9,8 +9,11 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "og": "node scripts/make-og.mjs",
+    "icons": "node scripts/make-icons.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
     "verify:visual": "node scripts/verify-visual.mjs",
+    "verify:chrome": "node scripts/verify-chrome.mjs",
+    "verify:tokens": "node scripts/verify-tokens.mjs",
     "verify:fixtures": "node scripts/verify-fixtures.mjs"
   },
   "dependencies": {

@@ -1,0 +1,4 @@
+/* F9 — the same defect wearing rgba(), which is how the alpha steps got
+   duplicated in the comp before they were named as tokens. */
+:root{ --sig-wash:rgba(63,217,160,.10); }
+.card:hover{ background:rgba(63, 217, 160, 0.10) }
