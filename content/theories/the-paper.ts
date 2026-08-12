@@ -16,7 +16,7 @@ export const entry: TheoryEntry = {
   claim:
     "A business run mostly by agents needs its layers gated bottom-up, because execution that runs ahead of the plan that authorizes it produces confident work against an unverified truth.",
   abstract:
-    "THE PAPER specifies five gated layers — business truth, intelligence, strategy, execution and visibility measurement — where each layer may act only on what the layer beneath it has established.",
+    "THE PAPER specifies five gated layers (business truth, intelligence, strategy, execution and visibility measurement) where each layer may act only on what the layer beneath it has established.",
   answerCapsule:
     "THE PAPER is a single working document that specifies a five-layer operating system for running a business where AI agents do most of the labour. The five layers are business truth, competitive monitoring and recommendation, strategy, execution, and visibility measurement, each one gated by the layer beneath it. The document is a specification under active revision, not a published theory, and this page introduces it without reproducing it.",
   summary:
@@ -66,7 +66,7 @@ The idea it specifies is a stack. Each layer only gets to act on what the layer 
 
 ## What makes the document itself unusual
 
-Its tagging. Every load-bearing claim carries exactly one tag: locked, resolved, decision needed, assumption, unverified, or verified with an evidence path. You can strike any single line and immediately see what it takes down with it. Decisions sit at the top of each section, mechanics below, because decisions are what a reader is most likely to change.
+Every load-bearing claim carries exactly one tag: locked, resolved, decision needed, assumption, unverified, or verified with an evidence path. You can strike any single line and immediately see what it takes down with it. Decisions sit at the top of each section, mechanics below, because decisions are what a reader is most likely to change.
 
 ## Where this stands
 

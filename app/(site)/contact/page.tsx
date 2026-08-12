@@ -24,7 +24,7 @@ const FAQ = [
   {
     question: "What happens after I send this?",
     answer:
-      "The form posts to the existing lead gateway. If the gateway is unavailable the page says so on screen and gives you the email address instead — it never reports success it has not earned.",
+      "The form posts to the existing lead gateway. If the gateway is unavailable the page says so on screen and gives you the email address instead. It never reports success it has not earned.",
   },
 ];
 
@@ -56,7 +56,7 @@ export default function ContactPage() {
           <p className="page-lead">
             A project enquiry reaches James Brady through the same lead gateway the rest
             of the studio uses. Say what needs to change, what makes it difficult, and
-            what a useful outcome looks like — the system comes after that, not before.
+            what a useful outcome looks like. The system comes after that, not before.
           </p>
         </div>
 

@@ -14,7 +14,7 @@ export const entry: TheoryEntry = {
   abstract:
     "Function-First Orchestration puts proof of function ahead of proof of thoroughness, keeps refusal tests mandatory, and requires every deferral to be written down rather than felt.",
   answerCapsule:
-    "Function-First Orchestration is an operating rule that puts proof of function ahead of proof of thoroughness. Under the rule, a piece of work ships with one honest happy-path test plus the specific refusals that protect money, custody, and truth, and nothing else. Broader test coverage is deliberately deferred rather than skipped, and the deferral is written into a parking file so that later is a real entry on a list rather than a feeling.",
+    "Function-First Orchestration is an operating rule that puts proof of function ahead of proof of thoroughness. Under the rule, a piece of work ships with one honest happy-path test plus the specific refusals that protect money, custody, and truth, and nothing else. Broader test coverage is deliberately deferred rather than skipped. Each deferral is written into a parking file, so “later” becomes a concrete list entry instead of a vague intention.",
   summary:
     "Prove function first: one honest happy path plus mandatory refusal tests, with every deferral written down.",
   datePublished: "2026-07-28",
@@ -44,7 +44,7 @@ Two things keep this from becoming an excuse for sloppiness.
 
 First, the refusals are not optional. A test that proves the system says no, correctly, when money moves, when custody changes, or when a truth claim is being made, is function-proof, not polish. Those tests ship in the first pass, every time.
 
-Second, the deferral is written down. "Refine later" only works if later is a real entry on a list, not a feeling. Improvements go into a parking file, not into the current wave, and the current wave's scope is frozen and shrink-only.
+Second, the deferral is written down. "Refine later" only works if later is a real entry on a list, not a feeling. Improvements go into a parking file instead of the current wave, and the current wave's scope is frozen and shrink-only.
 
 There is a matching rule for the agents doing the work: give each one a narrow lane and all the surrounding context. Narrow, because a broad brief invites design beyond the ask. All the context, because an agent forced to re-derive a settled decision will sometimes derive a different one.
 

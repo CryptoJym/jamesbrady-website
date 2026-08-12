@@ -39,7 +39,7 @@ export default function TheoriesIndexPage() {
             level={1}
             eyebrow="Theories"
             heading="Open questions I'm working in public."
-            aside={`${CAPSULE} The ladder is named, sketched, developed, live demo — with paused as a separate flag, because paused is a status, not a rung. ${theoriesActive} active, ${theoriesPaused} paused.`}
+            aside={`${CAPSULE} The ladder is named, sketched, developed, live demo, with paused as a separate flag, because paused is a status, not a rung. ${theoriesActive} active, ${theoriesPaused} paused.`}
           />
           <TheoryList entries={discoverableTheories} headingLevel={2} />
           <PageNameplate

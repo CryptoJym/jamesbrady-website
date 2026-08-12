@@ -101,7 +101,7 @@ Two pieces ship. \`ofone-skillchain\` is the open method: the skill file, the sc
 
 You state what is being decided, over what time, at what stakes. That is the charter. Then you list your evidence, and each piece carries its source, how fresh it is, and how reliable it is. Claims sit on top of evidence. Anything you do not know becomes a real object called an unknown, and an unknown is allowed to block the recommendation. Every strong claim has to name the result that would prove it wrong.
 
-Confidence is low, medium, or high, plus a named reason. Never a made-up percentage.
+Confidence is low, medium, or high, plus a named reason. It is never a made-up percentage.
 
 When a new fact shows up, the map does not get rewritten. The system patches only the chain of claims, options, and gates that actually depended on the fact that changed, and it reports what it invalidated.
 

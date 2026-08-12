@@ -9,7 +9,7 @@ export const entry: WorkEntry = {
   answerCapsule:
     "The EEG meditation toolkit is Python tooling that turns a raw consumer-headset recording into a readable account of a meditation session. Filtering removes artifacts, power is measured in each brainwave band, and a depth score from 0 to 100 rolls up with one of four labels: alert, light, moderate or deep. A synthetic data generator ships with it, so the whole pipeline runs without a headset and without handing over a personal recording.",
   summary:
-    "Python tooling that filters an EEG recording, measures band power, and scores meditation depth — runnable without hardware.",
+    "Python tooling that filters an EEG recording, measures band power, and scores meditation depth. It runs without hardware.",
   datePublished: "2026-08-11",
   dateModified: "2026-08-11",
   entities: ["person:james"],
@@ -78,7 +78,7 @@ Those numbers roll into one score and one of four labels: alert, light, moderate
 
 ## Honest limits
 
-This is a signal-processing toolkit, not a clinical instrument and not a validated study. The four state labels are thresholds chosen from published band conventions, not outcomes measured against a control group. No accuracy claim is made here.
+This is a signal-processing toolkit, not a clinical instrument and not a validated study. The four state labels are thresholds taken from published band conventions, and no control group was used to check them. No accuracy claim is made here.
 
 Status: dormant. The last commit was 2025-11-11, about nine months before this page was drafted.
 

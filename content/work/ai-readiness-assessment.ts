@@ -81,7 +81,7 @@ Most organizations answer "are we ready for AI" with a feeling. The people who a
 
 ## What I built
 
-An interactive assessment that scores an organization across seven competency domains, using 28 questions, and returns charts and a downloadable report. It filters questions by role, so an executive, a manager, an IT lead, and an HR lead each answer what they can actually judge.
+An interactive assessment that scores an organization across seven competency domains, using 28 questions, and returns charts and a downloadable report. It filters questions by role, so an executive, a manager, an IT lead, and an HR lead each answer what they can judge.
 
 ## How it works in plain words
 

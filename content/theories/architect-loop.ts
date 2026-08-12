@@ -44,21 +44,21 @@ So the loop puts a wall in the middle. One model holds judgment. One to four bui
 
 ## The repository is the only memory
 
-Not chat history, not a scratch folder. A handoff file, a gates directory, and a lanes directory. Anything not written to the repository did not happen. That rule sounds bureaucratic until the first time a lane dies mid-run and everything it "knew" turns out to have been in a conversation nobody can replay.
+The memory is not chat history and not a scratch folder. It is a handoff file, a gates directory, and a lanes directory. Anything not written to the repository did not happen. That rule sounds bureaucratic until the first time a lane dies mid-run and everything it "knew" turns out to have been in a conversation nobody can replay.
 
 ## Gates are frozen before the work starts
 
-That is the part most systems get wrong. If the test that decides "done" can be edited by the thing being tested, the test decides nothing. So the gate has a tamper perimeter, and it covers more than the gate file: it includes the validators, the test files, and the script entries the gate command depends on. After the run, the loop diffs that whole set. A fix that touched the checker has to be re-verified against a known-bad input before it counts.
+Most systems get this wrong. If the test that decides "done" can be edited by the thing being tested, the test decides nothing. So the gate has a tamper perimeter, and it covers more than the gate file: it includes the validators, the test files, and the script entries the gate command depends on. After the run, the loop diffs that whole set. A fix that touched the checker has to be re-verified against a known-bad input before it counts.
 
 The failure this prevents is specific and common: a guard gets broken by the diff that was supposed to satisfy it, someone narrows the guard so the run goes green, and the narrowed guard still looks like coverage from the outside.
 
 ## Disagreement stops the run before code
 
-If the plan and the request materially disagree, the run ends as blocked rather than proceeding on a guess. A blocked run is cheap. A run that guessed at the intent and built the wrong thing correctly is not.
+If the plan and the request materially disagree, the run ends as blocked rather than proceeding on a guess. A blocked run is cheap. A run that guessed at the intent and built the wrong thing correctly is expensive.
 
 ## The verdict comes from a fresh judge
 
-The final verdict is given by a judge with no memory of the build conversation, and that judge is handed pointers only: the handoff file, the gates, and the frozen commit. Not the story of how the work went. A judge who watched the struggle grades the struggle.
+The final verdict is given by a judge with no memory of the build conversation, and that judge is handed pointers only: the handoff file, the gates, and the frozen commit, without the story of how the work went. A judge who watched the struggle grades the struggle.
 
 This is the same principle as the wall in the middle, applied at the end instead of the beginning. Anyone who has watched a difficult piece of work come together starts to price in the difficulty, and a verdict that prices in difficulty is no longer a verdict about the artifact. Handing over pointers rather than a narrative is not a slight against the builders. It is the only way the grade means what it says.
 
@@ -66,7 +66,7 @@ This is the same principle as the wall in the middle, applied at the end instead
 
 Honesty about the price matters as much as the design. Isolated worktrees mean more disk and slower setup. Frozen gates mean a mid-run realization that the gate was wrong becomes a stop-and-restart rather than a quiet edit. Writing everything to the repository is slower than remembering it. Each of those costs is real, and each is the direct price of the property it buys.
 
-The trade is worth taking when the work is going to be judged by someone who was not in the room — a client, a future maintainer, or the person you will be in three months. It is probably not worth taking for a throwaway script.
+The trade is worth taking when the work is going to be judged by someone who was not in the room: a client, a future maintainer, or the person you will be in three months. It is probably not worth taking for a throwaway script.
 
 ## Attribution, stated plainly
 

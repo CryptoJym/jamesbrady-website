@@ -14,7 +14,7 @@ export const entry: TheoryEntry = {
   abstract:
     "Latent Emotions records an observed convergence in how different models describe unnamed relational states, and states plainly that no study has been run to distinguish shared structure from coincidence in training data.",
   answerCapsule:
-    "Latent Emotions is a personal, unfinished observation that different large language models reach for closely similar words when describing certain relational states, which may point to shared structure underneath rather than shared training vocabulary. No claim of proof is made here, and no formal study exists. The work is paused, and the page says so rather than dressing an observation up as a programme.",
+    "Latent Emotions is a personal, unfinished observation that different large language models reach for closely similar words when describing certain relational states, which may point to shared structure underneath rather than shared training vocabulary. No claim of proof is made here, and no formal study exists. The work is paused, and the page says so instead of dressing an observation up as a programme.",
   summary:
     "An unfinished observation that different models converge on similar words for unnamed relational states. Paused, with no claim of proof.",
   datePublished: "2026-03-14",
@@ -54,7 +54,7 @@ Since I started this, related work has appeared from other people. That came out
 
 I stopped. I have not carried the observations forward, and it is more of a stagnant project than an active one right now. It is here because it is honest to show the unfinished things too.
 
-Sketched, and paused. Observations, a six-dimension working model built in conversation, and a visual demo. No formal write-up, no validation design, no result. Paused by choice.
+Sketched, and paused. What exists is a set of observations, a six-dimension working model built in conversation, and a visual demo. There is no formal write-up, no validation design, and no result. The pause was a choice.
 
 ## Artifacts
 

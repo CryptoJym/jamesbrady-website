@@ -13,9 +13,9 @@ const emotionalManifold: LabEntry = {
   stateWord: "Paused",
   explanationUrl: "/theories/latent-emotions",
   answerCapsule:
-    "The emotional manifold is a visual demo that moves a conversation through a six-axis space — energy, valence, complexity, novelty, introspection and focus — instead of down a page. The six axes were arrived at in conversation with a language model rather than derived from anything, so the demo is a lens for looking at an idea and not evidence for it. The theory behind it is paused, and the demo is labelled accordingly.",
+    "The emotional manifold is a visual demo that moves a conversation through a six-axis space (energy, valence, complexity, novelty, introspection and focus) instead of down a page. The six axes were arrived at in conversation with a language model rather than derived from anything, so the demo is a lens for looking at an idea and not evidence for it. The theory behind it is paused, and the demo is labelled accordingly.",
   summary:
-    "A visual demo that moves a conversation through a six-axis space. A lens for an idea, not evidence for it.",
+    "A visual demo that moves a conversation through a six-axis space. It is a lens for an idea, not evidence for it.",
   datePublished: "2026-03-14",
   dateModified: "2026-08-11",
   entities: ["person:james"],

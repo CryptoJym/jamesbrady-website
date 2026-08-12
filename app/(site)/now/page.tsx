@@ -67,7 +67,7 @@ export default function NowPage() {
                 ]}
               />
               <div className="panel__body">
-                Hand-edited monthly. No auto-generation from repository activity — an
+                Hand-edited monthly, with no auto-generation from repository activity. An
                 automatic “now” page tells you a machine is running, not what a person is
                 doing.
               </div>

@@ -41,7 +41,7 @@ The visibility platform is running for client accounts, measuring how findable a
 
 ## Heading toward release
 
-plimsoll — the collector that ties AI coding spend to merged pull requests — has release signing and npm publication outstanding. Background service mode for npm installs is not fitted yet, and the README says so.
+plimsoll, the collector that ties AI coding spend to merged pull requests, has release signing and npm publication outstanding. Background service mode for npm installs is not fitted yet, and the README says so.
 
 ## Open on my desk
 

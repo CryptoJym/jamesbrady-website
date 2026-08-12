@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/learn",
   title: "Learn",
   description:
-    "Three archived volumes — the Primer, the Manuscript and the Workshop — introduced here and kept at their original URLs.",
+    "Three archived volumes (the Primer, the Manuscript and the Workshop) introduced here and kept at their original URLs.",
   og: { image: "/og/learn.png", imageAlt: "James Brady — learn hub" },
 });
 
@@ -30,7 +30,7 @@ export default function LearnPage() {
             level={1}
             eyebrow="Learn"
             heading="Three volumes, written earlier, kept where they were."
-            aside="These are archived as written. They stay at their original URLs — nothing moved, nothing redirected — and each one carries the date it stopped being maintained. Archived is not the same as paused, and it is not the same as wrong."
+            aside="These are archived as written. They stay at their original URLs, with nothing moved and nothing redirected, and each one carries the date it stopped being maintained. Archived is not the same as paused, and it is not the same as wrong."
           />
           <div className="grid-work grid-work--3">
             {learn.map((entry) => (

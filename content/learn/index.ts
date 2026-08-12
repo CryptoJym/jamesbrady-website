@@ -14,9 +14,9 @@ export const learn: LearnEntry[] = [
     volumeRoute: "/primer",
     archivedDate: "2026-08-11",
     answerCapsule:
-      "The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent actually does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Nothing in it has been rewritten to match the current site; the archive date says when it stopped being maintained.",
+      "The Primer explains how modern coding systems fit together for a reader who does not write code: what code is, what a stack is, what an AI agent does, what a skill is, and what MCP connects. The volume is archived as written and kept at its original URL. Nothing in it has been rewritten to match the current site; the archive date says when it stopped being maintained.",
     summary:
-      "Code, the stack, AI agents, skills and MCP — explained for humans. Archived, kept at its original URL.",
+      "Code, the stack, AI agents, skills and MCP, explained for humans. Archived, kept at its original URL.",
     datePublished: "2026-02-01",
     dateModified: "2026-08-11",
     entities: ["person:james"],
@@ -39,7 +39,7 @@ export const learn: LearnEntry[] = [
     volumeRoute: "/manuscript",
     archivedDate: "2026-08-11",
     answerCapsule:
-      "The Manuscript is a curated catalog of tools and MCP servers, grouped by the job each one does, with an install line and a source link for every entry. The catalog count shown anywhere on this site is computed from the catalog source at build — an earlier version of this site printed a hand-typed figure that was wrong by a factor of eight, and that class of defect is what the computed count exists to prevent.",
+      "The Manuscript is a curated catalog of tools and MCP servers, grouped by the job each one does, with an install line and a source link for every entry. The catalog count shown anywhere on this site is computed from the catalog source at build. An earlier version of this site printed a hand-typed figure that was wrong by a factor of eight, and that class of defect is what the computed count exists to prevent.",
     summary:
       "A curated catalog of tools and MCP servers with install lines and sources. Archived, kept at its original URL.",
     datePublished: "2026-02-15",
@@ -54,7 +54,7 @@ export const learn: LearnEntry[] = [
       },
     ],
     og: { image: "/og/learn.png", imageAlt: "James Brady — The Manuscript, archived" },
-    body: `A shelf, not a ranking. Each entry names what the tool does, how to install it, and where the source lives, so the reader can check it rather than take the recommendation.`,
+    body: `The catalog is a shelf, not a ranking. Each entry names what the tool does, how to install it, and where the source lives, so the reader can check it rather than take the recommendation.`,
   },
   {
     collection: "learn",
