@@ -123,7 +123,7 @@ export const entry: OfferEntry = {
     {
       label: "A route back to a person",
       detail:
-        "The enquiry lands with James Brady rather than in a queue, and the screening is delivered by Vuplicity. Both halves of that are stated on this page rather than discovered later.",
+        "The enquiry lands with James Brady, and Vuplicity delivers the screening. Both halves of that are stated on this page, so neither is something you find out afterwards.",
     },
   ],
   budgetBands: ["not_applicable", "under_5k"],

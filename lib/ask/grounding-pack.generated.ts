@@ -9,7 +9,7 @@
 // site moved, not one changed megabyte.
 
 /** sha256 of the pack text, for the drift check and the health payload. */
-export const GROUNDING_PACK_SHA256 = "d206faa603df3eb7ccbf6519ac2005e2687280ee1c3e2d0feb2e27f85ad1dca3";
+export const GROUNDING_PACK_SHA256 = "c533558bdbc59b85cc2a225bf31d23dc99746d553efea0ecada56786176f5197";
 
 export const GROUNDING_PACK = [
   "# James Brady — site content pack",
@@ -151,7 +151,7 @@ export const GROUNDING_PACK = [
   "  - A price you could read before you asked: Vuplicity publishes package pricing on a public page. Nothing on this site quotes a figure for it, because the figure belongs to Vuplicity and it can change without this page hearing about it.",
   "  - A consent record for every candidate: Candidate intake and consent are described on Vuplicity's own offerings page as part of the screening workflow.",
   "  - Reports with release boundaries around them: Vuplicity's security overview names report release controls and audit trails. The employer decision itself stays with the employer; Vuplicity's own frequently-asked-questions page draws that boundary.",
-  "  - A route back to a person: The enquiry lands with James Brady rather than in a queue, and the screening is delivered by Vuplicity. Both halves of that are stated on this page rather than discovered later.",
+  "  - A route back to a person: The enquiry lands with James Brady, and Vuplicity delivers the screening. Both halves of that are stated on this page, so neither is something you find out afterwards.",
   "Budget bands, from the enquiry form's own list: Not applicable, Under $5k. These are orientation, not a quote.",
   "Proof:",
   "  - Vuplicity, the company that runs the checks. Method: HTTP GET, returned 200. Its own page title reads \"Nationwide background screening with clear pricing and cleaner workflows\", and its own description says it helps hiring teams run nationwide background screening with transparent pricing and compliant workflows. Captured 2026-08-12. Where: https://www.vuplicity.com",
