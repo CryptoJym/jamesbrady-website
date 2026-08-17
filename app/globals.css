@@ -225,6 +225,7 @@ main:focus{outline:none}
   letter-spacing:var(--track-label);
   color:var(--t-faint);
   position:relative;z-index:40;
+  opacity:.78;
 }
 .rail__in{
   display:flex;align-items:center;justify-content:space-between;
@@ -457,6 +458,25 @@ main:focus{outline:none}
 .nav__links a:hover::after{transform:scaleX(1)}
 .nav__links a[aria-current="page"]{color:var(--t-hi)}
 .nav__links a[aria-current="page"]::after{transform:scaleX(1)}
+.nav__more{position:relative;list-style:none}
+.nav__more summary{
+  list-style:none;cursor:pointer;
+  color:var(--t-lo);font:inherit;letter-spacing:inherit;
+  text-transform:uppercase;min-height:24px;padding-block:6px;
+}
+.nav__more summary::-webkit-details-marker{display:none}
+.nav__more summary::after{
+  content:" +";color:var(--t-faint);
+}
+.nav__more[open] summary,.nav__more details[open] summary{color:var(--t-hi)}
+.nav__more ul{
+  position:absolute;right:0;top:calc(100% + 8px);z-index:60;
+  min-width:12rem;padding:var(--s-3);
+  background:var(--c-panel);border:1px solid var(--c-edge-int);
+  border-radius:var(--r-sm);
+  display:flex;flex-direction:column;gap:2px;
+}
+.nav__more ul a{text-transform:none;letter-spacing:var(--track-data)}
 
 .ask{
   display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:none;
@@ -480,20 +500,28 @@ main:focus{outline:none}
 .hero{position:relative;overflow:hidden;isolation:isolate}
 .hero__in{
   position:relative;z-index:2;
-  display:grid;grid-template-columns:repeat(12,1fr);
-  gap:var(--s-6);
-  padding-block:var(--s-9) var(--s-10);
-  align-items:start;
+  display:flex;flex-direction:column;
+  gap:var(--s-8);
+  padding-block:var(--s-8) var(--s-6);
 }
-.hero__copy{grid-column:1 / span 7}
+.hero__copy{max-width:72ch}
 /* Panel top sits on the h1 CAP-LINE: the eyebrow's line box (11px x 1.6)
    + its 24px margin + the gap from the h1 line-box top down to the cap
    (.172em for this face, measured against the rendered baseline). Scales
    with the clamped h1 instead of being a frozen pixel guess. */
-.hero__panel{
-  grid-column:8 / span 5;
-  margin-top:calc(var(--ts-micro) * 1.6 + var(--s-5) + var(--ts-h1) * .172);
+.hero__panel{width:100%}
+.panel--strip{
+  max-width:none;
+  margin-top:0;
+  background:transparent;
+  border:1px solid var(--c-line);
 }
+.panel--strip .readout{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:var(--s-4);
+}
+.panel--strip .readout li{padding-block:0}
 
 /* --- the manifold field ---
    Decoration, and it is scored to lose to the headline: one hue (158deg),
@@ -555,7 +583,7 @@ main:focus{outline:none}
   letter-spacing:var(--track-tight);
   font-weight:600;
   color:var(--t-hi);
-  max-width:17ch;
+  max-width:18ch;
   text-wrap:balance;
 }
 /* Highlighter rule under the thesis phrase. Background-image (not box-shadow)
@@ -748,6 +776,7 @@ main:focus{outline:none}
    only --sig here is interaction feedback (the documented fourth role,
    ruling B), never a fill competing with a primary action. */
 .doorway{padding-block:var(--s-7) 0}
+.doorway--lead{padding-top:var(--s-5)}
 .doorway--bare{padding-top:var(--s-7)}
 /* .b-room h2 sets --ts-h2 with one more element of specificity, so this
    selector carries the room class too. Without it the row's kicker rendered
@@ -767,17 +796,29 @@ main:focus{outline:none}
 }
 .door{
   display:flex;flex-direction:column;gap:var(--s-2);
-  padding:var(--s-5);
+  padding:var(--s-6) var(--s-5);
+  min-height:16rem;
   border:1px solid var(--c-edge-int);border-radius:var(--r-md);
-  background:var(--c-panel);
+  background:linear-gradient(180deg, var(--c-raised) 0%, var(--c-panel) 42%);
+  position:relative;
+  overflow:hidden;
   transition:transform var(--dur) var(--ease),
              border-color var(--dur) var(--ease),
              background var(--dur) var(--ease);
 }
+.door::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:var(--sig);transform:scaleX(0);transform-origin:left;
+  transition:transform var(--dur) var(--ease);
+}
 .door:hover{transform:translateY(-3px);background:var(--c-raised);border-color:var(--sig-edge)}
+.door:hover::before{transform:scaleX(1)}
+.doors .door:first-child{border-color:var(--sig-edge)}
+.doors .door:first-child::before{transform:scaleX(1)}
 .door__n{
-  font-family:var(--f-mono);font-size:var(--ts-micro);
+  font-family:var(--f-mono);font-size:var(--ts-h2);
   color:var(--t-faint);letter-spacing:var(--track-data);
+  line-height:1;opacity:.45;
 }
 .door__label{
   font-size:var(--ts-h3);font-weight:600;letter-spacing:var(--track-display);
@@ -1669,8 +1710,9 @@ a.chip:hover{color:var(--sig);border-color:var(--sig-edge);background:var(--sig-
 /* ============================================================ RESPONSIVE */
 @media (max-width:1180px){
   :root{--gutter:40px;--s-9:80px;--s-10:88px}
-  .hero__copy{grid-column:1 / span 12}
-  .hero__panel{grid-column:1 / span 12;margin-top:var(--s-6);max-width:520px}
+  .hero__copy{max-width:100%}
+  .hero__panel{max-width:100%}
+  .panel--strip .readout{grid-template-columns:repeat(2,minmax(0,1fr))}
   .b-room h1{max-width:16ch}
   .np--stamp{grid-template-columns:auto 1fr;row-gap:var(--s-2)}
   /* Stacked layout: the field stops being a hero object and becomes
@@ -1701,6 +1743,10 @@ a.chip:hover{color:var(--sig);border-color:var(--sig-edge);background:var(--sig-
     scrollbar-width:none;
   }
   .nav__links::-webkit-scrollbar{display:none}
+  .nav__more ul{
+    position:static;min-width:0;padding:0;border:0;background:transparent;
+    flex-direction:row;flex-wrap:wrap;gap:var(--s-5);
+  }
   .ask{margin-left:auto}
   .sec-aside{max-width:100%}
   .rail__set:last-child .rail__i:first-child{display:none}
@@ -1724,9 +1770,11 @@ a.chip:hover{color:var(--sig);border-color:var(--sig-edge);background:var(--sig-
   .b-room h1{max-width:100%}
   /* 12 columns of 1fr carry 11 x 32px of gap — 352px of grid before any
      content, which is wider than a 320px phone. One column below 620. */
-  .hero__in{grid-template-columns:1fr;gap:var(--s-5)}
-  .hero__copy,.hero__panel{grid-column:1 / -1}
-  .hero__panel{max-width:100%;margin-top:var(--s-6)}
+  .hero__in{gap:var(--s-5)}
+  .hero__panel{max-width:100%;margin-top:0}
+  .panel--strip .readout{grid-template-columns:1fr}
+  .door{min-height:0;padding:var(--s-4)}
+  .door__n{font-size:var(--ts-body);opacity:.55}
   .foot{gap:var(--s-6)}
   /* Touch targets: 44px minimum on everything a thumb has to find. */
   .ask{height:44px;padding:0 var(--s-4)}

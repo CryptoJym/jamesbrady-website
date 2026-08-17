@@ -21,7 +21,7 @@ import { usePathname } from "next/navigation";
  * contradicts the visible label breaks voice control, which types the label it
  * can see; the hint therefore starts with the label itself.
  */
-const LINKS: { href: string; label: string; hint: string }[] = [
+const PRIMARY: { href: string; label: string; hint: string }[] = [
   {
     href: "/work-with-me",
     label: "Work with me",
@@ -32,6 +32,19 @@ const LINKS: { href: string; label: string; hint: string }[] = [
     label: "Work",
     hint: "Work: built systems, each with its proof attached",
   },
+  {
+    href: "/about",
+    label: "About",
+    hint: "About: who does what, and how the work gets checked",
+  },
+  {
+    href: "/now",
+    label: "Now",
+    hint: "Now: what is happening this month, including what is stuck",
+  },
+];
+
+const MORE: { href: string; label: string; hint: string }[] = [
   {
     href: "/theories",
     label: "Theories",
@@ -48,41 +61,58 @@ const LINKS: { href: string; label: string; hint: string }[] = [
     hint: "Learn: three archived volumes of long-form writing",
   },
   {
-    href: "/about",
-    label: "About",
-    hint: "About: who does what, and how the work gets checked",
-  },
-  {
-    href: "/now",
-    label: "Now",
-    hint: "Now: what is happening this month, including what is stuck",
-  },
-  {
     href: "/contact",
     label: "Contact",
     hint: "Contact: the enquiry form and what makes a strong fit",
   },
 ];
 
+function Item({
+  href,
+  label,
+  hint,
+  pathname,
+}: {
+  href: string;
+  label: string;
+  hint: string;
+  pathname: string;
+}) {
+  const current = pathname === href || pathname.startsWith(`${href}/`);
+  return (
+    <li>
+      <Link
+        href={href}
+        title={hint}
+        aria-label={hint}
+        aria-current={current ? "page" : undefined}
+      >
+        {label}
+      </Link>
+    </li>
+  );
+}
+
 export function NavLinks() {
   const pathname = usePathname();
+  const moreOpen = MORE.some(
+    (l) => pathname === l.href || pathname.startsWith(`${l.href}/`),
+  );
   return (
     <ul className="nav__links">
-      {LINKS.map((l) => {
-        const current = pathname === l.href || pathname.startsWith(`${l.href}/`);
-        return (
-          <li key={l.href}>
-            <Link
-              href={l.href}
-              title={l.hint}
-              aria-label={l.hint}
-              aria-current={current ? "page" : undefined}
-            >
-              {l.label}
-            </Link>
-          </li>
-        );
-      })}
+      {PRIMARY.map((l) => (
+        <Item key={l.href} {...l} pathname={pathname} />
+      ))}
+      <li className="nav__more">
+        <details open={moreOpen || undefined}>
+          <summary>More</summary>
+          <ul>
+            {MORE.map((l) => (
+              <Item key={l.href} {...l} pathname={pathname} />
+            ))}
+          </ul>
+        </details>
+      </li>
     </ul>
   );
 }

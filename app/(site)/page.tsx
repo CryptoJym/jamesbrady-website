@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { Manifold } from "@/components/site/Manifold";
-import { DockTrigger } from "@/components/site/Dock";
 import {
   Dot,
   JsonLd,
@@ -62,14 +60,12 @@ export default function HomePage() {
 
         <div className="wrap hero__in">
           <div className="hero__copy">
-            {/* No status dot here: these are subjects, not states. Dots mean
-                live / active / paused / dormant and nothing else. */}
             <p className="eyebrow-b rise d1">
-              <span>Agent fleets</span>
+              <span>Lehi, UT</span>
               <i aria-hidden="true">/</i>
-              <span>Open source</span>
+              <span>Utlyze</span>
               <i aria-hidden="true">/</i>
-              <span>Evidence, not adjectives</span>
+              <span>New Reward</span>
             </p>
 
             <h1 className="rise d2">
@@ -78,32 +74,13 @@ export default function HomePage() {
             </h1>
 
             <p className="hero__sub rise d3">
-              One person, operating at fleet scale — documenting what actually works.
-            </p>
-
-            {/* Both demoted to ghost in wave 3. The door row below now carries
-                the page's primary sort, and two competing primary treatments
-                above the fold is how a visitor ends up pressing neither. */}
-            <div className="hero__cta rise d5">
-              <Link href="#proof" className="btn btn--ghost">
-                SEE THE PROOF <span className="arw" aria-hidden="true">→</span>
-              </Link>
-              <DockTrigger className="btn btn--ghost">
-                <>
-                  ASK ABOUT MY WORK <span className="arw" aria-hidden="true">→</span>
-                </>
-              </DockTrigger>
-            </div>
-            <p className="hero__terms rise d5">
-              The assistant is grounded only in what&rsquo;s published here, and it says
-              when it doesn&rsquo;t know.
+              One person. Two shops. You either need customers to find you,
+              or you need a system built. Start there.
             </p>
           </div>
 
-          {/* Page-level counts only. Per-system numbers live in the proof bank;
-              the two used to say most of the same things twice. */}
           <aside
-            className="hero__panel panel rise d4"
+            className="hero__panel panel panel--strip rise d5"
             aria-label="What this page can back up"
           >
             <div className="panel__head">
@@ -157,14 +134,7 @@ export default function HomePage() {
       </header>
 
       <main id="main" tabIndex={-1}>
-        {/* ======================= 00 / DOORS ======================= *
-         * Sorted by WHO the visitor is, not by what the site contains.
-         * The five-persona audit found every persona landing on the same
-         * two buttons: an owner who wants customers, a founder who wants
-         * something built, and a builder who wants the source were all
-         * offered "see the proof". Two of the three had no reason to press
-         * it. */}
-        <section className="doorway" aria-labelledby="doorway-h">
+        <section className="doorway doorway--lead rise d4" aria-labelledby="doorway-h">
           <div className="wrap">
             <h2 className="doorway__h" id="doorway-h">
               What did you come here to do?
