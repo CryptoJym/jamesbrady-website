@@ -50,3 +50,9 @@ next-env.d.ts
 # absent — and in CI mode that path fails the run, it does not pass.
 .seo-denylist.txt
 .seo-denylist.local.txt
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/

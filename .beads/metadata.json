@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "jamesbrady_website",
+  "project_id": "64d2ea99-ee79-4e57-9847-4410ecd5fa6e"
+}
