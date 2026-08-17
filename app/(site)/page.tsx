@@ -79,41 +79,6 @@ export default function HomePage() {
             </p>
           </div>
 
-          <section className="doorway doorway--hero rise d4" aria-labelledby="doorway-h">
-            <h2 className="doorway__h" id="doorway-h">
-              What did you come here to do?
-            </h2>
-            <DoorRow
-              label="Choose a starting point"
-              doors={[
-                {
-                  label: "Get my business found",
-                  who: "For an owner whose customers cannot find them",
-                  detail: `${getFound.summary} Delivered by ${getFound.deliveredBy.name}.`,
-                  href: `/work-with-me/${getFound.slug}`,
-                },
-                {
-                  label: "Build me a system",
-                  who: "For a founder or an operator with a build to run",
-                  detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
-                  href: `/work-with-me/${buildSystem.slug}`,
-                },
-                {
-                  label: "Screen your hires",
-                  who: "For an employer about to trust a stranger",
-                  detail: `${screening.summary} Delivered by ${screening.deliveredBy.name}.`,
-                  href: `/work-with-me/${screening.slug}`,
-                },
-                {
-                  label: "Read the code",
-                  who: "For a builder who would rather check than be told",
-                  detail: `${systemsListed} systems, ${publicRepos.length} of them in public repositories you can open from the card.`,
-                  href: "/work",
-                },
-              ]}
-            />
-          </section>
-
           <aside
             className="hero__panel panel panel--strip rise d5"
             aria-label="What this page can back up"
@@ -169,6 +134,42 @@ export default function HomePage() {
       </header>
 
       <main id="main" tabIndex={-1}>
+        <section className="doorway doorway--lead rise d4" aria-labelledby="doorway-h">
+          <div className="wrap">
+            <h2 className="doorway__h" id="doorway-h">
+              What did you come here to do?
+            </h2>
+            <DoorRow
+              label="Choose a starting point"
+              doors={[
+                {
+                  label: "Get my business found",
+                  who: "For an owner whose customers cannot find them",
+                  detail: `${getFound.summary} Delivered by ${getFound.deliveredBy.name}.`,
+                  href: `/work-with-me/${getFound.slug}`,
+                },
+                {
+                  label: "Build me a system",
+                  who: "For a founder or an operator with a build to run",
+                  detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
+                  href: `/work-with-me/${buildSystem.slug}`,
+                },
+                {
+                  label: "Screen your hires",
+                  who: "For an employer about to trust a stranger",
+                  detail: `${screening.summary} Delivered by ${screening.deliveredBy.name}.`,
+                  href: `/work-with-me/${screening.slug}`,
+                },
+                {
+                  label: "Read the code",
+                  who: "For a builder who would rather check than be told",
+                  detail: `${systemsListed} systems, ${publicRepos.length} of them in public repositories you can open from the card.`,
+                  href: "/work",
+                },
+              ]}
+            />
+          </div>
+        </section>
 
         {/* ======================= 01 / PROOF ======================= */}
         <section className="proof" id="proof">
