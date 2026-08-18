@@ -1,6 +1,6 @@
 "use client";
 
-import { DoorRow, type Door } from "./offers";
+import { DoorRow, type Door } from "./DoorRow";
 import { ThisVisit } from "./ThisVisit";
 import type { VisitDoor } from "@/lib/content/visits";
 import { chooseVisitDoor } from "@/lib/visit/storage";
