@@ -35,7 +35,8 @@ function plot(
   ctx.clearRect(0, 0, w, h);
   const ink = getComputedStyle(document.documentElement)
     .getPropertyValue("--sig")
-    .trim() || "#3FD9A0";
+    .trim();
+  if (!ink) return;
   ctx.fillStyle = ink;
   let x = 0.1;
   let y = 0.1;
