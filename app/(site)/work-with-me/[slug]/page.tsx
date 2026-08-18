@@ -73,6 +73,14 @@ export default async function OfferPage({
           <h1>{entry.title}</h1>
           <p className="page-lead">{entry.summary}</p>
           <DeliveryLine entry={entry} />
+          <div className="hero__cta" style={{ marginTop: "var(--s-5)" }}>
+            <Link href={cta} className="btn btn--primary">
+              {entry.ctaLabel.toUpperCase()}{" "}
+              <span className="arw" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          </div>
         </div>
 
         <div className="article">

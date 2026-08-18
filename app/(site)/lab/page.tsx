@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EmotionalManifoldDemo } from "@/components/site/EmotionalManifoldDemo";
 import {
   Dot,
   JsonLd,
@@ -34,7 +35,8 @@ export default function LabPage() {
             heading="Things you can poke at."
             aside="Every artifact here ships with a written explanation page. One that does not is excluded from search engines by the loader, not by anyone remembering to set a flag."
           />
-          <div className="grid-work grid-work--3">
+          <EmotionalManifoldDemo />
+          <div className="grid-work grid-work--3" style={{ marginTop: "var(--s-7)" }}>
             {lab.map((entry) => (
               <article className="card" key={entry.slug}>
                 <div className="card__top">
