@@ -373,7 +373,7 @@ report(
 );
 await page.screenshot({ path: join(OUT, "home-1440-doors.png") });
 
-// The work cards' repository link — one click from home to the source.
+await page.goto(`${BASE}/work`, { waitUntil: "networkidle" });
 const cardRepos = await page.evaluate(() =>
   [...document.querySelectorAll(".work .card__repo a")].map((a) => ({
     href: a.getAttribute("href"),
