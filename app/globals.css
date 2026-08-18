@@ -52,7 +52,10 @@
      literals, named. No new colours were invented — each value is the one
      already in the comp. --mask-ink is a stencil for mask-image, not a
      colour anything is painted with. */
-  --ink-on-sig:  #052018;   /* button-ink: text on a --sig fill */
+  --ink-on-sig:  #052018;   /* kept for phosphor-on-dark marks, not buttons */
+  --sig-btn:     #165C44;   /* primary fill · 6.93:1 with --ink-on-btn */
+  --sig-btn-hi:  #1B6B4A;   /* primary hover · 5.65:1 with --ink-on-btn */
+  --ink-on-btn:  #E9F1F3;   /* cream on the primary fill */
   --sig-hi:      #5FE6B4;   /* the one signal hover */
   --sig-under:   rgba(63,217,160,.55);   /* h1 highlighter rule */
   --mask-ink:    #000;
@@ -194,7 +197,7 @@ body{
   position:fixed;top:8px;left:8px;z-index:100;
   transform:translateY(-200%);
   display:inline-flex;align-items:center;height:44px;padding:0 var(--s-4);
-  background:var(--sig);color:var(--ink-on-sig);font-weight:600;
+  background:var(--sig-btn);color:var(--ink-on-btn);font-weight:600;
   font-family:var(--f-mono);font-size:var(--ts-small);
   letter-spacing:var(--track-label);border-radius:var(--r-sm);
   transition:transform var(--dur) var(--ease);
@@ -623,8 +626,8 @@ main:focus{outline:none}
              border-color var(--dur) var(--ease),
              color var(--dur) var(--ease);
 }
-.btn--primary{background:var(--sig);color:var(--ink-on-sig);font-weight:600}
-.btn--primary:hover{background:var(--sig-hi);transform:translateY(-1px)}
+.btn--primary{background:var(--sig-btn);color:var(--ink-on-btn);font-weight:600}
+.btn--primary:hover{background:var(--sig-btn-hi);transform:translateY(-1px)}
 .btn--ghost{border-color:var(--c-edge-int);color:var(--t-mid);background:var(--c-panel)}
 .btn--ghost:hover{border-color:var(--c-line-hot);color:var(--t-hi);transform:translateY(-1px)}
 .btn .arw{transition:transform var(--dur) var(--ease)}
@@ -1875,6 +1878,7 @@ a.chip:hover{color:var(--sig);border-color:var(--sig-edge);background:var(--sig-
     --t-hi:#0A0E11; --t-mid:#1F2A2E; --t-lo:#3D4A4F; --t-faint:#4E5B60;
     --sig:#0E6B4C; --sig-wash:transparent; --sig-edge:#0E6B4C; --sig-under:transparent;
     --ink-on-sig:#FFFFFF;
+    --sig-btn:#0E6B4C; --sig-btn-hi:#0E6B4C; --ink-on-btn:#FFFFFF;
   }
   .mf,.grain,.hero__scrim,.dock,.askp,.skip,.ask,.filters{display:none !important}
   /* The mark's glint is a 4%-duty flash, so printing the same page twice would

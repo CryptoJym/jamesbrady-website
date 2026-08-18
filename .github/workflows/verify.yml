@@ -98,6 +98,9 @@ jobs:
       - name: Token discipline (no colour literal outside :root)
         run: npm run verify:tokens
 
+      - name: Primary button contrast (WCAG AA)
+        run: npm run verify:contrast
+
       - name: Gate fixtures (red-team the gates themselves)
         run: npm run verify:fixtures
 
