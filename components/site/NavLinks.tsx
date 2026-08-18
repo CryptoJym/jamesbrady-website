@@ -38,9 +38,9 @@ const PRIMARY: { href: string; label: string; hint: string }[] = [
     hint: "About: who does what, and how the work gets checked",
   },
   {
-    href: "/now",
-    label: "Now",
-    hint: "Now: what is happening this month, including what is stuck",
+    href: "/contact",
+    label: "Contact",
+    hint: "Contact: the enquiry form and what makes a strong fit",
   },
 ];
 
@@ -61,9 +61,9 @@ const MORE: { href: string; label: string; hint: string }[] = [
     hint: "Learn: three archived volumes of long-form writing",
   },
   {
-    href: "/contact",
-    label: "Contact",
-    hint: "Contact: the enquiry form and what makes a strong fit",
+    href: "/now",
+    label: "Now",
+    hint: "Now: what is happening this month, including what is stuck",
   },
 ];
 

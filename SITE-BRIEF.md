@@ -114,6 +114,7 @@ Flagship: Universal Question Geometry (OfOne). Then: Question-Answer Dynamics, C
 - 2026-08-11 — Apocaltips GitHub account is another user's; excluded from everything, never attributed. — James
 - 2026-08-11 — Design direction: B "Operating Room" (dark live-console, self-auditing readout, luminous manifold). Grafts carried from A (provenance nameplate device) and C (counts never animate; serif for theories). — James
 - 2026-08-11 — Location shown on site: Lehi, UT. — James
+- 2026-08-18 — This visit plate, pokeable Lab lens, Ask-off is mailto, offer CTA under H1, Contact in primary nav, home is doors + proof not a second /work. Issues #13–#15. — James: “go for some big stuff”
 - 2026-08-17 — First visit reimagined as a front door: who you are, two shops, four visitor doors in the hero, readout as a strip after the choice. Primary nav is Work with me / Work / About / Now. Theories, Lab, Learn, Contact stay in More and in the footer. Honesty gates (computed numbers, four doors, rail count) stay. — James: “reimagine the entire thing your way”
 - 2026-08-11 — Direction B audited by three independent lenses (credibility / craft / accessibility); 25-item punch list consolidated (docs/design/direction-b-v2-punchlist.md) and applied; v2 comp verified (0 contrast fails across 32 pairs, 0 dead links, 0 overflow at 5 widths, counter mechanism intact). Phase 3 complete. Build-gates carried into Phase 4/5: every proof link resolves externally; all numbers computed at build; real photo asset; mobile dock behavior; light/print case-study path.
 

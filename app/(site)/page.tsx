@@ -7,11 +7,8 @@ import {
   PageNameplate,
   SectionHead,
 } from "@/components/site/instruments";
-import { ProofBank, Tally, WorkFilters, WorkGrid } from "@/components/site/work";
-import { DoorRow } from "@/components/site/offers";
-import { TheoryList } from "@/components/site/theories";
+import { ProofBank } from "@/components/site/work";
 import {
-  discoverableTheories,
   offers,
   outsideStars,
   proofSlots,
@@ -22,8 +19,9 @@ import {
   theoriesActive,
   theoriesListed,
   theoriesPaused,
-  work,
 } from "@/lib/content";
+import { HomeDoors } from "@/components/site/HomeDoors";
+import { VISIT_DOORS } from "@/lib/content/visits";
 import { homeGraph, serializeGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { SITE } from "@/lib/seo/site";
@@ -134,44 +132,36 @@ export default function HomePage() {
       </header>
 
       <main id="main" tabIndex={-1}>
-        <section className="doorway doorway--lead rise d4" aria-labelledby="doorway-h">
-          <div className="wrap">
-            <h2 className="doorway__h" id="doorway-h">
-              What did you come here to do?
-            </h2>
-            <DoorRow
-              label="Choose a starting point"
-              doors={[
-                {
-                  label: "Get my business found",
-                  who: "For an owner whose customers cannot find them",
-                  detail: `${getFound.summary} Delivered by ${getFound.deliveredBy.name}.`,
-                  href: `/work-with-me/${getFound.slug}`,
-                },
-                {
-                  label: "Build me a system",
-                  who: "For a founder or an operator with a build to run",
-                  detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
-                  href: `/work-with-me/${buildSystem.slug}`,
-                },
-                {
-                  label: "Screen your hires",
-                  who: "For an employer about to trust a stranger",
-                  detail: `${screening.summary} Delivered by ${screening.deliveredBy.name}.`,
-                  href: `/work-with-me/${screening.slug}`,
-                },
-                {
-                  label: "Read the code",
-                  who: "For a builder who would rather check than be told",
-                  detail: `${systemsListed} systems, ${publicRepos.length} of them in public repositories you can open from the card.`,
-                  href: "/work",
-                },
-              ]}
-            />
-          </div>
-        </section>
+        <HomeDoors
+          visitDoors={VISIT_DOORS}
+          doors={[
+            {
+              label: "Get my business found",
+              who: "For an owner whose customers cannot find them",
+              detail: `${getFound.summary} Delivered by ${getFound.deliveredBy.name}.`,
+              href: `/work-with-me/${getFound.slug}`,
+            },
+            {
+              label: "Build me a system",
+              who: "For a founder or an operator with a build to run",
+              detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
+              href: `/work-with-me/${buildSystem.slug}`,
+            },
+            {
+              label: "Screen your hires",
+              who: "For an employer about to trust a stranger",
+              detail: `${screening.summary} Delivered by ${screening.deliveredBy.name}.`,
+              href: `/work-with-me/${screening.slug}`,
+            },
+            {
+              label: "Read the code",
+              who: "For a builder who would rather check than be told",
+              detail: `${systemsListed} systems, ${publicRepos.length} of them in public repositories you can open from the card.`,
+              href: "/work",
+            },
+          ]}
+        />
 
-        {/* ======================= 01 / PROOF ======================= */}
         <section className="proof" id="proof">
           <div className="wrap">
             <SectionHead
@@ -181,34 +171,6 @@ export default function HomePage() {
               aside="Each one links to the thing itself: a repo, a doc site, a running product, and not a case study about it. Every value and every last-active date is read from the content source when the page is built."
             />
             <ProofBank entries={proofSlots} />
-          </div>
-        </section>
-
-        {/* ======================= 02 / WORK ======================== */}
-        <section className="work" id="work">
-          <div className="wrap">
-            <SectionHead
-              num="02"
-              eyebrow="Work"
-              heading="Products, open source, client work, experiments."
-              aside="Filter the shelf. The count below updates with it. The number is read from what is on screen, not typed in, and there is no denominator to fall out of date."
-            />
-            <WorkFilters />
-            <WorkGrid entries={work} />
-            <Tally />
-          </div>
-        </section>
-
-        {/* ===================== 03 / THEORIES ====================== */}
-        <section className="theories" id="theories">
-          <div className="wrap">
-            <SectionHead
-              num="03"
-              eyebrow="Theories"
-              heading="Open questions I'm working in public."
-              aside="Labeled by what they actually are. Anything still named-only stays off this page until it is at least sketched."
-            />
-            <TheoryList entries={discoverableTheories} />
           </div>
         </section>
       </main>

@@ -54,7 +54,7 @@ export function LeadForm({
     <form action={formAction} className="panel" noValidate>
       <div className="panel__head">
         <span>Project enquiry</span>
-        <span>All fields required</span>
+        <span>Company optional</span>
       </div>
       <div className="panel__body">
         {state.status === "error" ? (
@@ -82,7 +82,7 @@ export function LeadForm({
         </div>
 
         <div className="field">
-          <label htmlFor="company">Company</label>
+          <label htmlFor="company">Company (optional)</label>
           <input id="company" name="company" type="text" autoComplete="organization" />
           <Err message={state.fieldErrors?.company} />
         </div>

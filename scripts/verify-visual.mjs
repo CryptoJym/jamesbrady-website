@@ -185,6 +185,8 @@ report(
 // only way it can be: by cropping the rendered element and showing its pixels
 // change in lockstep with the number of displayed cards. That is the whole
 // point of the mechanism — the count is whatever is on screen, by construction.
+await page.goto(`${BASE}/work`, { waitUntil: "networkidle" });
+
 const tallyState = async () =>
   page.evaluate(() => {
     const cards = [...document.querySelectorAll(".work .card")];
@@ -260,10 +262,10 @@ const noAnim = await page.evaluate(() =>
 );
 report("Counts never animate", noAnim);
 
-// Reset the filter and scroll back to the top so the evidence shows the page
-// as a visitor first meets it, not the state the tally test left behind.
-await page.click('label[for="wf-all"]');
-await page.evaluate(() => window.scrollTo(0, 0));
+await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await page.waitForFunction(() => document.querySelector(".mf")?.classList.contains("is-live"), {
+  timeout: 10_000,
+});
 await page.waitForTimeout(500);
 await page.screenshot({ path: join(OUT, "home-1440-hero.png") });
 await page.screenshot({ path: join(OUT, "home-1440-full.png"), fullPage: true });

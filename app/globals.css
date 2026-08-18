@@ -777,6 +777,52 @@ main:focus{outline:none}
    ruling B), never a fill competing with a primary action. */
 .doorway{padding-block:var(--s-7) 0}
 .doorway--lead{padding-top:var(--s-5)}
+.doors{padding-right:72px}
+@media (max-width:1180px){
+  .doors{padding-right:0}
+}
+
+.visit{padding:var(--s-6) 0 var(--s-7)}
+.visit__idle{
+  margin-top:var(--s-4);max-width:62ch;
+  color:var(--t-lo);font-size:var(--ts-small);line-height:1.6;
+}
+.visit__list{margin:var(--s-4) 0 0;padding:0;list-style:none;display:grid;gap:var(--s-3)}
+.visit__list li{
+  display:flex;justify-content:space-between;gap:var(--s-4);
+  font-size:var(--ts-small);border-bottom:1px solid var(--c-line);
+  padding-bottom:var(--s-2);
+}
+.visit__list a{color:var(--t-hi)}
+.visit__list span{
+  font-family:var(--f-mono);font-size:var(--ts-nano);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t-faint);
+  flex:none;
+}
+.visit__pay{margin-top:var(--s-5)}
+
+.lens{
+  margin-top:var(--s-6);
+  border:1px solid var(--c-edge-int);border-radius:var(--r-md);
+  background:var(--c-panel);padding:var(--s-5);
+}
+.lens__flag{
+  font-family:var(--f-mono);font-size:var(--ts-micro);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--warn);
+}
+.lens__c{display:block;width:100%;height:min(52vh,420px);margin-top:var(--s-4);background:var(--c-inset);border-radius:var(--r-sm)}
+.lens__axes{
+  margin-top:var(--s-5);
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-4);
+}
+.lens__axis{display:flex;flex-direction:column;gap:6px;font-size:var(--ts-small);color:var(--t-mid)}
+.lens__axis span{display:flex;justify-content:space-between;gap:var(--s-3)}
+.lens__axis b{font-family:var(--f-mono);color:var(--t-hi);font-weight:400}
+.lens__axis input{width:100%}
+.lens__note{
+  margin-top:var(--s-4);max-width:70ch;
+  font-size:var(--ts-small);line-height:1.6;color:var(--t-lo);
+}
 .doorway--bare{padding-top:var(--s-7)}
 /* .b-room h2 sets --ts-h2 with one more element of specificity, so this
    selector carries the room class too. Without it the row's kicker rendered
@@ -1775,6 +1821,7 @@ a.chip:hover{color:var(--sig);border-color:var(--sig-edge);background:var(--sig-
   .panel--strip .readout{grid-template-columns:1fr}
   .door{min-height:0;padding:var(--s-4)}
   .door__n{font-size:var(--ts-body);opacity:.55}
+  .lens__axes{grid-template-columns:1fr}
   .foot{gap:var(--s-6)}
   /* Touch targets: 44px minimum on everything a thumb has to find. */
   .ask{height:44px;padding:0 var(--s-4)}

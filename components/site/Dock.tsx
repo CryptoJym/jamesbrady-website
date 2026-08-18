@@ -127,7 +127,10 @@ export function Dock({ configured }: { configured: boolean }) {
           onClick={() => (open ? handleClose() : handleOpen())}
         />
         <span className="dock__ico">
-          <span className="dot dot--live" aria-hidden="true" />
+          <span
+            className={configured ? "dot dot--live" : "dot dot--off"}
+            aria-hidden="true"
+          />
         </span>
         <span className="dock__txt">
           <span className="dock__t" aria-hidden="true">
@@ -146,8 +149,19 @@ export function Dock({ configured }: { configured: boolean }) {
                   {SITE.email}
                 </a>
               </>
-            ) : (
+            ) : configured ? (
               <>Grounded only in what&rsquo;s published here — it says when it doesn&rsquo;t know.</>
+            ) : (
+              <>
+                Assistant is off. Email{" "}
+                <a
+                  className="dock__mail"
+                  href={`mailto:${SITE.email}?subject=Question%20about%20your%20work`}
+                >
+                  {SITE.email}
+                </a>
+                .
+              </>
             )}
           </span>
         </span>

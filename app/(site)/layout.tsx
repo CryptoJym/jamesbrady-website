@@ -1,5 +1,6 @@
 import { Dock } from "@/components/site/Dock";
 import { ConsoleRail, SiteFooter, SiteNav } from "@/components/site/chrome";
+import { VisitTracker } from "@/components/site/VisitTracker";
 import { askRails } from "@/lib/ask/config";
 
 /**
@@ -28,7 +29,8 @@ export default function SiteLayout({
     <div className="b-room">
       <div className="grain" aria-hidden="true" />
       <ConsoleRail />
-      <SiteNav />
+      <SiteNav askConfigured={askRails().configured} />
+      <VisitTracker />
       {children}
       <SiteFooter />
       <Dock configured={askRails().configured} />

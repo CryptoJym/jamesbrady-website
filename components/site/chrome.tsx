@@ -39,7 +39,7 @@ export function ConsoleRail() {
   );
 }
 
-export function SiteNav() {
+export function SiteNav({ askConfigured }: { askConfigured: boolean }) {
   return (
     <nav className="nav" aria-label="Primary">
       <div className="wrap nav__in">
@@ -67,13 +67,26 @@ export function SiteNav() {
           JAMES&nbsp;BRADY
         </Link>
         <NavLinks />
-        <DockTrigger className="ask">
-          <>
-            <Dot state="live" />
-            ASK<span className="vh"> about my work.</span>
-            <span className="kbd" aria-hidden="true">⌘K</span>
-          </>
-        </DockTrigger>
+        {askConfigured ? (
+          <DockTrigger className="ask">
+            <>
+              <Dot state="live" />
+              ASK<span className="vh"> about my work.</span>
+              <span className="kbd" aria-hidden="true">
+                ⌘K
+              </span>
+            </>
+          </DockTrigger>
+        ) : (
+          <a
+            className="ask"
+            href={`mailto:${SITE.email}?subject=Question%20about%20your%20work`}
+          >
+            <Dot state="dormant" />
+            ASK
+            <span className="vh"> — assistant is off. Email James.</span>
+          </a>
+        )}
       </div>
     </nav>
   );

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { BUDGET_LABEL, type BudgetRange } from "@/lib/contact";
@@ -28,11 +30,24 @@ export type Door = {
   href: string;
 };
 
-export function DoorRow({ doors, label }: { doors: Door[]; label: string }) {
+export function DoorRow({
+  doors,
+  label,
+  onChoose,
+}: {
+  doors: Door[];
+  label: string;
+  onChoose?: (href: string) => void;
+}) {
   return (
     <nav className="doors" aria-label={label}>
       {doors.map((door, i) => (
-        <Link key={door.href} className="door" href={door.href}>
+        <Link
+          key={door.href}
+          className="door"
+          href={door.href}
+          onClick={() => onChoose?.(door.href)}
+        >
           <span className="door__n" aria-hidden="true">
             {String(i + 1).padStart(2, "0")}
           </span>
