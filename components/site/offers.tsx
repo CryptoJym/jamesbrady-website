@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { BUDGET_LABEL, type BudgetRange } from "@/lib/contact";
 import type { OfferEntry } from "@/lib/content/types";
 

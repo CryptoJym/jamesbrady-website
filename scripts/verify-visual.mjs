@@ -373,6 +373,93 @@ report(
 );
 await page.screenshot({ path: join(OUT, "home-1440-doors.png") });
 
+/* ---------------------------------------------- THIS VISIT PLATE (issue 13)
+   A stranger picks one of the four doors; the plate lists that door's
+   inspectable pages, names each page actually opened from this-tab
+   sessionStorage, computes the opened count from that set (never typed,
+   never animated), locks nothing behind the set, and — only when every
+   listed page has been opened — offers exactly the enquiry written on
+   that door. Every step below is exercised in one fresh tab. */
+
+const visitCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const vpage = await visitCtx.newPage();
+await vpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
+report(
+  "This visit: idle before any door is picked",
+  await vpage.locator(".visit__idle").isVisible(),
+);
+
+// Pick the Build-a-system door, come back, read the plate.
+await vpage.click('.doors .door[href="/work-with-me/build-a-system"]');
+await vpage.waitForURL("**/work-with-me/build-a-system");
+await vpage.goBack();
+await vpage.locator(".visit__tally").waitFor();
+
+const plateRows = async () =>
+  vpage.evaluate(() =>
+    [...document.querySelectorAll(".visit__list li")].map((li) => ({
+      href: li.querySelector("a")?.getAttribute("href"),
+      state: li.querySelector("span")?.textContent?.trim(),
+    })),
+  );
+
+let rows = await plateRows();
+// textContent, not innerText: the furniture CSS uppercases the tally, and the
+// assertion is about the characters the site computed, not their styling.
+const tallyText = () =>
+  vpage.evaluate(() => document.querySelector(".visit__tally")?.textContent?.trim());
+const t0 = await tallyText();
+// The door's own page IS one of its inspectable pages, and this tab just
+// opened it — so the set starts at 1, not 0. The count must say exactly that.
+const openedOf = (rs) => rs.filter((r) => r.state === "opened").length;
+report(
+  "This visit: plate lists the chosen door's pages as ordinary links",
+  rows.length === 3 &&
+    rows.every((r) => r.href?.startsWith("/")) &&
+    openedOf(rows) === 1 &&
+    t0 === `1 opened · ${rows.length} listed`,
+  `${rows.length} rows · "${t0}" · ${rows.map((r) => `${r.href}:${r.state}`).join(", ")}`,
+);
+
+// Open each remaining listed page in turn; the count must track the set,
+// step by step, never ahead of and never behind what was actually opened.
+for (let i = openedOf(rows); i < rows.length; i++) {
+  const next = rows.find((r) => r.state !== "opened");
+  const href = next.href;
+  await vpage.click(`.visit__list li a[href="${href}"]`);
+  await vpage.waitForURL(`**${href}`);
+  await vpage.goBack();
+  await vpage.locator(".visit__tally").waitFor();
+  rows = await plateRows();
+  const n = await tallyText();
+  report(
+    `This visit: opening a page names it and recounts (${href})`,
+    openedOf(rows) === i + 1 && n === `${i + 1} opened · ${rows.length} listed`,
+    `"${n}"`,
+  );
+}
+
+// All opened → ONLY the matching enquiry appears, the one written on the door.
+const ctaCount = await vpage.locator(".visit__pay .btn").count();
+const cta = vpage.locator(".visit__pay .btn");
+const ctaVisible = await cta.isVisible();
+const ctaHref = ctaVisible ? await cta.getAttribute("href") : null;
+const offerHtml = await (await fetch(`${BASE}/work-with-me/build-a-system`)).text();
+const offerInquiry = offerHtml.match(/\/contact\?inquiry=[a-z_-]+/)?.[0];
+report(
+  "This visit: complete plate offers only the door's own enquiry",
+  ctaVisible && ctaCount === 1 && ctaHref === offerInquiry,
+  `plate → ${ctaHref} · offer page writes ${offerInquiry ?? "NOTHING"}`,
+);
+
+// The count element never animates.
+const visitNoAnim = await vpage.evaluate(() => {
+  const s = getComputedStyle(document.querySelector(".visit__tally"));
+  return s.animationName === "none" && s.transitionDuration === "0s";
+});
+report("This visit: the opened count never animates", visitNoAnim);
+await visitCtx.close();
+
 await page.goto(`${BASE}/work`, { waitUntil: "networkidle" });
 const cardRepos = await page.evaluate(() =>
   [...document.querySelectorAll(".work .card__repo a")].map((a) => ({
@@ -606,6 +693,14 @@ report(
   "No JS: full theory text is in the server response",
   (await (await fetch(`${BASE}/theories/universal-question-geometry`)).text()).includes(
     "Universal Question Geometry starts from a different claim",
+  ),
+);
+// Issue 13: with JavaScript off the four doors are plain server-rendered
+// anchors — navigation works, nothing waits on a click handler.
+report(
+  "No JS: the four homepage doors are ordinary links in the server response",
+  ["/work-with-me/get-found", "/work-with-me/build-a-system", "/work-with-me/background-screening", "/work"].every(
+    (h) => njHtml.includes(`href="${h}"`),
   ),
 );
 await njPage.screenshot({ path: join(OUT, "home-1440-no-js.png") });
