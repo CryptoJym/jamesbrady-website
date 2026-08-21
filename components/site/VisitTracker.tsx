@@ -5,34 +5,27 @@ import { useEffect } from "react";
 
 import { chooseVisitDoor, recordVisitOpen } from "@/lib/visit/storage";
 
-const DOOR_HREFS: Record<string, string> = {
-  "/work-with-me/get-found": "get-found",
-  "/work-with-me/build-a-system": "build-a-system",
-  "/work-with-me/background-screening": "background-screening",
-  "/work": "read-the-code",
-};
-
-const INSPECT_HREFS = new Set([
-  "/work-with-me/get-found",
-  "/work-with-me/build-a-system",
-  "/work-with-me/background-screening",
-  "/work",
-  "/work/visibility-platform",
-  "/work/ofone",
-  "/work/plimsoll",
-  "/work/eeg-meditation-analysis",
-  "/work/seopr1",
-  "/work/ai-readiness-assessment",
-  "/work/of-one-family",
-]);
-
-/** Records this-tab opens of inspectable pages. Enhancement only. */
-export function VisitTracker() {
+/**
+ * Records this-tab opens of inspectable pages. Enhancement only.
+ *
+ * Both maps arrive as props from the server layout, derived from
+ * VISIT_DOORS — the typed content source the plate itself renders. Nothing
+ * here is restated by hand: an inspectable page added to VISIT_DOORS is
+ * tracked on the next build with no second edit, so a page the plate lists
+ * can never be one this tracker silently misses.
+ */
+export function VisitTracker({
+  doorIdByHref,
+  inspectHrefs,
+}: {
+  doorIdByHref: Record<string, string>;
+  inspectHrefs: string[];
+}) {
   const pathname = usePathname();
   useEffect(() => {
-    const doorId = DOOR_HREFS[pathname];
+    const doorId = doorIdByHref[pathname];
     if (doorId) chooseVisitDoor(doorId);
-    if (INSPECT_HREFS.has(pathname)) recordVisitOpen(pathname);
-  }, [pathname]);
+    if (inspectHrefs.includes(pathname)) recordVisitOpen(pathname);
+  }, [pathname, doorIdByHref, inspectHrefs]);
   return null;
 }

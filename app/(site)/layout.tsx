@@ -2,6 +2,7 @@ import { Dock } from "@/components/site/Dock";
 import { ConsoleRail, SiteFooter, SiteNav } from "@/components/site/chrome";
 import { VisitTracker } from "@/components/site/VisitTracker";
 import { askRails } from "@/lib/ask/config";
+import { VISIT_DOORS } from "@/lib/content/visits";
 
 /**
  * Direction B chrome. Pages render their own <main id="main" tabIndex={-1}>
@@ -25,12 +26,20 @@ import { askRails } from "@/lib/ask/config";
 export default function SiteLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // The tracker's maps are DERIVED here, on the server, from the same typed
+  // door set the plate renders — never restated by hand. A new inspectable
+  // page added to VISIT_DOORS is therefore recorded without a second edit,
+  // and the two surfaces cannot drift apart.
+  const doorIdByHref: Record<string, string> = {};
+  for (const d of VISIT_DOORS) doorIdByHref[d.href] = d.id;
+  const inspectHrefs = [...new Set(VISIT_DOORS.flatMap((d) => d.pages.map((p) => p.href)))];
+
   return (
     <div className="b-room">
       <div className="grain" aria-hidden="true" />
       <ConsoleRail />
       <SiteNav askConfigured={askRails().configured} />
-      <VisitTracker />
+      <VisitTracker doorIdByHref={doorIdByHref} inspectHrefs={inspectHrefs} />
       {children}
       <SiteFooter />
       <Dock configured={askRails().configured} />

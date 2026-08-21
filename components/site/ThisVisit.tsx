@@ -49,7 +49,7 @@ function VisitPlate({ door, opened }: { door: VisitDoor; opened: string[] }) {
     <aside className="panel panel--strip" aria-label="This visit">
       <div className="panel__head">
         <span>{door.label}</span>
-        <span>
+        <span className="visit__tally">
           {named.length} opened · {door.pages.length} listed
         </span>
       </div>
