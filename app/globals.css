@@ -54,6 +54,13 @@
      colour anything is painted with. */
   --ink-on-sig:  #052018;   /* button-ink: text on a --sig fill */
   --sig-hi:      #5FE6B4;   /* the one signal hover */
+
+  /* Issue 17: primary CTAs (.btn--primary, .skip) left dark-ink-on-phosphor
+     for cream ink on the deep-green family. The two values below are the
+     measured inputs of scripts/verify-contrast.mjs (npm run verify:contrast),
+     which holds them to >=4.5:1 — they are gate inputs, not freehand picks. */
+  --ink-on-deep: #FCF7E8;   /* cream — text on a --sig-deep / --sig-deepest fill */
+  --sig-deepest: #175E47;   /* primary-button hover: --sig-deep, darkened */
   --sig-under:   rgba(63,217,160,.55);   /* h1 highlighter rule */
   --mask-ink:    #000;
   --mask-soft:   rgba(0,0,0,.58);
@@ -194,7 +201,7 @@ body{
   position:fixed;top:8px;left:8px;z-index:100;
   transform:translateY(-200%);
   display:inline-flex;align-items:center;height:44px;padding:0 var(--s-4);
-  background:var(--sig);color:var(--ink-on-sig);font-weight:600;
+  background:var(--sig-deep);color:var(--ink-on-deep);font-weight:600;
   font-family:var(--f-mono);font-size:var(--ts-small);
   letter-spacing:var(--track-label);border-radius:var(--r-sm);
   transition:transform var(--dur) var(--ease);
@@ -623,8 +630,8 @@ main:focus{outline:none}
              border-color var(--dur) var(--ease),
              color var(--dur) var(--ease);
 }
-.btn--primary{background:var(--sig);color:var(--ink-on-sig);font-weight:600}
-.btn--primary:hover{background:var(--sig-hi);transform:translateY(-1px)}
+.btn--primary{background:var(--sig-deep);color:var(--ink-on-deep);font-weight:600}
+.btn--primary:hover{background:var(--sig-deepest);transform:translateY(-1px)}
 .btn--ghost{border-color:var(--c-edge-int);color:var(--t-mid);background:var(--c-panel)}
 .btn--ghost:hover{border-color:var(--c-line-hot);color:var(--t-hi);transform:translateY(-1px)}
 .btn .arw{transition:transform var(--dur) var(--ease)}
