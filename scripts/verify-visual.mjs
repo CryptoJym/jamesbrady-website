@@ -178,6 +178,16 @@ report(
   starRow?.sub,
 );
 
+const heroCopy = await page.locator(".hero__copy").innerText();
+const frontDoorTerms = ["get found", "build a system", "screen hires", "read the code"];
+report(
+  "Homepage explains James, both shops, and the four starting points",
+  heroCopy.includes("James Brady builds AI systems") &&
+    heroCopy.includes("James operates Utlyze and New Reward") &&
+    frontDoorTerms.every((term) => heroCopy.toLowerCase().includes(term)),
+  heroCopy.replace(/\s+/g, " ").trim(),
+);
+
 // The CSS-counter tally: it must recount from what is DISPLAYED.
 //
 // getComputedStyle() will not resolve counter() in generated content, and the

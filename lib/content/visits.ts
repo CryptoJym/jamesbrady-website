@@ -8,6 +8,8 @@ export type VisitPage = {
 export type VisitDoor = {
   id: string;
   label: string;
+  who: string;
+  detail: string;
   href: string;
   inquiryHref: string;
   ctaLabel: string;
@@ -23,23 +25,38 @@ function workPage(slug: string): VisitPage {
 function offerDoor(
   slug: string,
   extra: VisitPage[],
-): Pick<VisitDoor, "href" | "inquiryHref" | "ctaLabel" | "pages"> {
+  who: string,
+): Pick<
+  VisitDoor,
+  "href" | "inquiryHref" | "ctaLabel" | "who" | "detail" | "pages"
+> {
   const entry = offers.find((o) => o.slug === slug);
   if (!entry) throw new Error(`visit set missing offer slug ${slug}`);
   return {
     href: `/work-with-me/${entry.slug}`,
     inquiryHref: `/contact?inquiry=${entry.inquiryType}`,
     ctaLabel: entry.ctaLabel,
+    who,
+    detail: `${entry.summary} Delivered by ${entry.deliveredBy.name}.`,
     pages: [{ href: `/work-with-me/${entry.slug}`, title: entry.title }, ...extra],
   };
 }
 
-const getFound = offerDoor("get-found", [workPage("visibility-platform")]);
-const build = offerDoor("build-a-system", [
-  workPage("ofone"),
-  workPage("plimsoll"),
-]);
-const screen = offerDoor("background-screening", []);
+const getFound = offerDoor(
+  "get-found",
+  [workPage("visibility-platform")],
+  "For an owner whose customers cannot find them",
+);
+const build = offerDoor(
+  "build-a-system",
+  [workPage("ofone"), workPage("plimsoll")],
+  "For a founder or an operator with a build to run",
+);
+const screen = offerDoor(
+  "background-screening",
+  [],
+  "For an employer about to trust a stranger",
+);
 
 const publicWork = work.filter((w) => w.repo?.public).map((w) => ({
   href: `/work/${w.slug}`,
@@ -65,9 +82,11 @@ export const VISIT_DOORS: VisitDoor[] = [
   {
     id: "read-the-code",
     label: "Read the code",
+    who: "For a builder who would rather check than be told",
     href: "/work",
     inquiryHref: "/work",
     ctaLabel: "Open the work shelf",
+    detail: `${work.length} systems, ${publicWork.length} of them in public repositories you can open from the card.`,
     pages: [{ href: "/work", title: "Work index" }, ...publicWork],
   },
 ];

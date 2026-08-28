@@ -9,7 +9,6 @@ import {
 } from "@/components/site/instruments";
 import { ProofBank } from "@/components/site/work";
 import {
-  offers,
   outsideStars,
   proofSlots,
   publicRepoNames,
@@ -41,11 +40,15 @@ function pad(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-// The door row reads the offer collection rather than restating it: the
-// summaries, the slugs and the delivering entity all come from the same
-// entries the offer pages render, so the door and the page it opens cannot
-// describe different things.
-const [getFound, buildSystem, screening] = offers;
+// The visible door row and the session tracker read the same typed set. This
+// keeps the four labels, audiences, destinations and details from drifting
+// apart across two surfaces.
+const homeDoors = VISIT_DOORS.map(({ label, who, detail, href }) => ({
+  label,
+  who,
+  detail,
+  href,
+}));
 
 export default function HomePage() {
   return (
@@ -72,8 +75,9 @@ export default function HomePage() {
             </h1>
 
             <p className="hero__sub rise d3">
-              One person. Two shops. You either need customers to find you,
-              or you need a system built. Start there.
+              James operates Utlyze and New Reward — one person, two shops.
+              Choose a door: get found, build a system, screen hires, or read
+              the code.
             </p>
           </div>
 
@@ -134,32 +138,7 @@ export default function HomePage() {
       <main id="main" tabIndex={-1}>
         <HomeDoors
           visitDoors={VISIT_DOORS}
-          doors={[
-            {
-              label: "Get my business found",
-              who: "For an owner whose customers cannot find them",
-              detail: `${getFound.summary} Delivered by ${getFound.deliveredBy.name}.`,
-              href: `/work-with-me/${getFound.slug}`,
-            },
-            {
-              label: "Build me a system",
-              who: "For a founder or an operator with a build to run",
-              detail: `${buildSystem.summary} Delivered by ${buildSystem.deliveredBy.name}.`,
-              href: `/work-with-me/${buildSystem.slug}`,
-            },
-            {
-              label: "Screen your hires",
-              who: "For an employer about to trust a stranger",
-              detail: `${screening.summary} Delivered by ${screening.deliveredBy.name}.`,
-              href: `/work-with-me/${screening.slug}`,
-            },
-            {
-              label: "Read the code",
-              who: "For a builder who would rather check than be told",
-              detail: `${systemsListed} systems, ${publicRepos.length} of them in public repositories you can open from the card.`,
-              href: "/work",
-            },
-          ]}
+          doors={homeDoors}
         />
 
         <section className="proof" id="proof">
