@@ -11,7 +11,7 @@ export const entry: WorkEntry = {
   summary:
     "A multi-tenant platform that measures how findable a business is in search and in AI answers, and prints the evidence under every score.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:new-reward"],
   stack: [
     "Next.js",
@@ -26,8 +26,9 @@ export const entry: WorkEntry = {
   timeframe: { start: "2025-11" },
   anonymized: true,
   footFacts: [{ label: "In production" }, { field: "anonymized" }],
+  // new-rewards.vercel.app was listed here as the live application. On 2026-09-27 it served the agency homepage
+  // instead (work study, checked), so it is no longer listed anywhere on this page.
   liveUrls: [
-    { url: "https://new-rewards.vercel.app", checkedAt: "2026-08-11", status: 200 },
     { url: "https://newreward.com", checkedAt: "2026-08-11", status: 200 },
     {
       url: "https://h3ro-dev.github.io/new-reward-seo-skills-os/",
@@ -55,12 +56,6 @@ export const entry: WorkEntry = {
     state: "live",
   },
   proof: [
-    {
-      label: "Live application",
-      url: "https://new-rewards.vercel.app",
-      method: "HTTP GET, returned 200.",
-      capturedAt: "2026-08-11",
-    },
     {
       label: "Published method — the scorecard documentation site",
       url: "https://h3ro-dev.github.io/new-reward-seo-skills-os/",
@@ -126,7 +121,7 @@ The report leads with the comparison and the business conclusion. The score sits
 
 ## What is not shown here
 
-The platform repository is private, so the proof on this page is the live application, the agency front, and the published method site.
+The platform repository is private, so the proof on this page is the agency front and the published method site.
 
 [JAMES: supply one outcome number with its method, for one anonymized client. Example shape: "an HVAC client, over 90 days, moved from N of 76 measures passing to M." Nothing goes on this page until you give the figure and the window.]
 

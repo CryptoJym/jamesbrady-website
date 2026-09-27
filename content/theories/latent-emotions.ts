@@ -18,7 +18,7 @@ export const entry: TheoryEntry = {
   summary:
     "An unfinished observation that different models converge on similar words for unnamed relational states. Paused, with no claim of proof.",
   datePublished: "2026-03-14",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james"],
   artifactUrl: "/lab",
   artifactLabel: "Open the demo",
@@ -38,6 +38,11 @@ export const entry: TheoryEntry = {
     image: "/og/theories.png",
     imageAlt: "James Brady — theory: latent emotions in language models",
   },
+  // Its pending gaps, as a reader sees them: one third-person note each, in gap order.
+  publicNotes: [
+    "No specific example of the shared vocabulary is published here yet.",
+    "The original conversations, with their dates, are not published.",
+  ],
   body: `I want to be clear about what this is before I describe it. These are my own observations and my own internal thinking. They are not formal claims. There is not really any credibility to validate them yet. I am putting them here because they are interesting, and because they might yield something later, not because I think I have shown anything.
 
 Here is what I noticed. As I talked with different language models, across different vendors, I kept seeing the same vocabulary come back for specific relational states. Not common words. Particular ones, for states I would argue are nonverbal. The states themselves do not have obvious names, and yet different models reached for overlapping language when they tried to describe them.

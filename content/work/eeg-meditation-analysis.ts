@@ -11,7 +11,7 @@ export const entry: WorkEntry = {
   summary:
     "Python tooling that filters an EEG recording, measures band power, and scores meditation depth. It runs without hardware.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james"],
   stack: ["Python 3.8+", "NumPy", "SciPy", "Matplotlib"],
   timeframe: { start: "2025-09", end: "2025-11" },
@@ -32,7 +32,7 @@ export const entry: WorkEntry = {
     pad: true,
     unit: "stars from outside this project",
     method:
-      "Read from the GitHub API on 2026-08-11. Every outside star counted anywhere on this site is on this one repo.",
+      "Read from the GitHub API on 2026-08-11.",
     source: "github.com/CryptoJym",
     lastActive: "2025-11-11",
     goLabel: "View on GitHub",
@@ -58,6 +58,10 @@ export const entry: WorkEntry = {
     image: "/og/work.png",
     imageAlt: "James Brady — case study: an EEG meditation analysis toolkit",
   },
+  // Its pending gap, as a reader sees it: one third-person note.
+  publicNotes: [
+    "Whether it was run on real recordings, and on which headset, is not recorded here.",
+  ],
   body: `## The problem
 
 People who meditate have almost no way to tell whether a session went deep or shallow, other than how it felt. Consumer EEG headsets record the signal, but the raw signal is noise to a human eye. The gap is not the sensor. It is the analysis in between.

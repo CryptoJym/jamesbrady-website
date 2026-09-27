@@ -77,7 +77,12 @@ export default async function TheoryPage({
         </div>
 
         <div className="article">
-          <Prose html={renderMarkdown(entry.body)} />
+          <Prose
+            html={renderMarkdown(
+              entry.body,
+              entry.publicNotes ? { mode: "public", notes: entry.publicNotes } : { mode: "inline" },
+            )}
+          />
 
           <aside className="article__aside" aria-label="State and provenance">
             <div className="panel">

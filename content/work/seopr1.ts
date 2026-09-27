@@ -22,7 +22,7 @@ export const entry: WorkEntry = {
   summary:
     "A five-page site selling AI-search visibility, built speed-first: static pages, one dependency, and an explicit fallback for every effect.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:new-reward"],
   stack: [
     "Astro 6",
@@ -72,6 +72,10 @@ export const entry: WorkEntry = {
     image: "/og/work.png",
     imageAlt: "James Brady — case study: seopr1.com, a speed-first marketing site",
   },
+  // Its pending gap, as a reader sees it: one third-person note.
+  publicNotes: [
+    "No measured performance score for seopr1.com is published here yet.",
+  ],
   body: `## The problem
 
 A site that sells AI-search visibility has a credibility trap built into it. If the site itself is slow, invisible to crawlers, or generic, the pitch is dead on arrival. It also has a plain business job: explain a new service to professional firms who have not heard of it, and book a call.
