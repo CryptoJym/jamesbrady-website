@@ -316,11 +316,20 @@ function validateNow(entries: NowEntry[]) {
     (Date.parse(`${buildDay()}T00:00:00Z`) - Date.parse(`${entry.updated}T00:00:00Z`)) / 86_400_000,
   );
   if (ageDays > 42 && process.env.ALLOW_STALE_NOW !== "1") {
-    throw new ContentError(
-      "now",
-      `/now is ${ageDays} days old (limit 42). Update content/now/now.ts, or set ALLOW_STALE_NOW=1 locally for an unrelated hotfix.`,
-    );
+    const message = `/now is ${ageDays} days old (limit 42). Update content/now/now.ts, or set ALLOW_STALE_NOW=1 locally for an unrelated hotfix.`;
+    // The gate stops a build or a verify script. It must never stop a live request: the content module is evaluated
+    // again when an on-demand page renders, and on 2026-09-27 this throw took /contact down once /now passed 42 days.
+    if (isLiveRequest()) {
+      console.warn(`[content] now: ${message}`);
+      return;
+    }
+    throw new ContentError("now", message);
   }
+}
+
+/** True inside a running Next.js server (not during `next build`, and not in a plain Node script). */
+function isLiveRequest(): boolean {
+  return process.env.NEXT_RUNTIME !== undefined && process.env.NEXT_PHASE !== "phase-production-build";
 }
 
 function buildDay(): string {
