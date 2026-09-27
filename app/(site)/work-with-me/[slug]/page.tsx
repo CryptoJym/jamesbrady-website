@@ -9,7 +9,6 @@ import {
   Prose,
 } from "@/components/site/instruments";
 import {
-  BudgetBands,
   DeliverableList,
   DeliveryLine,
   StepList,
@@ -173,8 +172,6 @@ export default async function OfferPage({
           </div>
 
           <aside className="article__aside" aria-label="Engagement facts">
-            <BudgetBands bands={entry.budgetBands} />
-
             <div className="panel">
               <div className="panel__head">
                 <span>How the work gets checked</span>

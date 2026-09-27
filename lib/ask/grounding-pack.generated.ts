@@ -9,7 +9,7 @@
 // site moved, not one changed megabyte.
 
 /** sha256 of the pack text, for the drift check and the health payload. */
-export const GROUNDING_PACK_SHA256 = "3d214ada5cccfaf777fa578fae8d9877e2b81b4ff934fe5159e7e493a4b7d3db";
+export const GROUNDING_PACK_SHA256 = "aa5e3d1b623a3dc268822bd66b68a90b0e936d535bd17a93191286920b5651e2";
 
 export const GROUNDING_PACK = [
   "# James Brady — site content pack",
@@ -91,7 +91,7 @@ export const GROUNDING_PACK = [
   "Answer capsule: Getting found means two things now: ranking in an ordinary Google search, and being the source an AI assistant answers from. New Reward, the agency James Brady operates, measures both from outside a business, scores what it finds against a fixed rubric of 12 axes and 76 measures, and reports which gaps are worth closing first. Missing evidence is written down as missing. No outcome figure from a client engagement is published on this site yet.",
   "Summary: Measuring how findable a business is in Google and in AI answers, scoring it against a fixed rubric, and fixing what the score exposes.",
   "Published 2026-08-12. Last modified 2026-08-12.",
-  "Who it is for: Medical and health services, HVAC, Roofing, Concrete, Gutters, Financial and commercial lending, Custom software and IT staffing, Pet breeding, Background screening, Promotional products, Call-center software",
+  "Who it is for: Medical and health services, HVAC, Roofing, Concrete, Gutters, Financial and commercial lending, Custom software and IT staffing, Pet breeding, Promotional products, Call-center software",
   "What an engagement looks like:",
   "  - Measure from outside: A first run uses only what any member of the public can see, so nothing waits on account access. Where a connection already exists, Search Console and analytics are read directly.",
   "  - Score against a fixed rubric: The same 12 axes and 76 measures every time. A fixed rubric is what makes this month comparable to last month, and one business comparable to a competitor.",
@@ -102,7 +102,6 @@ export const GROUNDING_PACK = [
   "  - The evidence under every finding: Each finding carries its source, the date it was collected, and the vantage point it was seen from, because the same page can look different to different visitors.",
   "  - A fix list in priority order: What to do first, what it should change, and how the change will be checked.",
   "  - A repeatable baseline: The same rubric run again later, so movement is measured rather than asserted.",
-  "Budget bands, from the enquiry form's own list: $5k – $15k, $15k – $50k, $50k+. These are orientation, not a quote.",
   "Proof:",
   "  - New Reward, the agency that delivers this work. Method: HTTP GET, returned 200. Captured 2026-08-11. Where: https://newreward.com",
   "  - The published scoring method, in full. Method: HTTP GET, returned 200. The underlying repository is private; the method site is public. Captured 2026-08-11. Where: https://h3ro-dev.github.io/new-reward-seo-skills-os/",
@@ -127,7 +126,6 @@ export const GROUNDING_PACK = [
   "  - The checks that hold it up: The required checks and the merge queue travel with the repository. They are the part that keeps working after the engagement ends.",
   "  - A running deployment: Live, under your own accounts and your own billing, with the setup written down.",
   "  - An evidence packet per wave: What was claimed, how it was checked, and the state of anything that was not checked. It is what makes the next person able to trust the last one.",
-  "Budget bands, from the enquiry form's own list: $15k – $50k, $50k+. These are orientation, not a quote.",
   "Proof:",
   "  - plimsoll, the open-source cost collector, built this way. Method: Public repository, Apache-2.0 licensed. Signals read from the GitHub API. Captured 2026-08-11. Where: https://github.com/CryptoJym/plimsoll",
   "  - ofone-skillchain, the open method and its validator. Method: Public repository, MIT licensed. Signals read from the GitHub API. Captured 2026-08-11. Where: https://github.com/CryptoJym/ofone-skillchain",
@@ -152,7 +150,6 @@ export const GROUNDING_PACK = [
   "  - A consent record for every candidate: Candidate intake and consent are described on Vuplicity's own offerings page as part of the screening workflow.",
   "  - Reports with release boundaries around them: Vuplicity's security overview names report release controls and audit trails. The employer decision itself stays with the employer; Vuplicity's own frequently-asked-questions page draws that boundary.",
   "  - A route back to a person: The enquiry lands with James Brady, and Vuplicity delivers the screening. Both halves of that are stated on this page, so neither is something you find out afterwards.",
-  "Budget bands, from the enquiry form's own list: Not applicable, Under $5k. These are orientation, not a quote.",
   "Proof:",
   "  - Vuplicity, the company that runs the checks. Method: HTTP GET, returned 200. Its own page title reads \"Nationwide background screening with clear pricing and cleaner workflows\", and its own description says it helps hiring teams run nationwide background screening with transparent pricing and compliant workflows. Captured 2026-08-12. Where: https://www.vuplicity.com",
   "  - The published package pricing, readable without an enquiry. Method: HTTP GET, returned 200. Titled \"Background Check Pricing\", describing Basic, Essential and Complete packages with clear public package pricing and add-on guidance. Captured 2026-08-12. Where: https://www.vuplicity.com/pricing",

@@ -27,7 +27,6 @@ export const entry: OfferEntry = {
     "Financial and commercial lending",
     "Custom software and IT staffing",
     "Pet breeding",
-    "Background screening",
     "Promotional products",
     "Call-center software",
   ],

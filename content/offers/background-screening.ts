@@ -1,17 +1,6 @@
 import type { OfferEntry } from "@/lib/content/types";
 
 /*
- * THE NAMED-CLIENT EXCEPTION, AND WHERE IT STOPS.
- *
- * Every other client on this site is anonymized by the 2026-08-11 policy:
- * industries are named, companies are not. This entry names Vuplicity, under a
- * single owner ruling made on 2026-08-12 ("list Vuplicity as an option too,
- * where they can work with me"). The ruling covers THIS OFFER SURFACE and
- * nothing else. /work/visibility-platform stays anonymized, the industries
- * list on /work-with-me/get-found stays an industries list, and no other page
- * gains a client name from this change. The CLIENT_DENYLIST secret was updated
- * the same day so the confidentiality gate permits the name here.
- *
  * SOURCES. Same discipline as content/work/seopr1.ts: nothing on this page
  * describes Vuplicity from memory or from an internal record. Every fact below
  * came from www.vuplicity.com on 2026-08-12, read over plain HTTP, and each is
@@ -43,14 +32,6 @@ import type { OfferEntry } from "@/lib/content/types";
  *   /sitemap.xml            lists /, /offerings, /pricing, /security, /faq,
  *                           /book-now, /developers, /privacy, /terms and
  *                           /fcra-rights.
- *
- * DELIBERATELY NOT USED. The same HTML also carries two JSON-LD blocks tagged
- * `data-newrewards-edge`, which are injected by the agency's edge layer rather
- * than authored by Vuplicity. They are on the public page, so they are public,
- * but their provenance is this side of the relationship, and a page that
- * quotes its own supplier's output back as the client's statement is quoting
- * itself. Their extra facts (a Lehi address, international checks, ATS
- * integrations) are therefore absent here rather than softened.
  *
  * JAMES'S ROLE. Unstated on purpose. The ruling authorises naming Vuplicity as
  * a path a visitor can take, not a title or an ownership claim, and neither

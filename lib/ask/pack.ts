@@ -28,7 +28,6 @@ import {
   offers,
   work,
 } from "@/lib/content";
-import { BUDGET_LABEL } from "@/lib/contact";
 import { toPlainText } from "@/lib/content/markdown";
 import { CATEGORY_LABEL, MATURITY_LABEL } from "@/lib/content/types";
 import type { AnyEntry, ProofSource } from "@/lib/content/types";
@@ -164,9 +163,6 @@ export function buildGroundingPack(): string {
           ...entry.steps.map((s) => `  - ${s.label}: ${sentence(s.detail)}`),
           "What the client is left holding:",
           ...entry.deliverables.map((d) => `  - ${d.label}: ${sentence(d.detail)}`),
-          `Budget bands, from the enquiry form's own list: ${entry.budgetBands
-            .map((b) => BUDGET_LABEL[b])
-            .join(", ")}. These are orientation, not a quote.`,
           ...proofLines(entry.proof),
           ...bodyBlock(entry),
         ]),
