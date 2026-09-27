@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import {
   JsonLd,
@@ -157,19 +156,6 @@ export default function AboutPage() {
                     supplied yet. The box says so rather than standing in for one.
                   </p>
                 </div>
-              </div>
-            </div>
-            {/* The trail stays walkable. This page states what is missing; the
-                work log states the same gaps as the open questions they are,
-                in the words they were asked in. */}
-            <div className="panel">
-              <div className="panel__head">
-                <span>Open items</span>
-              </div>
-              <div className="panel__body">
-                Where this page says a fact is not published yet, the open question behind
-                it is listed in full on <Link href="/now">the work log</Link>, together
-                with every other one the site is carrying.
               </div>
             </div>
           </aside>

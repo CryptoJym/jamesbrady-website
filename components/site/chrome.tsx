@@ -95,22 +95,19 @@ export function SiteNav({ askConfigured }: { askConfigured: boolean }) {
 /**
  * Footer socials.
  *
- * All six profiles, not three. X, TikTok, YouTube and Bluesky existed only
+ * All five profiles, not three. X, YouTube and Bluesky existed only
  * inside the JSON-LD `sameAs` array: a machine reading the entity graph could
  * see them and a person reading the page could not, which is exactly backwards
  * for accounts whose whole job is to bring people here.
  *
- * X and TikTok print their FULL URL as the visible handle. The retired brand
- * token is permitted as those two exact URLs and in no other shape, so a
- * prettier "@handle" label would be a violation rather than a nicety.
+ * X is the live @of1ai account (renamed from the retired handle, 2026-09-27).
  */
 const SOCIAL = [
   { label: "GitHub", handle: "github.com/CryptoJym", href: SAME_AS[0] },
   { label: "LinkedIn", handle: "/in/jamesbrady1", href: SAME_AS[1] },
-  { label: "X", handle: SAME_AS[2], href: SAME_AS[2] },
-  { label: "TikTok", handle: SAME_AS[3], href: SAME_AS[3] },
-  { label: "Bluesky", handle: "bsky.app/profile/utlyzeit.bsky.social", href: SAME_AS[4] },
-  { label: "YouTube", handle: "youtube.com/channel/UCA_9udyLWeGoJy12vc5TmfA", href: SAME_AS[5] },
+  { label: "X", handle: "x.com/of1ai", href: SAME_AS[2] },
+  { label: "Bluesky", handle: "bsky.app/profile/utlyzeit.bsky.social", href: SAME_AS[3] },
+  { label: "YouTube", handle: "youtube.com/channel/UCA_9udyLWeGoJy12vc5TmfA", href: SAME_AS[4] },
   { label: "Email", handle: SITE.email, href: `mailto:${SITE.email}` },
 ];
 

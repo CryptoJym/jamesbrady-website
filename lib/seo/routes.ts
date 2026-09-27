@@ -162,7 +162,7 @@ export function buildRoutes(): RouteRecord[] {
     lastModified: gitOr(["app/(site)/links/page.tsx"], CONTENT_FLOOR),
     title: "Links",
     capsule:
-      "The links page collects James Brady's public profiles, every way to work with him, and the recorded walkthroughs, in one place at its original URL. Profiles listed: GitHub, LinkedIn, X, TikTok, YouTube, Bluesky, and a direct email address.",
+      "The links page collects James Brady's public profiles, every way to work with him, and the recorded walkthroughs, in one place at its original URL. Profiles listed: GitHub, LinkedIn, X, YouTube, Bluesky, and a direct email address.",
     collection: "site",
   });
 

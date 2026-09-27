@@ -34,9 +34,8 @@ export const metadata: Metadata = pageMetadata({
  * `sameAs` array in the Person node. One list, so a profile cannot appear in
  * the entity graph and not on the page a human reads, or the other way round.
  *
- * The X and TikTok rows print their FULL URL as the visible value. That is the
- * retired-brand ruling working as written: the token is permitted as those two
- * exact URLs and nowhere else, so the URL is the only shape the label may take.
+ * X is the live @of1ai account. The TikTok profile no longer serves, so it is
+ * not listed (2026-09-27).
  */
 const PROFILES: { label: string; href: string; note: string; display: string }[] = [
   {
@@ -54,24 +53,18 @@ const PROFILES: { label: string; href: string; note: string; display: string }[]
   {
     label: "X",
     href: SAME_AS[2],
-    display: SAME_AS[2],
+    display: "x.com/of1ai",
     note: "Short notes while the work is happening.",
   },
   {
-    label: "TikTok",
-    href: SAME_AS[3],
-    display: SAME_AS[3],
-    note: "Short video, usually a system doing something rather than a talking head.",
-  },
-  {
     label: "Bluesky",
-    href: SAME_AS[4],
+    href: SAME_AS[3],
     display: "bsky.app/profile/utlyzeit.bsky.social",
     note: "The same notes, on the other network.",
   },
   {
     label: "YouTube",
-    href: SAME_AS[5],
+    href: SAME_AS[4],
     display: "youtube.com/channel/UCA_9udyLWeGoJy12vc5TmfA",
     note: "Longer recordings. The channel-ID URL is the verified one.",
   },

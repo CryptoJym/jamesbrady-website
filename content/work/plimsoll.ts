@@ -33,7 +33,7 @@ export const entry: WorkEntry = {
     snapshotAt: "2026-08-11",
     lastPush: "2026-07-20",
   },
-  liveUrls: [{ url: "https://plimsoll.dev", checkedAt: "2026-08-11", status: 200 }],
+  liveUrls: [{ url: "https://plimsoll-cloud.vercel.app", checkedAt: "2026-09-27", status: 200 }],
   deltas: [
     {
       metric: "Cost of one merged pull request, measured end to end",
@@ -63,10 +63,10 @@ export const entry: WorkEntry = {
       capturedAt: "2026-08-11",
     },
     {
-      label: "Project site — plimsoll.dev",
-      url: "https://plimsoll.dev",
+      label: "Hosted version — plimsoll-cloud.vercel.app",
+      url: "https://plimsoll-cloud.vercel.app",
       method: "HTTP GET, returned 200.",
-      capturedAt: "2026-08-11",
+      capturedAt: "2026-09-27",
     },
     {
       label: "Measured cost of PR #28",

@@ -20,11 +20,11 @@ export const now: NowEntry = {
   title: "Research projects",
   updated: "2026-08-12",
   answerCapsule:
-    "James Brady is currently working on a number of different research projects. Which projects those are is not published here yet, and what ships from them will appear on this site with its numbers and its method when it is ready. This page is hand-edited rather than generated from repository activity, the age indicator beside it is computed from the date the file itself carries, and the open questions the whole site is still carrying are listed below.",
+    "James Brady is currently working on a number of different research projects. Which projects those are is not published here yet, and what ships from them will appear on this site with its numbers and its method when it is ready. This page is hand-edited rather than generated from repository activity, and the age indicator beside it is computed from the date the file itself carries.",
   summary:
-    "Research projects are the current work. This page is hand-edited monthly, and the open questions the rest of the site is carrying are listed below.",
+    "Research projects are the current work. This page is hand-edited, and its age is shown beside it.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-12",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze", "org:new-reward"],
   proof: [
     {
@@ -43,7 +43,5 @@ export const now: NowEntry = {
   // content register names (pattern 29).
   body: `James is currently working on a number of different research projects.
 
-Which ones they are is not published here yet. What ships from them will be published on this site, with its numbers and the method behind them, when it is ready. Nothing goes up before that: a project described before it exists is a promise, and this site publishes results.
-
-The rest of this page is the work log.`,
+Which ones they are is not published here yet. What ships from them will be published on this site, with its numbers and the method behind them, when it is ready. Nothing goes up before that: a project described before it exists is a promise, and this site publishes results.`,
 };
