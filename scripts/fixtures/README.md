@@ -22,8 +22,23 @@ F4 and F5 are the two the old allowlist actually let through. F6 and F7 are
 kept as regression fixtures: they are the cases a future "simplification" would
 break first.
 
-`h3ro-allowed.txt` is the control — the four permitted URL shapes, which must
-NOT be flagged, so the fix cannot be "reject everything".
+`h3ro-allowed.txt` is the control — the permitted shapes, which must NOT be
+flagged, so the fix cannot be "reject everything".
+
+On 2026-09-27 the accepted Fulgurite design, grown from the public GitHub
+record, needed two more shapes of the same org-infrastructure fact: the
+repository URL printed without its scheme (`github.com/h3ro-dev/borg`) and the
+repository's full name (`h3ro-dev/eegt`). Both joined the control.
+`h3ro-f11-shape-edges.txt` is the other half: the bare org name as prose, an
+`http://` link, a lookalike host, `www.github.com`, an `@`-scope, a slash with
+no repository after it, the org's pages without a scheme and the org page with
+no repository. Each line is asserted on its own, so none can pass by sharing a
+file with a hit.
+
+`H3RO_SOURCE_FACTS` in `scripts/lib/h3ro-gate.mjs` pins one sentence in the
+source, by file and exact text, that names the org's GitHub account in prose
+(the history snapshot's method line). The fixtures show the pin allows it in
+that file only, and that a reworded sentence in the same file is caught.
 
 The `md-*` fixtures cover the markdown renderer: link schemes it must refuse to
 turn into anchors, and the two ways a `[JAMES: …]` gap used to break.
@@ -43,7 +58,8 @@ been prose for a whole wave, which caught nothing; it became code when
 F10 is the one that matters. An allowlist that only *allows* is how an exempt
 brand asset drifts off the palette with nobody watching; this gate grants the
 exemption and then pins the literal to the token it froze. The shipped
-`app/icon.svg` is asserted clean against the same check, so the control and the
-hostile case are the same code path.
+`app/icon.svg` and `components/specimen/Specimen.tsx` (whose WebGL bead colour
+is `--bead` in `app/fg.css`) are asserted clean against the same check, so the
+controls and the hostile case are the same code path.
 
 Fixtures are DATA. Nothing here is imported by the app.

@@ -27,7 +27,7 @@
 //   script 14 heading outline ................. §7.5
 //   script 15 no unsourced numerals in display strings ............. P0-1
 //   script 16 no title repeats the site name .................. wave-2 fix
-//   script 17 pending-mark placement .......................... wave-3 audit
+//   script 17 open questions, third person, one note per gap ... 2026-09-27 ruling
 //
 // §8.9 (proof-link liveness) is NOT implemented and is not claimed. It needs
 // network egress at verify time; it is named in the PR as an open gap.
@@ -41,7 +41,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
-import { scanH3ro } from "./lib/h3ro-gate.mjs";
+import { scanH3ro, scanH3roSource } from "./lib/h3ro-gate.mjs";
 
 const BASE =
   process.argv.includes("--base")
@@ -82,6 +82,8 @@ const STATIC_ROUTES = [
   "/about",
   "/contact",
   "/now",
+  // His words, verbatim: a Fulgurite route (2026-09-27) and in the sitemap.
+  "/words",
   // The dated archives. URLs preserved, reskinned onto Direction B in wave 4,
   // and held to every check below with no deferral. /links and /watch left this
   // list on 2026-09-27: both redirect permanently (next.config.ts), and a
@@ -107,26 +109,6 @@ const STATIC_ROUTES = [
  * deadline. If it is still empty several waves from now, delete it then.
  */
 const LEGACY_ROUTES = [];
-
-/**
- * Buyer routes — check 17.
- *
- * The routes someone reads while deciding whether to hire James. None of them
- * may render a second-person pending mark; each states the same absence in the
- * third person instead, and the full owner-facing register lives on /now.
- */
-const BUYER_ROUTES = [
-  "/",
-  "/about",
-  "/contact",
-  "/work/visibility-platform",
-  "/work-with-me",
-  "/work-with-me/get-found",
-  "/work-with-me/build-a-system",
-  // Wave 3b. It carries two pending marks about James's own position, which is
-  // exactly the kind of question a buyer must not be handed.
-  "/work-with-me/background-screening",
-];
 
 /**
  * Defects on a route named in LEGACY_ROUTES — currently none, see above. The
@@ -188,6 +170,11 @@ function walk(dir, out = []) {
  * `url` through a clean run (independent review, P1-3 / P2-11). Anything that
  * emits public bytes belongs here — a JSON endpoint is a public surface even
  * though it renders no HTML.
+ *
+ * The Fulgurite design (2026-09-27) renders through components/fg and the
+ * specimen, grows the specimen in lib/specimen, and styles through three new
+ * stylesheets; none of them was on the list, so these gates could not see the
+ * surfaces the site now ships. They are now.
  */
 const SCAN_DIRS = [
   "app/(site)",
@@ -196,20 +183,28 @@ const SCAN_DIRS = [
   "app/llms.txt",
   "app/feed.xml",
   "components/site",
+  "components/fg",
+  "components/specimen",
   "content",
   "lib/ask",
   "lib/content",
   "lib/seo",
   "lib/schema",
   "lib/manifold",
+  "lib/specimen",
 ].map((d) => join(ROOT, d));
 
 const SCAN_FILES = [
   "app/layout.tsx",
   "app/globals.css",
+  "app/fg.css",
+  "app/fg-a.css",
+  "app/fg-b.css",
   "app/robots.ts",
   "app/sitemap.ts",
   "lib/catalog.ts",
+  "lib/tray.ts",
+  "lib/words.ts",
 ].map((f) => join(ROOT, f));
 
 function newSurfaceFiles() {
@@ -675,6 +670,38 @@ function checkSitemapLastmod(sitemapXml, buildStartIso) {
   );
 }
 
+/**
+ * An image's size, read from its own header: a PNG's IHDR or a JPEG's
+ * start-of-frame. The Fulgurite pages share a JPEG (/og/fulgurite.jpg), and
+ * reading PNG offsets out of a JPEG reported it as 65536x4292542531. Any other
+ * format returns null and fails the check rather than being guessed at.
+ */
+function imageSize(buf) {
+  if (buf.length >= 24 && buf.readUInt32BE(0) === 0x89504e47) {
+    return { format: "PNG", w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  }
+  if (buf.length >= 4 && buf[0] === 0xff && buf[1] === 0xd8) {
+    for (let o = 2; o + 9 < buf.length; ) {
+      if (buf[o] !== 0xff) return null;
+      const marker = buf[o + 1];
+      if (marker === 0xff) {
+        o++;
+        continue;
+      }
+      if (marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) {
+        o += 2;
+        continue;
+      }
+      // SOF0-SOF15, less DHT (C4), JPG (C8) and DAC (CC): precision, height, width.
+      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+        return { format: "JPEG", w: buf.readUInt16BE(o + 7), h: buf.readUInt16BE(o + 5) };
+      }
+      o += 2 + buf.readUInt16BE(o + 2);
+    }
+  }
+  return null;
+}
+
 async function checkOg(pages) {
   const bad = [];
   const deferred = [];
@@ -703,10 +730,9 @@ async function checkOg(pages) {
       bad.push(`${img}: HTTP ${res.status}`);
       continue;
     }
-    const buf = Buffer.from(await res.arrayBuffer());
-    const w = buf.readUInt32BE(16);
-    const h = buf.readUInt32BE(20);
-    if (w !== 1200 || h !== 630) bad.push(`${img}: ${w}x${h}, expected 1200x630`);
+    const size = imageSize(Buffer.from(await res.arrayBuffer()));
+    if (!size) bad.push(`${img}: neither a PNG nor a JPEG, so its size cannot be read`);
+    else if (size.w !== 1200 || size.h !== 630) bad.push(`${img}: ${size.format} ${size.w}x${size.h}, expected 1200x630`);
   }
   report(
     "8. Per-page OG + twitter, images resolve at 1200x630",
@@ -735,17 +761,20 @@ function checkH3ro(pages) {
       if (!(LEGACY_ROUTES.includes(path) && legacyDefect("9 brand gate", msg))) hits.push(msg);
     }
   }
+  // Source files, less the sentences pinned by file and exact text in
+  // H3RO_SOURCE_FACTS. The rendered pages above get no such exemption.
   for (const file of newSurfaceFiles()) {
-    const { domainHits, brandHits } = scanH3ro(readFileSync(file, "utf8"));
-    if (domainHits || brandHits)
-      hits.push(`${relative(ROOT, file)}: ${domainHits} domain, ${brandHits} unanchored`);
+    const name = relative(ROOT, file).split("\\").join("/");
+    const { domainHits, brandHits } = scanH3roSource(name, readFileSync(file, "utf8"));
+    if (domainHits || brandHits) hits.push(`${name}: ${domainHits} domain, ${brandHits} unanchored`);
   }
   report(
     "9. Retired brand token: URL-anchored allowlist, nothing else",
     hits.length === 0,
     hits.length
       ? hits.join(" | ")
-      : "allowed ONLY as these URLs: x.com/h3roai, tiktok.com/@h3ro.ai, github.com/h3ro-dev/*, h3ro-dev.github.io/*",
+      : "allowed ONLY as x.com/h3roai, tiktok.com/@h3ro.ai, [https://]github.com/h3ro-dev/<repo>, " +
+          "h3ro-dev.github.io/*, a repository's full name h3ro-dev/<repo>, and the pinned source facts",
   );
 }
 
@@ -851,7 +880,7 @@ function checkRegister(pages) {
     if (BANNED.test(html)) bad.push(`rendered ${path}`);
   }
   report(
-    "11. Register rule on new surfaces (incl. app/api, lib/catalog.ts, globals.css)",
+    "11. Register rule on new surfaces (incl. app/api, lib/catalog.ts, every stylesheet)",
     bad.length === 0,
     bad.length
       ? bad.join(" | ")
@@ -998,69 +1027,122 @@ function checkTitleStutter(pages) {
 }
 
 /**
- * Check 17 — pending-mark placement (wave 3).
+ * Check 17 — open questions, in the third person (James, 2026-09-27).
  *
- * The register was never dishonest; it was mis-addressed. A buyer reading
- * /about met four questions written TO James, in the imperative, about things
- * he still had to supply, and read the page as unfinished rather than as
- * candid. So buyer routes render the same absences in the third person and the
- * owner-facing register moved to /now.
+ * The register was never dishonest; wave 3 found it mis-addressed. A buyer on
+ * /about met four questions written TO James, in the imperative, and read the
+ * page as unfinished rather than candid. So buyer routes stated the same
+ * absences in the third person, builder routes kept the questions inline, and
+ * the owner-facing register moved to /now. On 2026-09-27 James ruled that every
+ * open question renders as its third-person `publicNotes` note, on every route:
+ * the inline marks and the /now register are retired.
  *
- * The check has BOTH directions, because a one-directional version passes
- * trivially the day somebody deletes the marks:
- *   · no buyer route renders a second-person mark, AND
- *   · at least one builder route still does, AND
- *   · /now carries the consolidated block with real items in it.
- * Deleting the register to satisfy the first clause fails the other two.
+ * The check still has BOTH directions, because a one-directional version
+ * passes the day somebody deletes the notes:
+ *   · the source: every entry with [JAMES: …] gaps carries publicNotes, one
+ *     non-empty note per gap (the build checks the count only when notes exist);
+ *   · no route renders a second-person owner mark: not the inline mark, and
+ *     not any gap's question in its own words;
+ *   · what renders is the notes: every rendered note is one of its own route's
+ *     publicNotes, an entry whose prose is on its page shows ALL of its notes
+ *     there, and at least one note renders somewhere;
+ *   · no raw [JAMES: bracket reaches any page (the older defect).
+ * An entry whose prose is not on its page at all is named in the detail line,
+ * not passed over in silence.
  */
-function checkPendingPlacement(pages) {
-  const html = new Map(pages);
+async function checkOpenQuestions(pages) {
+  const { importTs } = await import("./lib/ts-register.mjs");
+  const { extractGaps, toPlainText, PENDING_TOKEN } = await importTs("lib/content/markdown.ts");
+  const content = await importTs("lib/content/index.ts");
+  const { siteProse } = await importTs("content/site/index.ts");
+
+  const routeOf = (e) =>
+    ({
+      work: `/work/${e.slug}`,
+      theories: `/theories/${e.slug}`,
+      lab: "/lab",
+      learn: e.volumeRoute,
+      now: "/now",
+      offers: `/work-with-me/${e.slug}`,
+    })[e.collection];
+  const entries = [
+    ...[...content.work, ...content.theories, ...content.lab, ...content.learn, ...content.offers, content.now].map(
+      (e) => ({ id: `${e.collection}/${e.slug}`, path: routeOf(e), body: e.body, notes: e.publicNotes }),
+    ),
+    ...siteProse.map((p) => ({ id: `site/${p.id}`, path: p.path, body: p.body, notes: p.publicNotes })),
+  ].map((e) => ({ ...e, gaps: extractGaps(e.body) }));
+
   const bad = [];
-  const MARK = /class="pending"|Pending from James/;
+  const html = new Map(pages);
 
-  for (const path of BUYER_ROUTES) {
-    const body = html.get(path);
-    if (body === undefined) {
-      bad.push(`${path}: not fetched, so placement is unverified`);
-      continue;
-    }
-    const hits = (body.match(new RegExp(MARK.source, "g")) ?? []).length;
-    if (hits > 0) bad.push(`${path}: ${hits} second-person pending mark(s) on a buyer route`);
+  // 1. The source: one note per gap, on every entry that has a gap.
+  const withGaps = entries.filter((e) => e.gaps.length);
+  for (const e of entries.filter((x) => x.gaps.length || x.notes?.length)) {
+    if (!Array.isArray(e.notes)) bad.push(`${e.id}: ${e.gaps.length} [JAMES: …] gap(s) and no publicNotes`);
+    else if (e.notes.length !== e.gaps.length) bad.push(`${e.id}: ${e.notes.length} publicNotes for ${e.gaps.length} gap(s)`);
+    else e.notes.forEach((n, i) => String(n).trim() || bad.push(`${e.id}: publicNotes[${i}] is empty`));
   }
 
-  // Positive control: the builder reading must survive. A theory or case study
-  // that drops its inline questions has lost the thing P4 reads as trust.
-  const builderRoutes = [...html.keys()].filter(
-    (p) => !BUYER_ROUTES.includes(p) && !LEGACY_ROUTES.includes(p),
-  );
-  const stillInline = builderRoutes.filter((p) => MARK.test(html.get(p)));
-  if (stillInline.length === 0) {
-    bad.push(
-      "no builder route renders an inline pending mark — the register was deleted rather than moved",
-    );
-  }
-
-  // The consolidated block, with items in it.
-  const nowHtml = html.get("/now") ?? "";
-  if (!/id="open-items"/.test(nowHtml)) {
-    bad.push('/now: no "Open items" block — the owner-facing register has nowhere to live');
-  } else {
-    const items = (nowHtml.match(/class="open-items__q"/g) ?? []).length;
-    if (items === 0) bad.push("/now: the Open items block rendered with no items");
-  }
-
-  // A raw marker reaching any page is the older defect and stays checked.
+  // 2. No second-person owner mark anywhere, in markup or in words.
+  const MARK = /class="pending"|Pending from James/g;
+  const questions = withGaps.flatMap((e) => e.gaps.map(normalize)).filter((q) => q.length >= 24);
   for (const [path, body] of pages) {
+    const marks = (body.match(MARK) ?? []).length;
+    if (marks) bad.push(`${path}: ${marks} second-person owner mark(s)`);
+    const text = normalize(visibleText(body));
+    const said = questions.filter((q) => text.includes(q)).length;
+    if (said) bad.push(`${path}: ${said} owner-facing question(s) printed in their own words`);
     if (body.includes("[JAMES:")) bad.push(`${path}: a raw [JAMES: bracket reached the page`);
   }
 
-  const items = (nowHtml.match(/class="open-items__q"/g) ?? []).length;
+  // 3. What renders is the notes, on the right page, all of them.
+  const notesOn = (body) =>
+    [...body.replace(/<script[\s\S]*?<\/script>/g, " ").matchAll(/<span class="pending-note">([\s\S]*?)<\/span>/g)].map(
+      (m) => normalize(visibleText(m[1])),
+    );
+  for (const [path, body] of pages) {
+    const own = new Set(withGaps.filter((e) => e.path === path).flatMap((e) => e.notes ?? []).map(normalize));
+    const stray = notesOn(body).filter((n) => !own.has(n));
+    if (stray.length) bad.push(`${path}: ${stray.length} rendered note(s) that are not this route's publicNotes`);
+  }
+  let shown = 0;
+  const absent = [];
+  for (const e of withGaps) {
+    const body = html.get(e.path);
+    if (body === undefined) {
+      bad.push(`${e.id}: its route ${e.path} was not fetched, so its notes are unverified`);
+      continue;
+    }
+    const rendered = notesOn(body);
+    const present = (e.notes ?? []).filter((n) => rendered.includes(normalize(n))).length;
+    if (present === e.gaps.length) {
+      shown += present;
+      continue;
+    }
+    if (present > 0) {
+      bad.push(`${e.id}: ${present} of ${e.gaps.length} notes on ${e.path}, so a gap lost its statement`);
+      continue;
+    }
+    // None of its notes: either its prose is not on the page, or the gaps went silent in prose that is.
+    const text = normalize(visibleText(body));
+    const sentences = normalize(toPlainText(e.body))
+      .split(/(?<=[.!?])\s+/)
+      .filter((s) => s.length >= 40 && !s.includes(PENDING_TOKEN));
+    const onPage = sentences.filter((s) => text.includes(s)).length;
+    if (onPage >= Math.max(2, Math.ceil(sentences.length / 3))) {
+      bad.push(`${e.id}: its prose is on ${e.path} (${onPage}/${sentences.length} sentences) and none of its ${e.gaps.length} notes are`);
+    } else absent.push(`${e.id} (${e.gaps.length}, prose not on ${e.path})`);
+  }
+  if (shown === 0) bad.push("no third-person note renders on any route: the notes were deleted, not shown");
+
   report(
-    "17. Pending marks: third person on buyer routes, inline on builder routes, register on /now",
+    "17. Open questions: one third-person note per gap, no owner-facing mark on any route",
     bad.length === 0,
     bad.length
       ? bad.join(" | ")
-      : `${BUYER_ROUTES.length} buyer routes clean · ${stillInline.length} builder routes keep theirs · /now lists ${items} open items`,
+      : `${withGaps.length} entries carry ${withGaps.reduce((n, e) => n + e.gaps.length, 0)} gaps, each with its note · ` +
+          `${shown} notes render on their own routes · 0 owner-facing marks across ${pages.length} routes` +
+          (absent.length ? ` · NOT RENDERED ANYWHERE: ${absent.join(", ")}` : ""),
   );
 }
 
@@ -1125,7 +1207,7 @@ checkRobots(robots);
 checkHeadings(pages);
 checkDisplayNumerals();
 checkTitleStutter(pages);
-checkPendingPlacement(pages);
+await checkOpenQuestions(pages);
 
 console.log("─".repeat(72));
 const passed = results.filter((r) => r.state === "PASS").length;

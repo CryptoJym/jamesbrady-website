@@ -19,6 +19,11 @@
   --glass: #cfe0d6;
   --heat: #ffb45c;
   --strike: #dde6ff;
+  /* Named so no colour lives outside :root (npm run verify:tokens). --bead is the glass bead on the specimen, painted in
+     WebGL: components/specimen/Specimen.tsx repeats the value and the gate pins it here. --shade is the method sheet's
+     shadow on phones. */
+  --bead: #eef4ec;
+  --shade: rgb(0 0 0 / 0.5);
   --f-voice: var(--font-voice), "Iowan Old Style", Georgia, serif;
   --f-narr: var(--font-narr), "Helvetica Neue", Arial, sans-serif;
   --f-rec: var(--font-rec), ui-monospace, "SF Mono", Menlo, monospace;
@@ -63,7 +68,7 @@ body.fg ::selection { background: color-mix(in srgb, var(--heat) 35%, transparen
 .fg-fig:hover .fg-fig__m, .fg-fig:focus .fg-fig__m { display: block; }
 @media (max-width: 720px) {
   /* On a phone the method opens as a small sheet at the bottom of the screen, never off its edge. */
-  .fg-fig:hover .fg-fig__m, .fg-fig:focus .fg-fig__m { position: fixed; left: 16px; right: 16px; top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); width: auto; z-index: 60; box-shadow: 0 10px 40px rgb(0 0 0 / 0.5); }
+  .fg-fig:hover .fg-fig__m, .fg-fig:focus .fg-fig__m { position: fixed; left: 16px; right: 16px; top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); width: auto; z-index: 60; box-shadow: 0 10px 40px var(--shade); }
 }
 .fg-live { color: var(--heat); }
 

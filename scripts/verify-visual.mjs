@@ -41,11 +41,55 @@
 // this wave they are built from the same components as every other route, so
 // the leak the gate watched for cannot single them out. No other gate is
 // weakened by this change.
+//
+// FULGURITE — 2026-09-27. The accepted design replaced Direction B, and every
+// selector this file read (.mf, .readout, .rail, .hero__copy, .tally, .doors,
+// .visit__*, .b-room, .dock) went with it. Each check below keeps its purpose
+// and now reads the Fulgurite page:
+//
+//   the manifold animates         → the specimen animates (stage pixels, 1s)
+//   readout === collection values → the home figures === the history snapshot
+//                                   and threads.ts, read here from source
+//   punch list 9/10, inline method → every figure carries its method, and the
+//                                   method opens on focus
+//   hero explains James            → h1 "James Brady · Lehi, Utah", his hero
+//                                   quote verbatim from lib/words, the CTA row
+//   counts never animate           → .fg-fig, .fg-tip__n, .fga-readout__n
+//   pending marks, three places    → James's 2026-09-27 ruling: every open
+//                                   question is a visible third-person note, and
+//                                   no page shows the owner-facing mark
+//   door row, 4 across / 2x2       → four doors, each a link naming where it
+//                                   goes, filling whole rows at 1440 and at 375
+//   work cards link to the repo    → a label that prints a repository URL links
+//                                   to exactly that URL
+//   archives: band, outline, chrome → the same, on the Fulgurite chrome, and no
+//                                   gold or Direction B colour painted
+//   dock clear space (375)         → the fixed chrome rule it enforced, applied
+//                                   to the chrome that is fixed now: the header
+//                                   covers no page's h1; on a phone the specimen
+//                                   window sits above the text, never over it
+//   reduced motion, static SVG     → the specimen stands still, the strike never
+//                                   runs
+//   no-JS static SVG               → the design's own fallback tier: with no
+//                                   WebGL the Blender poster stands in; with no
+//                                   JS the whole page is in the server response
+//
+// RETIRED, because the design no longer has the thing they measured:
+//   · the /work filter recount (the CSS-counter tally): /work is now a tray of
+//     labelled threads with no filter. Its counts are figures with methods and
+//     are covered by the figure checks above;
+//   · the "This visit" plate (issue 13): components/site/ThisVisit.tsx is not
+//     mounted by any route;
+//   · the /now open-items register: retired by the 2026-09-27 ruling.
+// The star count beside a work card went with the card: Fulgurite labels carry
+// no star count, so there is nothing for that half of the check to read.
 
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { chromium } from "playwright";
+
+import { importTs } from "./lib/ts-register.mjs";
 
 const arg = (flag) =>
   process.argv.includes(flag) ? process.argv[process.argv.indexOf(flag) + 1] : null;
@@ -60,13 +104,24 @@ const OUT = UPDATE_EVIDENCE
 mkdirSync(OUT, { recursive: true });
 
 /**
- * The dated archives: same URLs, Direction B skin as of wave 4.
+ * The dated archives: same URLs, Direction B skin as of wave 4, Fulgurite as of
+ * 2026-09-27.
  *
- * They are checked here the way every other Direction B route is checked, not
- * against a previous build. See the retirement note at the top of this file.
+ * They are checked here the way every other route is checked, not against a
+ * previous build. See the retirement note at the top of this file.
  */
 // /watch left on 2026-09-27: it redirects permanently to /learn (next.config.ts).
 const ARCHIVE_ROUTES = ["/primer", "/manuscript", "/workshop"];
+
+/** Retired palettes, as computed style prints them: the old gold, and Direction B's signal and base. */
+const RETIRED_COLOURS = ["212, 168, 83", "63, 217, 160", "10, 14, 17"];
+
+/** The history the home page is grown from, read from source, not from the page. */
+const SNAPSHOT = JSON.parse(
+  readFileSync(join(process.cwd(), "content", "history", "history.snapshot.json"), "utf8"),
+);
+const { threads } = await importTs("content/history/threads.ts");
+const { heroQuote } = await importTs("lib/words.ts");
 
 let failed = 0;
 const report = (name, ok, detail) => {
@@ -76,219 +131,209 @@ const report = (name, ok, detail) => {
 
 const browser = await chromium.launch();
 
+/** The WebGL canvas has taken over from the poster: it drew its first frame. */
+const specimenLive = (p) =>
+  p.waitForFunction(
+    () => {
+      const stage = document.querySelector(".fg-stage");
+      return Boolean(stage?.querySelector("canvas") && !stage.querySelector("img"));
+    },
+    { timeout: 30_000 },
+  );
+
+/** The stage's box, cut to the viewport. */
+const stageClip = async (p) => {
+  const box = await p.locator(".fg-stage").boundingBox();
+  const vh = p.viewportSize().height;
+  return { x: box.x, y: box.y, width: box.width, height: Math.min(box.height, vh - box.y) };
+};
+
+/** Pixels that differ by more than a rounding step between two PNG screenshots. */
+const pixelDiff = (p, a, b) =>
+  p.evaluate(
+    async ([a64, b64]) => {
+      const load = (src) =>
+        new Promise((res) => {
+          const img = new Image();
+          img.onload = () => res(img);
+          img.src = `data:image/png;base64,${src}`;
+        });
+      const [ia, ib] = await Promise.all([load(a64), load(b64)]);
+      const c = document.createElement("canvas");
+      c.width = ia.width;
+      c.height = ia.height;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(ia, 0, 0);
+      const da = ctx.getImageData(0, 0, c.width, c.height).data;
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.drawImage(ib, 0, 0);
+      const db = ctx.getImageData(0, 0, c.width, c.height).data;
+      let n = 0;
+      for (let i = 0; i < da.length; i += 4) {
+        if (Math.abs(da[i] - db[i]) + Math.abs(da[i + 1] - db[i + 1]) + Math.abs(da[i + 2] - db[i + 2]) > 12) n++;
+      }
+      return { changed: n, total: da.length / 4 };
+    },
+    [a.toString("base64"), b.toString("base64")],
+  );
+
+const overflowOf = (p) =>
+  p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+/** The fixed header's bottom edge against the page's h1 at load. */
+const headerVsH1 = (p) =>
+  p.evaluate(() => {
+    const head = document.querySelector(".fg-head")?.getBoundingClientRect();
+    const h1 = document.querySelector("h1")?.getBoundingClientRect();
+    return { headBottom: head?.bottom ?? null, h1Top: h1?.top ?? null };
+  });
+
+/** Four doors that fill whole rows: equal widths, and every row the same length. */
+const doorGrid = (p) =>
+  p.evaluate(() =>
+    [...document.querySelectorAll(".fg-doors__grid .fg-door")].map((d) => {
+      const r = d.getBoundingClientRect();
+      return {
+        href: d.getAttribute("href"),
+        title: d.querySelector("h3")?.textContent?.trim(),
+        go: d.querySelector(".fg-door__go")?.textContent?.trim(),
+        top: Math.round(r.top),
+        width: Math.round(r.width),
+      };
+    }),
+  );
+const rowsOf = (doors) => {
+  const rows = new Map();
+  for (const d of doors) rows.set(d.top, (rows.get(d.top) ?? 0) + 1);
+  return [...rows.values()];
+};
+
 /* ------------------------------------------------ 1440: the full home page */
 
 const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const page = await desktop.newPage();
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await specimenLive(page);
+await page.waitForTimeout(400);
 
-// The canvas takes over from the SVG only once it has drawn real ink.
-await page.waitForFunction(() => document.querySelector(".mf")?.classList.contains("is-live"), {
-  timeout: 10_000,
-});
-
-const grabCanvas = () =>
-  page.evaluate(() => {
-    const cv = document.querySelector("canvas.mf-c");
-    return cv.toDataURL("image/png");
-  });
-
-const frameA = await grabCanvas();
-await page.waitForTimeout(900);
-const frameB = await grabCanvas();
-
-const diffPixels = await page.evaluate(
-  async ([a, b]) => {
-    const load = (src) =>
-      new Promise((res) => {
-        const img = new Image();
-        img.onload = () => res(img);
-        img.src = src;
-      });
-    const [ia, ib] = await Promise.all([load(a), load(b)]);
-    const c = document.createElement("canvas");
-    c.width = ia.width;
-    c.height = ia.height;
-    const ctx = c.getContext("2d");
-    ctx.drawImage(ia, 0, 0);
-    const da = ctx.getImageData(0, 0, c.width, c.height).data;
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.drawImage(ib, 0, 0);
-    const db = ctx.getImageData(0, 0, c.width, c.height).data;
-    let n = 0;
-    for (let i = 0; i < da.length; i += 4) {
-      if (Math.abs(da[i] - db[i]) + Math.abs(da[i + 1] - db[i + 1]) + Math.abs(da[i + 2] - db[i + 2]) > 12) n++;
-    }
-    return { changed: n, total: da.length / 4 };
-  },
-  [frameA, frameB],
-);
-const pct = ((diffPixels.changed / diffPixels.total) * 100).toFixed(2);
+const clip1440 = await stageClip(page);
+const frameA = await page.screenshot({ clip: clip1440 });
+await page.waitForTimeout(1000);
+const frameB = await page.screenshot({ clip: clip1440 });
+const motion = await pixelDiff(page, frameA, frameB);
 report(
-  "Manifold tier-2 canvas animates (pixel diff over 900ms)",
-  diffPixels.changed > 1000,
-  `${diffPixels.changed} of ${diffPixels.total} px changed (${pct}%)`,
+  "The specimen animates (stage pixel diff over 1s)",
+  motion.changed > 1000,
+  `${motion.changed} of ${motion.total} px changed (${((motion.changed / motion.total) * 100).toFixed(2)}%)`,
 );
 
-// Readout values, read off the rendered page.
-const readout = await page.evaluate(() =>
-  [...document.querySelectorAll(".readout li")].map((li) => ({
-    key: li.querySelector(".k")?.textContent?.trim(),
-    value: li.querySelector(".v")?.textContent?.trim(),
-    sub: li.querySelector(".sub")?.textContent?.trim() ?? "",
+// Figures, read off the rendered page — and the same values read from the
+// history snapshot and threads.ts on disk, so the page is not checking itself.
+const shownFigures = await page.evaluate(() => ({
+  hero: document.querySelector(".fg-lede .fg-fig")?.innerText.trim(),
+  tip: [...document.querySelectorAll(".fg-tip__cell")].map((c) => ({
+    k: c.querySelector(".fg-tip__k")?.textContent?.trim() ?? "",
+    n: c.querySelector(".fg-tip__n")?.innerText.trim() ?? "",
   })),
-);
-const railText = await page.evaluate(() => document.querySelector(".rail")?.innerText.replace(/\s+/g, " "));
-
-// The same values, derived independently from the JSON artifacts the build
-// produced — so the comparison is not the page checking itself.
-const manifest = await (await fetch(`${BASE}/.well-known/ai-manifest.json`)).json();
-const counts = Object.fromEntries(manifest.collections.map((c) => [c.name, c.count]));
-
-const expected = {
-  "Systems listed": String(counts.work).padStart(2, "0"),
-  Theories: String(counts.theories).padStart(2, "0"),
-};
-const mismatches = readout
-  .filter((r) => expected[r.key] !== undefined && r.value !== expected[r.key])
-  .map((r) => `${r.key}: page ${r.value} vs source ${expected[r.key]}`);
+}));
+const tipValue = (label) => shownFigures.tip.find((t) => t.k.startsWith(label))?.n;
+const plimsollReleases = [...(SNAPSHOT.releases["CryptoJym/plimsoll"] ?? [])].sort((a, b) => a.date.localeCompare(b.date));
+const expectedFigures = [
+  ["merged in public, all time", shownFigures.hero, SNAPSHOT.totals.mergedPublicAll.toLocaleString("en-US")],
+  ["merged in the last thirty days", tipValue("in the last thirty"), SNAPSHOT.totals.mergedPublic30d.toLocaleString("en-US")],
+  ["latest Plimsoll release", tipValue("latest Plimsoll release"), plimsollReleases.at(-1)?.tag],
+  ["threads still growing", tipValue("threads still growing"), String(threads.filter((t) => t.status === "active").length)],
+];
+const figureMismatches = expectedFigures.filter(([, shown, source]) => !source || shown !== source);
 report(
-  "Readout numbers === collection-derived values",
-  mismatches.length === 0,
-  mismatches.length
-    ? mismatches.join(" | ")
-    : readout.map((r) => `${r.key}=${r.value}`).join(" · "),
-);
-report(
-  "Console rail count === work.length",
-  railText.includes(`${counts.work} SYSTEMS TRACKED`),
-  railText.trim(),
+  "Home figures === the record they are computed from (history snapshot, threads.ts)",
+  figureMismatches.length === 0,
+  figureMismatches.length
+    ? figureMismatches.map(([k, shown, source]) => `${k}: page ${shown} vs source ${source}`).join(" | ")
+    : expectedFigures.map(([k, shown]) => `${k}=${shown}`).join(" · "),
 );
 
-// Public-repo count must be checkable: the sub line names the repos.
-const repoRow = readout.find((r) => r.key === "Public repos");
-report(
-  "Public-repo count is checkable inline (punch list 9)",
-  repoRow && repoRow.sub.split("·").length === Number(repoRow.value),
-  `${repoRow?.value} → "${repoRow?.sub}"`,
+// Every number carries its method, and the method opens on focus (the design's
+// "method one tap away"; punch lists 9 and 10 asked the same of the readout).
+const figures = await page.evaluate(() =>
+  [...document.querySelectorAll(".fg-fig")].map((f) => {
+    const m = f.querySelector(".fg-fig__m")?.textContent?.trim() ?? "";
+    return { m, labelled: Boolean(m) && (f.getAttribute("aria-label") ?? "").endsWith(`Method: ${m}`), focusable: f.tabIndex === 0 };
+  }),
 );
-const starRow = readout.find((r) => r.key === "Outside stars");
-report(
-  "Outside-stars method stated inline (punch list 10)",
-  Boolean(starRow && /summed across/i.test(starRow.sub)),
-  starRow?.sub,
+await page.focus(".fg-lede .fg-fig");
+const methodOpens = await page.evaluate(
+  () => getComputedStyle(document.querySelector(".fg-lede .fg-fig .fg-fig__m")).display !== "none",
 );
-
-const heroCopy = await page.locator(".hero__copy").innerText();
-const frontDoorTerms = ["get found", "build a system", "screen hires", "read the code"];
+await page.evaluate(() => document.activeElement?.blur());
 report(
-  "Homepage explains James, both shops, and the four starting points",
-  heroCopy.includes("James Brady builds AI systems") &&
-    heroCopy.includes("James operates Utlyze and New Reward") &&
-    frontDoorTerms.every((term) => heroCopy.toLowerCase().includes(term)),
-  heroCopy.replace(/\s+/g, " ").trim(),
+  "Every home figure states its method, and the method opens on focus",
+  figures.length > 0 && figures.every((f) => f.m && f.labelled && f.focusable) && methodOpens,
+  `${figures.length} figures · ${figures.filter((f) => f.m && f.labelled && f.focusable).length} with a method in text and in the label · opens on focus: ${methodOpens}`,
 );
 
-// The CSS-counter tally: it must recount from what is DISPLAYED.
-//
-// getComputedStyle() will not resolve counter() in generated content, and the
-// accessibility tree does not expose it either, so the numeral is proved the
-// only way it can be: by cropping the rendered element and showing its pixels
-// change in lockstep with the number of displayed cards. That is the whole
-// point of the mechanism — the count is whatever is on screen, by construction.
-await page.goto(`${BASE}/work`, { waitUntil: "networkidle" });
+const hero = await page.evaluate(() => ({
+  h1: document.querySelector("h1")?.textContent?.trim(),
+  firstHeading: document.querySelector("h1,h2,h3")?.tagName,
+  quote: document.querySelector(".fg-surface #hero q")?.textContent?.replace(/\s+/g, " ").trim(),
+  attribution: document.querySelector(".fg-surface .fg-attrib")?.textContent?.trim() ?? "",
+  cta: [...document.querySelectorAll(".fg-surface .fg-cta-row a")].map((a) => a.getAttribute("href")),
+  descent: Boolean(document.getElementById("descent")),
+  stageLabel: document.querySelector(".fg-stage")?.getAttribute("aria-label") ?? "",
+}));
+report(
+  "Home says who and where: the h1, his hero quote verbatim, the CTA row, the stage described",
+  hero.h1 === "James Brady · Lehi, Utah" &&
+    hero.firstHeading === "H1" &&
+    hero.quote === heroQuote.text.replace(/\s+/g, " ").trim() &&
+    hero.attribution.includes(heroQuote.context) &&
+    hero.cta.join(" ") === "#descent /work-with-me" &&
+    hero.descent &&
+    hero.stageLabel.length > 0,
+  `h1 "${hero.h1}" · quote "${hero.quote}" · ${hero.attribution} · CTA ${hero.cta.join(", ")} · stage "${hero.stageLabel}"`,
+);
 
-const tallyState = async () =>
-  page.evaluate(() => {
-    const cards = [...document.querySelectorAll(".work .card")];
+// Counts never animate.
+const countSelectors = ".fg-fig, .fg-tip__n, .fga-readout__n, .fga-delta__v";
+let countsSeen = 0;
+let countsMoving = [];
+for (const path of ["/", "/work", "/work/plimsoll", "/manuscript"]) {
+  await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+  const r = await page.evaluate((sel) => {
+    const els = [...document.querySelectorAll(sel)];
     return {
-      filter: getComputedStyle(document.querySelector(".tally .fname"), "::after")
-        .content.replace(/"/g, ""),
-      visible: cards.filter((c) => getComputedStyle(c).display !== "none").length,
+      n: els.length,
+      moving: els.filter((el) => {
+        const s = getComputedStyle(el);
+        return s.animationName !== "none" || s.transitionDuration !== "0s";
+      }).length,
     };
-  });
-
-// Independently derived from the data-cat attributes in the markup, which come
-// from the content source down a different path than the CSS counter.
-const expectedByCat = await page.evaluate(() => {
-  const out = { all: 0 };
-  for (const c of document.querySelectorAll(".work .card")) {
-    out.all++;
-    for (const t of (c.dataset.cat ?? "").split(/\s+/).filter(Boolean))
-      out[t] = (out[t] ?? 0) + 1;
-  }
-  return out;
-});
-
-const shot = async () => (await page.locator(".tally .n").screenshot()).toString("base64");
-
-const steps = [];
-let tallyOk = true;
-const seen = new Map();
-
-for (const [id, cat] of [
-  ["wf-all", "all"],
-  ["wf-prod", "prod"],
-  ["wf-oss", "oss"],
-  ["wf-client", "client"],
-  ["wf-exp", "exp"],
-]) {
-  await page.click(`label[for="${id}"]`);
-  await page.waitForTimeout(150);
-  const t = await tallyState();
-  const img = await shot();
-  steps.push(`${cat}:${t.visible}(${t.filter})`);
-  if (t.visible !== expectedByCat[cat]) tallyOk = false;
-  seen.set(cat, { count: t.visible, img });
+  }, countSelectors);
+  countsSeen += r.n;
+  if (r.moving) countsMoving.push(`${path}: ${r.moving}`);
 }
-
-// Distinct counts must render distinct pixels; equal counts must render equal
-// pixels. Both directions, so a frozen numeral cannot pass.
-for (const [a, va] of seen) {
-  for (const [b, vb] of seen) {
-    if (a === b) continue;
-    const sameCount = va.count === vb.count;
-    const samePixels = va.img === vb.img;
-    if (sameCount !== samePixels) {
-      tallyOk = false;
-      steps.push(`MISMATCH ${a}(${va.count}) vs ${b}(${vb.count}): pixels ${samePixels ? "same" : "differ"}`);
-    }
-  }
-}
-await page.click('label[for="wf-all"]');
 report(
-  "Filter mechanism recounts (rendered CSS counter tracks displayed cards)",
-  tallyOk,
-  `${steps.join(" ")} · expected ${JSON.stringify(expectedByCat)}`,
+  "Counts never animate",
+  countsSeen > 0 && countsMoving.length === 0,
+  countsMoving.length ? countsMoving.join(" | ") : `${countsSeen} counts on 4 routes, none animated or transitioned`,
 );
-
-// Counts must never animate.
-const noAnim = await page.evaluate(() =>
-  [".slot__val", ".readout .v", ".tally .n"].every((sel) =>
-    [...document.querySelectorAll(sel)].every((el) => {
-      const s = getComputedStyle(el);
-      return s.animationName === "none" && s.transitionDuration === "0s";
-    }),
-  ),
-);
-report("Counts never animate", noAnim);
 
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await page.waitForFunction(() => document.querySelector(".mf")?.classList.contains("is-live"), {
-  timeout: 10_000,
-});
+await specimenLive(page);
 await page.waitForTimeout(500);
 await page.screenshot({ path: join(OUT, "home-1440-hero.png") });
 await page.screenshot({ path: join(OUT, "home-1440-full.png"), fullPage: true });
 
 // No horizontal overflow at desktop.
-const overflow1440 = await page.evaluate(
-  () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-);
+const overflow1440 = await overflowOf(page);
 report("No horizontal overflow at 1440", overflow1440 <= 0, `${overflow1440}px`);
 
 /* ---------------------------------------------------------- inner surfaces */
 
+// The fixed header must never sit on a page's h1: the fixed-chrome rule the
+// Direction B dock answered at the foot of the page, on the chrome that is
+// fixed now.
+const underHeader = [];
 for (const [path, file] of [
   ["/work-with-me", "work-with-me-1440.png"],
   ["/work-with-me/get-found", "offer-get-found-1440.png"],
@@ -298,6 +343,7 @@ for (const [path, file] of [
   ["/work/plimsoll", "work-plimsoll-1440.png"],
   ["/theories", "theories-1440.png"],
   ["/theories/latent-emotions", "theory-latent-emotions-1440.png"],
+  ["/words", "words-1440.png"],
   ["/about", "about-1440.png"],
   ["/contact", "contact-1440.png"],
   ["/now", "now-1440.png"],
@@ -305,199 +351,92 @@ for (const [path, file] of [
   ["/learn", "learn-1440.png"],
 ]) {
   await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+  const { headBottom, h1Top } = await headerVsH1(page);
+  if (headBottom === null || h1Top === null || h1Top < headBottom) underHeader.push(`${path}: h1 at ${h1Top}, header to ${headBottom}`);
   await page.screenshot({ path: join(OUT, file), fullPage: true });
 }
-
-// PENDING-MARK PLACEMENT (wave 3). The gaps must still be VISIBLE — the
-// original assertion — and they must now be visible in the right voice on the
-// right page. A buyer page shows the absence in the third person; a builder
-// page keeps the owner-facing question; /now carries the whole register.
-await page.goto(`${BASE}/about`, { waitUntil: "networkidle" });
-const aboutPending = await page.evaluate(() => ({
-  secondPerson: document.querySelectorAll("mark.pending").length,
-  notes: [...document.querySelectorAll(".pending-note")].map(
-    (n) => getComputedStyle(n).display,
-  ),
-}));
 report(
-  "Buyer page /about: absences stated in the third person, and visible",
-  aboutPending.secondPerson === 0 &&
-    aboutPending.notes.length > 0 &&
-    aboutPending.notes.every((d) => d !== "none"),
-  `${aboutPending.secondPerson} owner-facing marks · ${aboutPending.notes.length} third-person notes`,
+  "The fixed header covers no page's h1 at 1440 (14 inner routes)",
+  underHeader.length === 0,
+  underHeader.length ? underHeader.join(" | ") : "every h1 starts below the header",
 );
 
-await page.goto(`${BASE}/theories/architect-loop`, { waitUntil: "networkidle" });
-const builderPending = await page.evaluate(() =>
-  [...document.querySelectorAll("mark.pending")].map((m) => getComputedStyle(m).display),
-);
-report(
-  "Builder page keeps its inline questions, rendered visibly",
-  builderPending.length > 0 && builderPending.every((d) => d !== "none"),
-  `${builderPending.length} marks on /theories/architect-loop`,
-);
-
-await page.goto(`${BASE}/now`, { waitUntil: "networkidle" });
-const openItems = await page.evaluate(() => {
-  const block = document.querySelector("#open-items");
-  return {
-    present: Boolean(block),
-    count: document.querySelectorAll(".open-items__q").length,
-    visible: block ? getComputedStyle(block).display !== "none" : false,
-  };
-});
-report(
-  "/now carries the consolidated Open items register",
-  openItems.present && openItems.visible && openItems.count > 0,
-  `${openItems.count} open items listed`,
-);
-await page.screenshot({ path: join(OUT, "now-open-items-1440.png"), fullPage: true });
-
-// The homepage door row: four doors from wave 3b, each a real link, each
-// naming a visitor. The count is asserted rather than described, because the
-// row's whole job is that a reader sees every way in; a door that silently
-// stopped rendering would leave the page looking finished.
-//
-// The row must also BE a row: four cells on one line at 1440. A door that
-// wrapped onto a second line under a three-across rule would still pass a
-// count check and would look like a mistake.
-await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-const doors = await page.evaluate(() =>
-  [...document.querySelectorAll(".doors .door")].map((d) => ({
-    href: d.getAttribute("href"),
-    label: d.querySelector(".door__label")?.textContent?.trim(),
-    who: d.querySelector(".door__who")?.textContent?.trim(),
-    top: Math.round(d.getBoundingClientRect().top),
-  })),
-);
-report(
-  "Homepage sorts visitors: four doors, each a link that names who it is for",
-  doors.length === 4 && doors.every((d) => d.href && d.label && d.who),
-  doors.map((d) => `${d.label} → ${d.href}`).join(" · "),
-);
-const doorRows1440 = new Set(doors.map((d) => d.top)).size;
-report(
-  "Door row is one row at 1440",
-  doorRows1440 === 1,
-  `${doors.length} doors across ${doorRows1440} row(s)`,
-);
-await page.screenshot({ path: join(OUT, "home-1440-doors.png") });
-
-/* ---------------------------------------------- THIS VISIT PLATE (issue 13)
-   A stranger picks one of the four doors; the plate lists that door's
-   inspectable pages, names each page actually opened from this-tab
-   sessionStorage, computes the opened count from that set (never typed,
-   never animated), locks nothing behind the set, and — only when every
-   listed page has been opened — offers exactly the enquiry written on
-   that door. Every step below is exercised in one fresh tab. */
-
-const visitCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-const vpage = await visitCtx.newPage();
-await vpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
-report(
-  "This visit: idle before any door is picked",
-  await vpage.locator(".visit__idle").isVisible(),
-);
-
-// Pick the Build-a-system door, come back, read the plate.
-await vpage.click('.doors .door[href="/work-with-me/build-a-system"]');
-await vpage.waitForURL("**/work-with-me/build-a-system");
-await vpage.goBack();
-await vpage.locator(".visit__tally").waitFor();
-
-const plateRows = async () =>
-  vpage.evaluate(() =>
-    [...document.querySelectorAll(".visit__list li")].map((li) => ({
-      href: li.querySelector("a")?.getAttribute("href"),
-      state: li.querySelector("span")?.textContent?.trim(),
-    })),
-  );
-
-let rows = await plateRows();
-// textContent, not innerText: the furniture CSS uppercases the tally, and the
-// assertion is about the characters the site computed, not their styling.
-const tallyText = () =>
-  vpage.evaluate(() => document.querySelector(".visit__tally")?.textContent?.trim());
-const t0 = await tallyText();
-// The door's own page IS one of its inspectable pages, and this tab just
-// opened it — so the set starts at 1, not 0. The count must say exactly that.
-const openedOf = (rs) => rs.filter((r) => r.state === "opened").length;
-report(
-  "This visit: plate lists the chosen door's pages as ordinary links",
-  rows.length === 3 &&
-    rows.every((r) => r.href?.startsWith("/")) &&
-    openedOf(rows) === 1 &&
-    t0 === `1 opened · ${rows.length} listed`,
-  `${rows.length} rows · "${t0}" · ${rows.map((r) => `${r.href}:${r.state}`).join(", ")}`,
-);
-
-// Open each remaining listed page in turn; the count must track the set,
-// step by step, never ahead of and never behind what was actually opened.
-for (let i = openedOf(rows); i < rows.length; i++) {
-  const next = rows.find((r) => r.state !== "opened");
-  const href = next.href;
-  await vpage.click(`.visit__list li a[href="${href}"]`);
-  await vpage.waitForURL(`**${href}`);
-  await vpage.goBack();
-  await vpage.locator(".visit__tally").waitFor();
-  rows = await plateRows();
-  const n = await tallyText();
-  report(
-    `This visit: opening a page names it and recounts (${href})`,
-    openedOf(rows) === i + 1 && n === `${i + 1} opened · ${rows.length} listed`,
-    `"${n}"`,
-  );
+// OPEN QUESTIONS (James, 2026-09-27): every one renders as its third-person
+// note. The gaps must still be VISIBLE — the original assertion — and no page
+// may show the owner-facing mark. Builder, buyer and hand-built pages, one each.
+const openQuestions = [];
+for (const path of ["/theories/architect-loop", "/work-with-me/background-screening", "/contact"]) {
+  await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+  const state = await page.evaluate(() => ({
+    marks: document.querySelectorAll("mark.pending, .pending__tag").length,
+    notes: [...document.querySelectorAll(".pending-note")].map((n) => {
+      const s = getComputedStyle(n);
+      const r = n.getBoundingClientRect();
+      return s.display !== "none" && s.visibility === "visible" && r.width > 0 && r.height > 0;
+    }),
+  }));
+  openQuestions.push({ path, ...state });
 }
-
-// All opened → ONLY the matching enquiry appears, the one written on the door.
-const ctaCount = await vpage.locator(".visit__pay .btn").count();
-const cta = vpage.locator(".visit__pay .btn");
-const ctaVisible = await cta.isVisible();
-const ctaHref = ctaVisible ? await cta.getAttribute("href") : null;
-const offerHtml = await (await fetch(`${BASE}/work-with-me/build-a-system`)).text();
-const offerInquiry = offerHtml.match(/\/contact\?inquiry=[a-z_-]+/)?.[0];
 report(
-  "This visit: complete plate offers only the door's own enquiry",
-  ctaVisible && ctaCount === 1 && ctaHref === offerInquiry,
-  `plate → ${ctaHref} · offer page writes ${offerInquiry ?? "NOTHING"}`,
+  "Open questions are visible third-person notes, and no page shows the owner-facing mark",
+  openQuestions.every((q) => q.marks === 0 && q.notes.length > 0 && q.notes.every(Boolean)),
+  openQuestions.map((q) => `${q.path}: ${q.notes.filter(Boolean).length}/${q.notes.length} notes visible, ${q.marks} marks`).join(" · "),
 );
+await page.screenshot({ path: join(OUT, "contact-open-question-1440.png"), fullPage: true });
 
-// The count element never animates.
-const visitNoAnim = await vpage.evaluate(() => {
-  const s = getComputedStyle(document.querySelector(".visit__tally"));
-  return s.animationName === "none" && s.transitionDuration === "0s";
-});
-report("This visit: the opened count never animates", visitNoAnim);
-await visitCtx.close();
+// The home page's doors: four, each a real link that says where it goes. The
+// count is asserted rather than described, because a door that silently
+// stopped rendering would leave the page looking finished — and the doors must
+// fill whole rows, because an orphan on a row of its own reads as a mistake.
+await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+const doors = await doorGrid(page);
+report(
+  "Home doors: four, each a link with a title and a destination",
+  doors.length === 4 && doors.every((d) => d.href && d.title && d.go),
+  doors.map((d) => `${d.title} → ${d.href}`).join(" · "),
+);
+const rows1440 = rowsOf(doors);
+report(
+  "Door grid fills whole rows at 1440, no door narrower than 240px",
+  doors.length === 4 &&
+    rows1440.every((n) => n === rows1440[0]) &&
+    Math.max(...doors.map((d) => d.width)) - Math.min(...doors.map((d) => d.width)) <= 1 &&
+    Math.min(...doors.map((d) => d.width)) >= 240,
+  `${doors.length} doors in rows of [${rows1440.join(", ")}] · widths ${[...new Set(doors.map((d) => d.width))].join("/")}px`,
+);
+await page.locator(".fg-doors").screenshot({ path: join(OUT, "home-1440-doors.png") });
 
+// A label that prints a repository URL goes to exactly that repository.
 await page.goto(`${BASE}/work`, { waitUntil: "networkidle" });
-const cardRepos = await page.evaluate(() =>
-  [...document.querySelectorAll(".work .card__repo a")].map((a) => ({
-    href: a.getAttribute("href"),
-    text: a.textContent.replace(/\s+/g, " ").trim(),
-  })),
+const repoLinks = await page.evaluate(() =>
+  [...document.querySelectorAll(".fg-label a, .fga-label a")]
+    .filter((a) => /^github\.com\//.test(a.textContent.trim()))
+    .map((a) => ({ href: a.getAttribute("href"), text: a.textContent.trim() })),
 );
+const misprinted = repoLinks.filter((r) => r.href !== `https://${r.text}`);
 report(
-  "Work cards link straight to the repository, with the star count beside it",
-  cardRepos.length > 0 &&
-    cardRepos.every((r) => r.href?.startsWith("https://github.com/") && /star/i.test(r.text)),
-  cardRepos.map((r) => r.text).join(" | "),
+  "Work labels link straight to the repository they print",
+  repoLinks.length > 0 && misprinted.length === 0,
+  misprinted.length
+    ? misprinted.map((r) => `"${r.text}" → ${r.href}`).join(" | ")
+    : `${repoLinks.length} repository labels, each linking to the URL it shows`,
 );
 
 /* ------------------------------------ THE DATED ARCHIVES, ON THE SYSTEM ---
    Wave 4. /primer, /manuscript, /workshop and /watch kept their URLs and moved
-   onto Direction B. The pixel-parity-against-main gate that used to live here
-   is retired — the reasoning is at the top of this file — and these are the
-   checks that replace it, the same ones every other Direction B route answers
-   to. They are ASSERTIONS, not screenshots: a screenshot proves a page
-   rendered, not that it rendered correctly. */
+   onto Direction B; on 2026-09-27 onto Fulgurite, and /watch now redirects.
+   The pixel-parity-against-main gate that used to live here is retired — the
+   reasoning is at the top of this file — and these are the checks that
+   replace it, the same ones every other route answers to. They are
+   ASSERTIONS, not screenshots: a screenshot proves a page rendered, not that
+   it rendered correctly. */
 
 const archiveFailures = [];
 const archiveDetail = [];
 for (const route of ARCHIVE_ROUTES) {
   await page.goto(`${BASE}${route}`, { waitUntil: "networkidle" });
   await page.waitForTimeout(400);
-  const state = await page.evaluate(() => {
+  const state = await page.evaluate((retired) => {
     const levels = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")].map((h) =>
       Number(h.tagName[1]),
     );
@@ -505,7 +444,7 @@ for (const route of ARCHIVE_ROUTES) {
     for (let i = 1; i < levels.length; i++) {
       if (levels[i] > levels[i - 1] + 1) skips++;
     }
-    const badge = document.querySelector(".archive .badge-archived");
+    const badge = document.querySelector(".fga-archive .fga-archive__tag");
     return {
       overflow:
         document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -514,25 +453,23 @@ for (const route of ARCHIVE_ROUTES) {
       // The band, and a REAL date in it. "Archived" with nothing after it is
       // the failure this asserts against, not the absence of the element.
       badge: badge?.textContent?.trim() ?? "",
-      // The chrome the reskin exists to deliver: one nav, one console rail,
-      // one footer, the grain, and the Ask dock. A route that renders on
-      // Direction B but mounts none of it is the old defect in a new palette.
+      // The chrome the reskin exists to deliver: the fixed header with the
+      // mark linking home, the navigation, the footer and the main landmark.
+      // A route that renders but mounts none of it is the old defect again.
       chrome: Boolean(
-        document.querySelector(".b-room") &&
-          document.querySelector(".rail") &&
-          document.querySelector(".nav .mark") &&
-          document.querySelector(".b-foot") &&
-          document.querySelector(".dock"),
+        document.querySelector('.fg-head .fg-wordmark[href="/"]') &&
+          document.querySelector(".fg-head .fg-nav") &&
+          document.querySelector(".fg-foot") &&
+          document.querySelector("main#main"),
       ),
-      // No colour from the retired palette survives anywhere on the page.
-      gold: [...document.querySelectorAll("*")].some((el) => {
+      // No colour from a retired palette survives anywhere on the page.
+      retired: [...document.querySelectorAll("*")].some((el) => {
         const s = getComputedStyle(el);
-        return `${s.color}${s.backgroundColor}${s.borderTopColor}`.includes(
-          "212, 168, 83",
-        );
+        const paint = `${s.color}${s.backgroundColor}${s.borderTopColor}${s.borderLeftColor}`;
+        return retired.some((c) => paint.includes(c));
       }),
     };
-  });
+  }, RETIRED_COLOURS);
 
   const problems = [];
   if (state.overflow > 0) problems.push(`${state.overflow}px of horizontal overflow`);
@@ -540,8 +477,8 @@ for (const route of ARCHIVE_ROUTES) {
   if (state.skips > 0) problems.push(`${state.skips} skipped heading level(s)`);
   if (!/^Archived \d{4}-\d{2}-\d{2}$/.test(state.badge))
     problems.push(`archive band reads "${state.badge}", expected a dated badge`);
-  if (!state.chrome) problems.push("Direction B chrome is not mounted");
-  if (state.gold) problems.push("a retired-palette colour is still painted");
+  if (!state.chrome) problems.push("the Fulgurite chrome is not mounted");
+  if (state.retired) problems.push("a retired-palette colour is still painted");
 
   if (problems.length) archiveFailures.push(`${route}: ${problems.join("; ")}`);
   else archiveDetail.push(`${route}:${state.badge.toLowerCase().replace(" ", "=")}`);
@@ -552,7 +489,7 @@ for (const route of ARCHIVE_ROUTES) {
   });
 }
 report(
-  `Dated archives on the design system (${ARCHIVE_ROUTES.length} routes: no overflow, one h1, no level skip, dated band, chrome mounted)`,
+  `Dated archives on the design system (${ARCHIVE_ROUTES.length} routes: no overflow, one h1, no level skip, dated band, chrome mounted, no retired colour)`,
   archiveFailures.length === 0,
   archiveFailures.length ? archiveFailures.join(" | ") : archiveDetail.join(" · "),
 );
@@ -567,57 +504,68 @@ const mobile = await browser.newContext({
 });
 const mpage = await mobile.newPage();
 await mpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await specimenLive(mpage);
 await mpage.waitForTimeout(600);
-const overflow375 = await mpage.evaluate(
-  () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-);
+const overflow375 = await overflowOf(mpage);
 report("No horizontal overflow at 375", overflow375 <= 0, `${overflow375}px`);
 
-// The dock must never overlap the page's own content at any width.
-const dockClear = await mpage.evaluate(() => {
-  const dock = document.querySelector(".dock").getBoundingClientRect();
-  const foot = document.querySelector(".b-foot");
-  const reserve = parseFloat(getComputedStyle(foot).paddingBottom);
-  const tally = document.querySelector(".tally")?.getBoundingClientRect();
-  return { dockH: dock.height, reserve, tallyExists: Boolean(tally) };
+// On a phone the specimen is a window at the top that descends with the
+// reader. It must stick, and the text must start below it, never under it.
+const window375 = await mpage.evaluate(() => {
+  const stage = document.querySelector(".fg-stage");
+  const r = stage.getBoundingClientRect();
+  return {
+    position: getComputedStyle(stage).position,
+    bottom: Math.round(r.bottom),
+    height: Math.round(r.height),
+    h1Top: Math.round(document.querySelector("h1").getBoundingClientRect().top),
+    vh: window.innerHeight,
+  };
 });
 report(
-  "Footer reserves the dock's clear space (96px)",
-  dockClear.reserve >= 96,
-  `padding-bottom ${dockClear.reserve}px vs dock ${dockClear.dockH}px`,
+  "At 375 the specimen is a sticky window above the text, and the h1 starts below it",
+  window375.position === "sticky" && window375.h1Top >= window375.bottom && window375.height < window375.vh * 0.6,
+  `${window375.position}, ${window375.height}px of ${window375.vh}px · stage ends ${window375.bottom}px · h1 at ${window375.h1Top}px`,
 );
 await mpage.screenshot({ path: join(OUT, "home-375-hero.png") });
 await mpage.screenshot({ path: join(OUT, "home-375-full.png"), fullPage: true });
 
 // The wave-3 surfaces at 375, and the overflow assertion on each of them. A
-// four-across door row and a three-across offer grid are exactly the shapes
-// that break a phone, so they are measured rather than eyeballed.
+// door grid and an offer grid are exactly the shapes that break a phone, so
+// they are measured rather than eyeballed.
 const narrowOverflow = [];
+const narrowUnderHeader = [];
 const NARROW_ROUTES = [
   ["/work-with-me", "work-with-me-375.png"],
   ["/work-with-me/get-found", "offer-get-found-375.png"],
   ["/work-with-me/build-a-system", "offer-build-a-system-375.png"],
   ["/work-with-me/background-screening", "offer-background-screening-375.png"],
   ["/now", "now-375.png"],
+  ["/words", "words-375.png"],
 ];
 for (const [path, file] of NARROW_ROUTES) {
   await mpage.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
   await mpage.waitForTimeout(300);
-  const over = await mpage.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  );
+  const over = await overflowOf(mpage);
   if (over > 0) narrowOverflow.push(`${path}: ${over}px`);
+  const { headBottom, h1Top } = await headerVsH1(mpage);
+  if (headBottom === null || h1Top === null || h1Top < headBottom) narrowUnderHeader.push(`${path}: h1 at ${h1Top}, header to ${headBottom}`);
   await mpage.screenshot({ path: join(OUT, file), fullPage: true });
 }
 report(
-  "No horizontal overflow at 375 on the wave-3 routes",
+  "No horizontal overflow at 375 on the wave-3 routes and /words",
   narrowOverflow.length === 0,
   narrowOverflow.length
     ? narrowOverflow.join(" | ")
     : `${NARROW_ROUTES.length} routes measured`,
 );
+report(
+  "The fixed header covers no page's h1 at 375",
+  narrowUnderHeader.length === 0,
+  narrowUnderHeader.length ? narrowUnderHeader.join(" | ") : `${NARROW_ROUTES.length} routes measured`,
+);
 
-// The dated archives at 375. These four are the pages most likely to break a
+// The dated archives at 375. These are the pages most likely to break a
 // phone, because their content is not a card grid: a command line, a JSON
 // config block, a 16:9 video and an install string are all fixed-width things
 // inside a 375px column. Each of them has to scroll inside its own box rather
@@ -626,9 +574,7 @@ const archiveNarrow = [];
 for (const route of ARCHIVE_ROUTES) {
   await mpage.goto(`${BASE}${route}`, { waitUntil: "networkidle" });
   await mpage.waitForTimeout(300);
-  const over = await mpage.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  );
+  const over = await overflowOf(mpage);
   if (over > 0) archiveNarrow.push(`${route}: ${over}px`);
   await mpage.screenshot({
     path: join(OUT, `${route.slice(1)}-375.png`),
@@ -640,27 +586,21 @@ report(
   archiveNarrow.length === 0,
   archiveNarrow.length ? archiveNarrow.join(" | ") : `${ARCHIVE_ROUTES.length} routes measured`,
 );
-// The door row at 375: four doors in two rows of two, and every door still
-// wide enough to be a tap target rather than a sliver. Two rows is the claim
-// the CSS makes, so it is the claim that gets measured.
+// The doors at 375: the same four, still filling whole rows, and every door a
+// full-width tap target rather than a sliver.
 await mpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
 await mpage.waitForTimeout(300);
-const doors375 = await mpage.evaluate(() =>
-  [...document.querySelectorAll(".doors .door")].map((d) => {
-    const r = d.getBoundingClientRect();
-    return { top: Math.round(r.top), width: Math.round(r.width) };
-  }),
-);
-const rows375 = new Set(doors375.map((d) => d.top)).size;
+const doors375 = await doorGrid(mpage);
+const rows375 = rowsOf(doors375);
 const narrowest = Math.min(...doors375.map((d) => d.width));
 report(
-  "Door row is two by two at 375, and no door is narrower than 140px",
-  doors375.length === 4 && rows375 === 2 && narrowest >= 140,
-  `${doors375.length} doors · ${rows375} rows · narrowest ${narrowest}px`,
+  "Door grid fills whole rows at 375, no door narrower than 240px",
+  doors375.length === 4 && rows375.every((n) => n === rows375[0]) && narrowest >= 240,
+  `${doors375.length} doors in rows of [${rows375.join(", ")}] · narrowest ${narrowest}px`,
 );
-await mpage.screenshot({ path: join(OUT, "home-375-doors.png") });
+await mpage.locator(".fg-doors").screenshot({ path: join(OUT, "home-375-doors.png") });
 
-/* ------------------------------------------- reduced motion + no-JS fallback */
+/* ----------------------------------- reduced motion, no WebGL and no JS */
 
 const rm = await browser.newContext({
   viewport: { width: 1440, height: 900 },
@@ -668,21 +608,51 @@ const rm = await browser.newContext({
 });
 const rmPage = await rm.newPage();
 await rmPage.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await specimenLive(rmPage);
 await rmPage.waitForTimeout(1200);
-const rmState = await rmPage.evaluate(() => {
-  const mf = document.querySelector(".mf");
+const rmClip = await stageClip(rmPage);
+const stillA = await rmPage.screenshot({ clip: rmClip });
+await rmPage.waitForTimeout(1000);
+const stillB = await rmPage.screenshot({ clip: rmClip });
+const stillness = await pixelDiff(rmPage, stillA, stillB);
+const strike = await rmPage.evaluate(() => sessionStorage.getItem("jb-strike"));
+// A rasterizer may round a pixel differently from one frame to the next; a
+// turning specimen changes thousands (see the first check), so the allowance
+// is 0.05% of the stage.
+report(
+  "Reduced motion: the specimen stands still and the strike never runs",
+  stillness.changed <= stillness.total * 0.0005 && strike === null,
+  `${stillness.changed} of ${stillness.total} px changed over 1s · strike ${strike === null ? "never ran" : "RAN"}`,
+);
+await rmPage.screenshot({ path: join(OUT, "home-1440-reduced-motion.png") });
+
+// No WebGL: the design's own fallback tier. The poster is the same object,
+// rendered in Blender from the same geometry, and it has to stay up.
+const noGl = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+await noGl.addInitScript(() => {
+  const getContext = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function (type, ...rest) {
+    return /webgl/i.test(String(type)) ? null : getContext.call(this, type, ...rest);
+  };
+});
+const ngPage = await noGl.newPage();
+await ngPage.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await ngPage.waitForTimeout(1500);
+const poster = await ngPage.evaluate(() => {
+  const img = document.querySelector(".fg-stage img");
   return {
-    live: mf.classList.contains("is-live"),
-    svgVisible: getComputedStyle(mf.querySelector("svg")).display !== "none",
-    mfAnimation: getComputedStyle(mf).animationName,
+    src: img?.getAttribute("src") ?? null,
+    loaded: Boolean(img?.complete && img.naturalWidth > 0),
+    shown: img ? getComputedStyle(img).display !== "none" && img.getBoundingClientRect().width > 0 : false,
+    canvas: Boolean(document.querySelector(".fg-stage canvas")),
   };
 });
 report(
-  "Reduced motion: static SVG only, canvas stands down",
-  !rmState.live && rmState.svgVisible && rmState.mfAnimation === "none",
-  `is-live=${rmState.live} svg=${rmState.svgVisible} animation=${rmState.mfAnimation}`,
+  "No WebGL: the specimen's poster stands in, loaded and shown",
+  poster.src === "/specimen/poster.webp" && poster.loaded && poster.shown && !poster.canvas,
+  `poster ${poster.src} loaded=${poster.loaded} shown=${poster.shown} · canvas ${poster.canvas ? "present" : "absent"}`,
 );
-await rmPage.screenshot({ path: join(OUT, "home-1440-reduced-motion.png") });
+await ngPage.screenshot({ path: join(OUT, "home-1440-no-webgl.png") });
 
 const nojs = await browser.newContext({
   viewport: { width: 1440, height: 900 },
@@ -690,13 +660,20 @@ const nojs = await browser.newContext({
 });
 const njPage = await nojs.newPage();
 await njPage.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
-const njState = await njPage.evaluate?.(() => null).catch(() => null);
-void njState;
 const njHtml = await njPage.content();
+// React escapes these five in text; the response carries the quote either way.
+const quoteHtml = heroQuote.text
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;")
+  .replace(/'/g, "&#x27;");
 report(
-  "No JS: static SVG manifold is in the server response",
-  njHtml.includes('class="mf"') && njHtml.includes("<polyline") && !njHtml.includes("is-live"),
-  `${(njHtml.match(/<polyline/g) ?? []).length} polylines server-rendered`,
+  "No JS: the home page's words are in the server response (h1, hero quote, CTA, the stage described)",
+  njHtml.includes("James Brady · Lehi, Utah") &&
+    (njHtml.includes(heroQuote.text) || njHtml.includes(quoteHtml)) &&
+    njHtml.includes('href="#descent"') &&
+    /<aside class="fg-stage" aria-label="[^"]+"/.test(njHtml),
 );
 report(
   "No JS: full theory text is in the server response",
@@ -704,13 +681,12 @@ report(
     "Universal Question Geometry starts from a different claim",
   ),
 );
-// Issue 13: with JavaScript off the four doors are plain server-rendered
-// anchors — navigation works, nothing waits on a click handler.
+// With JavaScript off the four doors are plain server-rendered anchors —
+// navigation works, nothing waits on a click handler.
 report(
   "No JS: the four homepage doors are ordinary links in the server response",
-  ["/work-with-me/get-found", "/work-with-me/build-a-system", "/work-with-me/background-screening", "/work"].every(
-    (h) => njHtml.includes(`href="${h}"`),
-  ),
+  doors.length === 4 && doors.every((d) => njHtml.includes(`href="${d.href}"`)),
+  doors.map((d) => d.href).join(" · "),
 );
 await njPage.screenshot({ path: join(OUT, "home-1440-no-js.png") });
 

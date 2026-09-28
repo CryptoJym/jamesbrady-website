@@ -6,7 +6,7 @@
 // squares. The only thing added here is an alpha channel, which the OG plates
 // never needed and a favicon does.
 
-import { deflateSync } from "node:zlib";
+import { deflateSync, inflateSync } from "node:zlib";
 
 const CRC_TABLE = (() => {
   const t = new Int32Array(256);
@@ -88,4 +88,48 @@ export function encodeIco(entries) {
   });
 
   return Buffer.concat([header, dir, ...entries.map((e) => e.png)]);
+}
+
+/**
+ * The image a PNG carries: its IHDR and its scanlines, inflated. Two encodes of
+ * the same pixels agree here even when their bytes do not, because deflate
+ * output belongs to the zlib build (Homebrew's node@22 links the system zlib
+ * 1.2.12; the official binaries bundle their own 1.3.1) and not to the image.
+ */
+export function decodePng(buf) {
+  if (buf.length < 8 || buf.readUInt32BE(0) !== 0x89504e47) throw new Error("not a PNG");
+  let header = null;
+  const idat = [];
+  for (let o = 8; o + 12 <= buf.length; ) {
+    const len = buf.readUInt32BE(o);
+    const type = buf.toString("ascii", o + 4, o + 8);
+    const data = buf.subarray(o + 8, o + 8 + len);
+    if (type === "IHDR") header = data;
+    else if (type === "IDAT") idat.push(data);
+    o += 12 + len;
+  }
+  if (!header || !idat.length) throw new Error("PNG has no IHDR or no IDAT");
+  return { header, pixels: inflateSync(Buffer.concat(idat)) };
+}
+
+/** An .ico's directory entries, each with the PNG it carries. */
+export function decodeIco(buf) {
+  if (buf.length < 6 || buf.readUInt16LE(0) !== 0 || buf.readUInt16LE(2) !== 1) throw new Error("not an ICO");
+  return Array.from({ length: buf.readUInt16LE(4) }, (_, i) => {
+    const o = 6 + 16 * i;
+    const size = buf.readUInt32LE(o + 8);
+    const at = buf.readUInt32LE(o + 12);
+    return { entry: buf.subarray(o, o + 8), png: buf.subarray(at, at + size) };
+  });
+}
+
+/** True when two PNGs, or two ICOs of PNGs, hold the same images: same headers, same pixels. */
+export function sameImage(a, b) {
+  const samePng = (x, y) => {
+    const [dx, dy] = [decodePng(x), decodePng(y)];
+    return dx.header.equals(dy.header) && dx.pixels.equals(dy.pixels);
+  };
+  if (a.readUInt32BE(0) === 0x89504e47) return b.readUInt32BE(0) === 0x89504e47 && samePng(a, b);
+  const [ia, ib] = [decodeIco(a), decodeIco(b)];
+  return ia.length === ib.length && ia.every((e, i) => e.entry.equals(ib[i].entry) && samePng(e.png, ib[i].png));
 }

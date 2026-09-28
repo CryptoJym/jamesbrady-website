@@ -28,6 +28,49 @@
 //   empty, the canvas must have stood down, and the mark must be static.
 //
 //   ICONS — served, linked in the HTML, and the theme colour matching --c-base.
+//
+// FULGURITE — 2026-09-27. The field, the living glyph and --c-base are retired
+// with Direction B. The four claims stand; this is what each reads now.
+//
+//   FRAME RATE — the living layer is the specimen, a three.js scene, so the
+//   rAF counter now drops with the WebGL render loop. That changes what a
+//   software rasterizer can prove. On one machine and one build the specimen
+//   ran at 77fps on the GPU and 20fps on SwiftShader: on a CPU rasterizer a
+//   WebGL frame rate measures the CPU. So: the browser is given the GPU where
+//   the platform offers one to headless Chromium (macOS, through ANGLE on
+//   Metal), and there the GPU floor of 55fps is asserted as before. On a
+//   software rasterizer (GitHub's runners) the rate is printed, labelled as the
+//   instrument's, and NOT asserted; what is asserted everywhere is the frame's
+//   cost that no instrument can distort: WebGL draw calls per frame, counted
+//   by wrapping the context's draw methods. The design draws three: the glass,
+//   the frosted glass and the beads, each one call ("Beads: one instanced
+//   draw", Specimen.tsx). A specimen that turned into a draw call per tube
+//   would fail here on any runner.
+//
+//   CONTRAST — decoration never outranks content, where content is read. The
+//   specimen stands BESIDE the text (and above it on a phone), never behind
+//   it, so the claim is now measured directly: with the hero text hidden, the
+//   pixels where it sits must be the ground and nothing else; the text's own
+//   colour must then clear WCAG against that measured ground (4.5:1, and 7:1
+//   for --ink, the design's own claim for reading text). The field's 0.45
+//   ceiling existed to keep a background under the h1; there is no background
+//   under the text any more, and the two assertions above say so directly. The
+//   PRESENCE floor stands: the specimen must actually be drawn, peak >= 0.30.
+//
+//   THE MARK — the wordmark in the fixed header. It is static type: it must be
+//   in the header, link home, never move or shift (its box is identical after
+//   time and after scrolling), and take the heat focus ring, which is the
+//   accent's interaction role (the ruling-B hover the glyph used to answer).
+//   The breathing, cycling, glint and hand-off checks measured the Direction B
+//   glyph's animation; Fulgurite's mark has none, so they are retired.
+//
+//   REDUCED MOTION — unchanged in kind: the specimen stands still, the strike
+//   never runs, the mark and every transition are still, and
+//   document.getAnimations() reports nothing running.
+//
+//   ICONS — served and linked as before; the theme colour must equal the
+//   page's ground as the browser renders it, read from the page rather than
+//   typed here.
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -59,18 +102,15 @@ const OUT = UPDATE_EVIDENCE
   : join(process.cwd(), "out", "verify-chrome");
 mkdirSync(OUT, { recursive: true });
 
-/** Two named floors for two named instruments (never silently lowered):
- * - GPU (any real visitor, local dev, pre-release): ≥55 of a 60Hz budget.
- *   Below this the motion stops reading as motion.
- * - Software rasterizer (GitHub's GPU-less runners render via SwiftShader/
- *   llvmpipe): ≥30. 42fps was measured there on a build that holds 61.5fps
- *   on a GPU — the delta is the instrument. The check label always names
- *   which floor applied, so a pass on the soft floor can never be read as
- *   a pass on the real one. The GPU floor remains enforced wherever a GPU
- *   exists, including local runs on dev machines. */
+/** The GPU floor, never silently lowered: >= 55 of a 60Hz budget. Below this
+ * the motion stops reading as motion. Asserted wherever the page is drawn on a
+ * GPU; see the FULGURITE note above for what a software rasterizer asserts. */
 const FPS_FLOOR_GPU = 55;
-const FPS_FLOOR_SOFTWARE = 30;
 const FPS_WINDOW_MS = 3000;
+/** WebGL draw calls one frame of the specimen may cost: glass, frosted glass, beads. */
+const DRAW_CALLS_PER_FRAME = 3;
+/** Headless Chromium draws WebGL on the GPU only when asked; macOS offers it through ANGLE on Metal. */
+const GPU_ARGS = process.platform === "darwin" ? ["--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist"] : [];
 
 let failed = 0;
 const measured = {};
@@ -78,6 +118,7 @@ const report = (name, ok, detail) => {
   if (!ok) failed++;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? ` — ${detail}` : ""}`);
 };
+const note = (text) => console.log(`      ${text}`);
 
 /**
  * ONE BROWSER PER VIEWPORT, torn down between samples. A frame-rate number is
@@ -86,9 +127,36 @@ const report = (name, ok, detail) => {
  * context closed but the browser warm, and 70.8 in a browser of its own. Two
  * of those three numbers were about the harness.
  */
-let browser = await chromium.launch();
+let browser = await chromium.launch({ args: GPU_ARGS });
 
-/** WCAG relative luminance of the brightest pixel in a PNG, computed in-page. */
+/** Counts WebGL draw calls per animation frame, from before the page's own scripts run. */
+const COUNT_DRAWS = () => {
+  const stats = { frames: [], current: 0 };
+  window.__jbDraws = stats;
+  for (const proto of [window.WebGLRenderingContext?.prototype, window.WebGL2RenderingContext?.prototype]) {
+    if (!proto) continue;
+    for (const name of ["drawArrays", "drawElements", "drawArraysInstanced", "drawElementsInstanced", "drawRangeElements"]) {
+      const original = proto[name];
+      if (typeof original !== "function") continue;
+      proto[name] = function (...args) {
+        stats.current++;
+        return original.apply(this, args);
+      };
+    }
+  }
+  const tick = () => {
+    stats.frames.push(stats.current);
+    stats.current = 0;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
+
+/** Draw calls in each of the frames drawn during the last sampling window (frames that drew nothing are idle, not cheap). */
+const drawsSince = (page, from) =>
+  page.evaluate((i) => window.__jbDraws.frames.slice(i).filter((n) => n > 0), from);
+
+/** WCAG relative luminance of the brightest pixel in a PNG, and how much of it is lit, computed in-page. */
 const peakLuminance = async (page, pngBase64) =>
   page.evaluate(async (b64) => {
     const img = await new Promise((res) => {
@@ -107,12 +175,43 @@ const peakLuminance = async (page, pngBase64) =>
       return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
     };
     let peak = 0;
+    let lit = 0;
     for (let i = 0; i < d.length; i += 4) {
       const L = 0.2126 * lin(d[i]) + 0.7152 * lin(d[i + 1]) + 0.0722 * lin(d[i + 2]);
       if (L > peak) peak = L;
+      if (L > 0.02) lit++;
     }
-    return { peak, px: d.length / 4 };
+    return { peak, lit: lit / (d.length / 4), px: d.length / 4 };
   }, pngBase64);
+
+/** Pixels that differ by more than a rounding step between two PNG screenshots. */
+const pixelDiff = (page, a, b) =>
+  page.evaluate(
+    async ([a64, b64]) => {
+      const load = (src) =>
+        new Promise((res) => {
+          const img = new Image();
+          img.onload = () => res(img);
+          img.src = `data:image/png;base64,${src}`;
+        });
+      const [ia, ib] = await Promise.all([load(a64), load(b64)]);
+      const c = document.createElement("canvas");
+      c.width = ia.width;
+      c.height = ia.height;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(ia, 0, 0);
+      const da = ctx.getImageData(0, 0, c.width, c.height).data;
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.drawImage(ib, 0, 0);
+      const db = ctx.getImageData(0, 0, c.width, c.height).data;
+      let n = 0;
+      for (let i = 0; i < da.length; i += 4) {
+        if (Math.abs(da[i] - db[i]) + Math.abs(da[i + 1] - db[i + 1]) + Math.abs(da[i + 2] - db[i + 2]) > 12) n++;
+      }
+      return { changed: n, total: da.length / 4 };
+    },
+    [a.toString("base64"), b.toString("base64")],
+  );
 
 /** rAF callbacks per second, over a fixed window. */
 const sampleFps = (page, ms) =>
@@ -131,284 +230,260 @@ const sampleFps = (page, ms) =>
     ms,
   );
 
-/* ==================================================== 1440: the living field */
+/** The WebGL canvas has taken over from the poster: it drew its first frame. */
+const specimenLive = (page) =>
+  page.waitForFunction(
+    () => {
+      const stage = document.querySelector(".fg-stage");
+      return Boolean(stage?.querySelector("canvas") && !stage.querySelector("img"));
+    },
+    { timeout: 30_000 },
+  );
+
+const stageClip = async (page) => {
+  const box = await page.locator(".fg-stage").boundingBox();
+  const vh = page.viewportSize().height;
+  return { x: box.x, y: box.y, width: box.width, height: Math.min(box.height, vh - box.y) };
+};
+
+const rendererOf = (page) =>
+  page.evaluate(() => {
+    try {
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+      if (!gl) return "none";
+      const ext = gl.getExtension("WEBGL_debug_renderer_info");
+      return ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : "unknown";
+    } catch {
+      return "unknown";
+    }
+  });
+
+/** A CSS colour string, as computed style prints it, to [r, g, b, a] in 0..255 / 0..1. */
+const parseColour = (css) => {
+  const rgb = /rgba?\(\s*([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)(?:\s*[,/]\s*([\d.]+%?))?\s*\)/.exec(css);
+  if (rgb) {
+    const a = rgb[4] === undefined ? 1 : rgb[4].endsWith("%") ? parseFloat(rgb[4]) / 100 : Number(rgb[4]);
+    return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3]), a];
+  }
+  const srgb = /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/.exec(css);
+  if (srgb) return [Number(srgb[1]) * 255, Number(srgb[2]) * 255, Number(srgb[3]) * 255, srgb[4] === undefined ? 1 : Number(srgb[4])];
+  const hex = /^#([0-9a-f]{6})$/i.exec(css.trim());
+  if (hex) return [0, 2, 4].map((i) => parseInt(hex[1].slice(i, i + 2), 16)).concat(1);
+  return null;
+};
+const luminance = ([r, g, b]) => {
+  const lin = (v) => {
+    const s = v / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+};
+const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+
+/* ==================================================== 1440: the living stage */
 
 const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+await desktop.addInitScript(COUNT_DRAWS);
 const page = await desktop.newPage();
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await page.waitForFunction(() => document.querySelector(".mf")?.classList.contains("is-live"), {
-  timeout: 10_000,
-});
+await specimenLive(page);
 await page.waitForTimeout(400);
 
-const glRenderer = await page.evaluate(() => {
-  try {
-    const c = document.createElement("canvas");
-    const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
-    if (!gl) return "none";
-    const ext = gl.getExtension("WEBGL_debug_renderer_info");
-    return ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : "unknown";
-  } catch { return "unknown"; }
-});
-const softwareRaster = /swiftshader|llvmpipe|software/i.test(String(glRenderer));
-const FPS_FLOOR = softwareRaster ? FPS_FLOOR_SOFTWARE : FPS_FLOOR_GPU;
-const floorLabel = softwareRaster
-  ? `software-raster floor ${FPS_FLOOR_SOFTWARE} — GPU floor ${FPS_FLOOR_GPU} enforced where a GPU exists; renderer: ${String(glRenderer).slice(0, 60)}`
-  : `GPU floor ${FPS_FLOOR_GPU}`;
+const glRenderer = String(await rendererOf(page));
+const softwareRaster = /swiftshader|llvmpipe|software/i.test(glRenderer);
+measured.renderer = glRenderer.slice(0, 80);
+const drawStart1440 = await page.evaluate(() => window.__jbDraws.frames.length);
 const fps1440 = await sampleFps(page, FPS_WINDOW_MS);
 measured.fps1440 = (fps1440.frames / (fps1440.ms / 1000)).toFixed(1);
+const draws1440 = await drawsSince(page, drawStart1440);
+if (!softwareRaster)
+  report(
+    `Frame rate at 1440 with the specimen live (>= ${FPS_FLOOR_GPU}fps · GPU floor · ${measured.renderer})`,
+    Number(measured.fps1440) >= FPS_FLOOR_GPU,
+    `${measured.fps1440}fps · ${fps1440.frames} rAF frames in ${fps1440.ms.toFixed(0)}ms`,
+  );
+else
+  note(
+    `frame rate at 1440 on a software rasterizer: ${measured.fps1440}fps (${measured.renderer}). ` +
+      `The instrument's number, not a visitor's; the GPU floor is asserted on a GPU run.`,
+  );
 report(
-  `Frame rate at 1440 with every layer on (>= ${FPS_FLOOR}fps · ${floorLabel})`,
-  Number(measured.fps1440) >= FPS_FLOOR,
-  `${measured.fps1440}fps · ${fps1440.frames} rAF frames in ${fps1440.ms.toFixed(0)}ms`,
+  `Frame cost at 1440: every drawn frame is <= ${DRAW_CALLS_PER_FRAME} WebGL draw calls`,
+  draws1440.length > 0 && draws1440.every((n) => n <= DRAW_CALLS_PER_FRAME),
+  `${draws1440.length} drawn frames · calls per frame: ${[...new Set(draws1440)].sort().join(", ")}`,
 );
+measured.drawsPerFrame = Math.max(0, ...draws1440);
 
 /* --------------------------------------------------- motion proof, 1s apart */
-// Two captures of the field a full second apart. A still frame of a canvas
+// Two captures of the stage a full second apart. A still frame of a canvas
 // proves it painted; a pair proves it is alive.
-const heroBox = await page.locator(".hero").boundingBox();
-const fieldClip = {
-  x: heroBox.x,
-  y: heroBox.y,
-  width: heroBox.width,
-  height: Math.min(heroBox.height, 900 - heroBox.y),
-};
-const HIDE_COPY = `.hero__copy,.hero__panel{visibility:hidden !important}`;
-const hider = await page.addStyleTag({ content: HIDE_COPY });
-const fieldT0 = await page.screenshot({ clip: fieldClip });
+const clip1440 = await stageClip(page);
+const stageT0 = await page.screenshot({ clip: clip1440 });
 await page.waitForTimeout(1000);
-const fieldT1 = await page.screenshot({ clip: fieldClip });
-writeFileSync(join(OUT, `field-1440-${LABEL}-t0.png`), fieldT0);
-writeFileSync(join(OUT, `field-1440-${LABEL}-t1.png`), fieldT1);
+const stageT1 = await page.screenshot({ clip: clip1440 });
+writeFileSync(join(OUT, `stage-1440-${LABEL}-t0.png`), stageT0);
+writeFileSync(join(OUT, `stage-1440-${LABEL}-t1.png`), stageT1);
 
-/* -------------------------------------------------------- field luminance */
-//
-// Sampled across FRAMES, not from one — and across ENOUGH frames, which is the
-// part this wave had to fix.
-//
-// The first version measured one capture. Two runs read 0.095 and 0.084 off
-// the same build, so it went to twelve frames over ~2.4s and the travelling
-// wave was declared covered. It was not. The manifold surface's slowest term
-// evolves over ~70s, so the number of lines standing high — and the whole
-// field's brightness with it — cycles on a minute scale underneath the wave.
-// Measured on one unchanged build, 170 captures over 43s: sliding a 2.4s
-// window across that series returns anything from 0.119 to 0.313. The window
-// was not measuring the field, it was measuring which minute it was.
-//
-// That is a SAFETY hole, not just a noisy number: a 2.4s window samples 3% of
-// the cycle, so a build that breaches the 0.45 ceiling at some other phase
-// passes this gate on luck. The window is now ~150 captures over ~35s, which
-// covers the cycle; measured spread across sliding windows of that length is
-// a few percent rather than 62%.
-//
-// The distribution is reported alongside the peak because they answer
-// different questions. The peak is what the 0.45 ceiling and the h1 comparison
-// are about — one pixel, at the field's brightest instant. The MEDIAN is what
-// a visitor actually sees, and it is the number that moved when the owner
-// asked for a more present field.
-const FIELD_SAMPLES = 150;
-const framePeaks = [];
-let fieldPx = 0;
-const lumStart = Date.now();
-for (const shot of [fieldT0, fieldT1]) {
-  const r = await peakLuminance(page, shot.toString("base64"));
-  framePeaks.push(r.peak);
-  fieldPx = r.px;
+/* --------------------------------------------------- the specimen's presence */
+// The floor from the presence pass, applied to the living layer the site has
+// now: the specimen must actually be drawn. Sampled across frames while it
+// turns, and the WORST frame must clear it.
+const presence = [];
+for (const shot of [stageT0, stageT1]) presence.push(await peakLuminance(page, shot.toString("base64")));
+while (presence.length < 12) {
+  presence.push(await peakLuminance(page, (await page.screenshot({ clip: clip1440 })).toString("base64")));
 }
-while (framePeaks.length < FIELD_SAMPLES) {
-  // Back to back: the capture+decode cadence (~230ms) is the sampling rate.
-  const r = await peakLuminance(page, (await page.screenshot({ clip: fieldClip })).toString("base64"));
-  framePeaks.push(r.peak);
-  fieldPx = r.px;
-}
-const lumSpanSec = (Date.now() - lumStart) / 1000;
-const ranked = [...framePeaks].sort((a, b) => a - b);
-const fieldLum = {
-  peak: ranked[ranked.length - 1],
-  median: ranked[Math.floor(ranked.length / 2)],
-  min: ranked[0],
-  px: fieldPx,
-  frames: framePeaks.length,
-  spanSec: lumSpanSec,
+const worstPeak = Math.min(...presence.map((p) => p.peak));
+const worstLit = Math.min(...presence.map((p) => p.lit));
+measured.specimenPeakMin = worstPeak.toFixed(3);
+measured.specimenLitMin = `${(worstLit * 100).toFixed(1)}%`;
+report(
+  "Specimen reaches its presence floor in every sampled frame (peak >= 0.30, >= 1% of the stage lit)",
+  worstPeak >= 0.3 && worstLit >= 0.01,
+  `${presence.length} frames · worst peak ${measured.specimenPeakMin} · worst lit ${measured.specimenLitMin} of ${presence[0].px} px`,
+);
+
+/* -------------------------------------------------------------- contrast */
+// Where the hero text sits, with the text (and the fixed header over it)
+// hidden: layout untouched, so this is exactly what shows through behind the
+// words as the page ships. It has to be the ground, and only the ground.
+const groundCss = await page.evaluate(() => getComputedStyle(document.documentElement).backgroundColor);
+const ground = parseColour(groundCss);
+const groundL = luminance(ground);
+const surfaceBox = await page.locator(".fg-surface").boundingBox();
+const surfaceClip = {
+  x: surfaceBox.x,
+  y: Math.max(0, surfaceBox.y),
+  width: surfaceBox.width,
+  height: Math.min(surfaceBox.y + surfaceBox.height, 900) - Math.max(0, surfaceBox.y),
 };
+const hider = await page.addStyleTag({ content: ".fg-surface > *, .fg-head { visibility: hidden !important; }" });
+await page.waitForTimeout(100);
+let behindPeak = 0;
+for (let i = 0; i < 3; i++) {
+  const r = await peakLuminance(page, (await page.screenshot({ clip: surfaceClip })).toString("base64"));
+  behindPeak = Math.max(behindPeak, r.peak);
+  await page.waitForTimeout(400);
+}
 await hider.evaluate((el) => el.remove());
-await page.waitForTimeout(200);
+measured.behindTextPeak = behindPeak.toFixed(4);
+measured.groundL = groundL.toFixed(4);
+report(
+  "Nothing but the ground is painted behind the hero text",
+  behindPeak <= groundL + 0.002,
+  `peak ${measured.behindTextPeak} behind the text vs ground ${measured.groundL} (${groundCss}) · ${surfaceClip.width.toFixed(0)}x${surfaceClip.height.toFixed(0)} px`,
+);
 
-const h1Box = await page.locator(".b-room h1").first().boundingBox();
-const h1Shot = await page.screenshot({
-  clip: { x: h1Box.x, y: h1Box.y, width: h1Box.width, height: h1Box.height },
+// The text's own colour against that measured ground. 4.5:1 is WCAG AA for
+// body-size text; 7:1 is the design's own claim for --ink reading text.
+const textColours = await page.evaluate(() => {
+  const pick = (sel, need) => [...document.querySelectorAll(sel)].map((el) => ({ sel, need, color: getComputedStyle(el).color }));
+  return [
+    ...pick(".fg-surface h1", 4.5),
+    ...pick(".fg-surface #hero", 7),
+    ...pick(".fg-surface .fg-attrib", 4.5),
+    ...pick(".fg-surface .fg-lede", 7),
+    ...pick(".fg-surface .fg-cta-row a", 4.5),
+  ];
 });
-const h1Lum = await peakLuminance(page, h1Shot.toString("base64"));
-
-measured.fieldPeak = fieldLum.peak.toFixed(3);
-measured.fieldMedian = fieldLum.median.toFixed(3);
-measured.fieldMin = fieldLum.min.toFixed(3);
-measured.h1Peak = h1Lum.peak.toFixed(3);
+const ratios = textColours.map((t) => {
+  const c = parseColour(t.color);
+  const blended = c ? [0, 1, 2].map((i) => c[i] * c[3] + ground[i] * (1 - c[3])) : null;
+  return { ...t, ratio: blended ? contrast(luminance(blended), groundL) : 0 };
+});
+const lowContrast = ratios.filter((r) => r.ratio < r.need);
+measured.heroContrast = ratios.map((r) => `${r.sel.replace(".fg-surface ", "")} ${r.ratio.toFixed(2)}`);
 report(
-  "Field peak luminance stays BELOW the h1's",
-  fieldLum.peak < h1Lum.peak,
-  `field ${measured.fieldPeak} vs h1 ${measured.h1Peak} ` +
-    `(${fieldLum.px} px x ${fieldLum.frames} frames over ${fieldLum.spanSec.toFixed(0)}s, h1 ${h1Lum.px} px)`,
+  "Hero text clears contrast against that ground (4.5:1; 7:1 for the quote and lede)",
+  textColours.length >= 5 && lowContrast.length === 0,
+  lowContrast.length
+    ? lowContrast.map((r) => `${r.sel} ${r.ratio.toFixed(2)}:1 < ${r.need}:1`).join(" | ")
+    : ratios.map((r) => `${r.sel.replace(".fg-surface ", "")} ${r.ratio.toFixed(1)}:1`).join(" · "),
 );
-/* The ceiling the wave was given: presence through structure, not brightness. */
-report(
-  "Field peak stays inside its 0.45 budget",
-  fieldLum.peak <= 0.45,
-  `${measured.fieldPeak} of 0.45 · median ${measured.fieldMedian} · min ${measured.fieldMin}`,
-);
-/* The FLOOR, added by the presence pass (owner: the field should be "more
-   visible and noticeable"). A ceiling on its own only ever says the field is
-   not too bright — it passed happily on a build whose field the owner could
-   not see. This is the other side of the same budget, and it is why the two
-   numbers are reported together: the field lives in a band, not under a cap.
-   Skipped under --baseline for the reason given at the top of this file: `main`
-   does not have this wave, so a red line here would only mean "this is the old
-   build". The baseline's number is still printed in `measured`, which is what
-   the before/after table is built from. */
-if (!BASELINE)
-  report(
-    "Field peak reaches its presence floor (>= 0.30)",
-    fieldLum.peak >= 0.3,
-    `${measured.fieldPeak} of 0.30 floor / 0.45 ceiling`,
-  );
 
-/* ------------------------------------------------------- the mark is alive */
+/* ---------------------------------------------------------------- the mark */
 
 if (!BASELINE) {
-const markState = await page.evaluate(() => {
-  const glyph = document.querySelector(".mark__glyph");
-  const cells = [...glyph.querySelectorAll("i")];
-  const squares = [...glyph.querySelectorAll("b")];
-  const nameOf = (el) => getComputedStyle(el).animationName;
-  return {
-    cells: cells.length,
-    breathing: cells.map(nameOf),
-    ticking: squares.map(nameOf).filter((n) => n !== "none"),
-    // The presence pass's two additions, read off computed style rather than
-    // assumed from the stylesheet.
-    cycling: cells.map(nameOf).filter((n) => n.includes("mark-cycle")).length,
-    glint: squares.map((b) => getComputedStyle(b, "::after").animationName).filter((n) => n !== "none"),
-    running: document.getAnimations().filter((a) => a.playState === "running").length,
-    // Nothing may move that could push the wordmark: transform only.
-    props: cells.map((c) => getComputedStyle(c).animationName !== "none"),
-    glyphRect: glyph.getBoundingClientRect().toJSON(),
-  };
-});
-report(
-  "Mark: three cells, each breathing on its own clock, one ticking",
-  markState.cells === 3 &&
-    new Set(markState.breathing).size === 3 &&
-    markState.breathing.every((n) => n !== "none") &&
-    markState.ticking.length === 1,
-  `cells ${markState.breathing.join(", ")} · tick ${markState.ticking.join(",") || "none"}`,
-);
-report(
-  "Mark: all three cells carry the 8.1s activity cycle, and the ticking cell alone carries the glint",
-  markState.cycling === 3 && markState.glint.length === 1 && markState.glint[0] === "mark-glint",
-  `cycling ${markState.cycling}/3 · glint on ${markState.glint.length} cell(s): ${markState.glint.join(",") || "none"}`,
-);
-
-/* THE ACTIVE CELL MOVES. The cycle is the claim a still frame cannot settle,
-   so it is sampled: read all three cells' computed opacity now and again 4s
-   later, and require the brightest one to be a DIFFERENT cell. With a 2.7s
-   hand-off a 4s gap can never land on the same cell twice, so this is
-   deterministic rather than hopeful. Screenshots of both moments ship with the
-   evidence for anyone who wants to see it rather than read it. */
-const activeCell = () =>
-  page.evaluate(() =>
-    [...document.querySelectorAll(".mark__glyph i")].map((el) => Number(getComputedStyle(el).opacity)),
+  const markOf = () =>
+    page.evaluate(() => {
+      const mark = document.querySelector(".fg-head .fg-wordmark");
+      if (!mark) return null;
+      const r = mark.getBoundingClientRect();
+      return {
+        href: mark.getAttribute("href"),
+        name: mark.getAttribute("aria-label") ?? "",
+        text: mark.textContent.trim(),
+        imagery: mark.querySelectorAll("img, svg, canvas").length,
+        headPosition: getComputedStyle(document.querySelector(".fg-head")).position,
+        rect: { x: r.x, y: r.y, width: r.width, height: r.height },
+      };
+    });
+  const mark0 = await markOf();
+  report(
+    "Mark: the wordmark sits in the fixed header, links home, and is type, not an image",
+    Boolean(mark0) &&
+      mark0.href === "/" &&
+      mark0.name.includes("James Brady") &&
+      mark0.text === "JAMES BRADY" &&
+      mark0.imagery === 0 &&
+      mark0.headPosition === "fixed",
+    mark0 ? `"${mark0.text}" → ${mark0.href} · "${mark0.name}" · header ${mark0.headPosition}` : "NO WORDMARK",
   );
-const markClip = { x: 0, y: 34, width: 420, height: 70 };
-const opacityA = await activeCell();
-await page.screenshot({ path: join(OUT, `mark-cycle-1440-${LABEL}-t0.png`), clip: markClip });
-await page.waitForTimeout(4000);
-const opacityB = await activeCell();
-await page.screenshot({ path: join(OUT, `mark-cycle-1440-${LABEL}-t4.png`), clip: markClip });
-const brightest = (o) => o.indexOf(Math.max(...o));
-report(
-  "Mark: the active cell hands off — a different cell is brightest 4s later",
-  brightest(opacityA) !== brightest(opacityB),
-  `t0 [${opacityA.map((v) => v.toFixed(2)).join(", ")}] cell ${brightest(opacityA) + 1} · ` +
-    `t+4s [${opacityB.map((v) => v.toFixed(2)).join(", ")}] cell ${brightest(opacityB) + 1}`,
-);
 
-// No layout shift: the glyph's box must be identical before and after a full
-// breath cycle. Transforms do not affect layout — this proves it rather than
-// asserting it.
-await page.waitForTimeout(1200);
-const glyphRect2 = await page.evaluate(() =>
-  document.querySelector(".mark__glyph").getBoundingClientRect().toJSON(),
-);
-const navHeights = await page.evaluate(() => document.querySelector(".nav").getBoundingClientRect().height);
-report(
-  "Mark animates transform only — zero layout shift",
-  glyphRect2.width === markState.glyphRect.width &&
-    glyphRect2.height === markState.glyphRect.height &&
-    glyphRect2.x === markState.glyphRect.x &&
-    glyphRect2.y === markState.glyphRect.y,
-  `glyph box stable at ${glyphRect2.width}x${glyphRect2.height} · nav ${navHeights}px`,
-);
-
-// Hover: the converge runs, and the cells take the signal colour.
-await page.hover(".mark");
-await page.waitForTimeout(120);
-const hover = await page.evaluate(() => ({
-  converge: getComputedStyle(document.querySelector(".mark__glyph")).animationName,
-  fill: getComputedStyle(document.querySelector(".mark__glyph b")).backgroundColor,
-}));
-await page.screenshot({
-  path: join(OUT, `mark-hover-1440-${LABEL}.png`),
-  clip: { x: 0, y: 34, width: 420, height: 70 },
-});
-report(
-  "Mark: hover converges and takes the signal colour (ruling B, role 4)",
-  hover.converge === "mark-converge",
-  `animation ${hover.converge} · cell fill ${hover.fill}`,
-);
-await page.mouse.move(1200, 700);
-
-/* MAGNIFIED MARK EVIDENCE. The gate above is assertions, and the pair of
-   420x70 crops beside it is honest but nearly useless to a human: the glyph is
-   15 CSS pixels, and a .58-to-1.0 brightness hand-off inside it does not
-   survive a 1x screenshot. The previous packet said as much — "the mark's own
-   motion is not screenshottable" — and then asked the reader to trust the
-   assertions. A 4x context costs about three seconds and closes that gap.
-   Its own context, so the measured page is never mutated for a photograph. */
-const zoomCtx = await browser.newContext({
-  viewport: { width: 1440, height: 900 },
-  deviceScaleFactor: 4,
-});
-const zoom = await zoomCtx.newPage();
-await zoom.goto(`${BASE}/`, { waitUntil: "networkidle" });
-const gbox = await zoom.locator(".mark__glyph").boundingBox();
-const gclip = { x: gbox.x - 7, y: gbox.y - 7, width: gbox.width + 14, height: gbox.height + 14 };
-/* THE GLINT FIRST, and that ordering is the whole trick. It runs on a 20s
-   clock with a 4s delay from load, so there is one ~4s after this page opened
-   and then nothing for twenty seconds. Shooting the rotation first burns 5.4s
-   and walks straight past it — measured, and it cost a red line before the
-   order was swapped. Poll the pseudo-element's own opacity and shoot the frame
-   it is actually lit; never infer a flash from the stylesheet. */
-let glintShot = 0;
-for (let i = 0; i < 200 && !glintShot; i++) {
-  const o = await zoom.evaluate(() =>
-    Number(getComputedStyle(document.querySelector(".mark__glyph i:nth-child(3) b"), "::after").opacity),
+  // No layout shift: the mark's box must be identical after time passes and
+  // after the page scrolls under it. This proves it rather than asserting it.
+  await page.waitForTimeout(2000);
+  const mark1 = await markOf();
+  await page.evaluate(() => window.scrollTo(0, 1500));
+  await page.waitForTimeout(300);
+  const mark2 = await markOf();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const sameBox = (a, b) => a && b && ["x", "y", "width", "height"].every((k) => a.rect[k] === b.rect[k]);
+  report(
+    "Mark stays put — zero layout shift over 2s and after a 1500px scroll",
+    sameBox(mark0, mark1) && sameBox(mark0, mark2),
+    mark0 ? `box ${mark0.rect.width.toFixed(1)}x${mark0.rect.height.toFixed(1)} at (${mark0.rect.x}, ${mark0.rect.y}) every time` : "",
   );
-  if (o > 0.25) {
-    await zoom.screenshot({ path: join(OUT, `mark-zoom-glint-${LABEL}.png`), clip: gclip });
-    glintShot = o;
-  } else await zoom.waitForTimeout(40);
-}
-/* Then the rotation, one frame per hand-off. */
-for (const [i, label] of ["a", "b", "c"].entries()) {
-  await zoom.screenshot({ path: join(OUT, `mark-zoom-cycle-${label}-${LABEL}.png`), clip: gclip });
-  if (i < 2) await zoom.waitForTimeout(2700);
-}
-report(
-  "Mark: the tick's glint was captured lit (not asserted from the stylesheet)",
-  glintShot > 0.25,
-  glintShot ? `caught at opacity ${glintShot.toFixed(2)} → mark-zoom-glint-${LABEL}.png` : "never lit within 12s",
-);
-await zoomCtx.close();
+
+  // Keyboard focus draws the heat ring: the accent's interaction role, which
+  // ruling B gave the old signal colour and Fulgurite gives heat.
+  await page.evaluate(() => document.activeElement?.blur());
+  let focused = false;
+  for (let i = 0; i < 6 && !focused; i++) {
+    await page.keyboard.press("Tab");
+    focused = await page.evaluate(() => document.activeElement?.classList.contains("fg-wordmark") ?? false);
+  }
+  const ring = await page.evaluate(() => {
+    const s = getComputedStyle(document.activeElement);
+    return {
+      style: s.outlineStyle,
+      width: parseFloat(s.outlineWidth),
+      colour: s.outlineColor,
+      heat: getComputedStyle(document.documentElement).getPropertyValue("--heat").trim(),
+    };
+  });
+  const heat = parseColour(ring.heat);
+  const drawn = parseColour(ring.colour);
+  await page.screenshot({ path: join(OUT, `mark-focus-1440-${LABEL}.png`), clip: { x: 0, y: 0, width: 420, height: 70 } });
+  report(
+    "Mark: keyboard focus draws the heat ring (the accent's interaction role)",
+    focused && ring.style === "solid" && ring.width >= 2 && Boolean(heat && drawn) && [0, 1, 2].every((i) => Math.abs(heat[i] - drawn[i]) < 1),
+    `reached by Tab: ${focused} · ${ring.style} ${ring.width}px ${ring.colour} · --heat ${ring.heat}`,
+  );
+  await page.evaluate(() => document.activeElement?.blur());
+
+  /* MAGNIFIED MARK EVIDENCE, in its own 4x context so the measured page is
+     never mutated for a photograph. */
+  const zoomCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 4 });
+  const zoom = await zoomCtx.newPage();
+  await zoom.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  const box = await zoom.locator(".fg-wordmark").boundingBox();
+  await zoom.screenshot({
+    path: join(OUT, `mark-zoom-${LABEL}.png`),
+    clip: { x: box.x - 7, y: box.y - 7, width: box.width + 14, height: box.height + 14 },
+  });
+  await zoomCtx.close();
 }
 
 await page.evaluate(() => window.scrollTo(0, 0));
@@ -435,10 +510,13 @@ report(
   iconLinks.some((l) => l.includes("/icon.svg")) && appleLink.includes("/apple-icon.png"),
   `${iconLinks.length} icon link(s): ${iconLinks.join(" ") || "NONE"} · ${appleLink || "MISSING apple-touch-icon"}`,
 );
+// The browser paints its own chrome in this colour before any stylesheet
+// loads, so it must be the ground the page then paints: read from the page.
+const theme = parseColour(/content="([^"]+)"/.exec(themeMeta)?.[1] ?? "");
 report(
-  "themeColor is present and equals --c-base",
-  /content="#0A0E11"/i.test(themeMeta),
-  themeMeta || "MISSING theme-color",
+  "themeColor is present and equals the page's ground as rendered",
+  Boolean(theme) && [0, 1, 2].every((i) => theme[i] === ground[i]),
+  `${themeMeta || "MISSING theme-color"} · page ground ${groundCss}`,
 );
 
 for (const [path, type] of [
@@ -460,7 +538,7 @@ for (const [path, type] of [
 //
 // Fresh browser: see the note on the launch above.
 await browser.close();
-browser = await chromium.launch();
+browser = await chromium.launch({ args: GPU_ARGS });
 
 const mobile = await browser.newContext({
   viewport: { width: 375, height: 812 },
@@ -468,26 +546,36 @@ const mobile = await browser.newContext({
   hasTouch: true,
   deviceScaleFactor: 2,
 });
+await mobile.addInitScript(COUNT_DRAWS);
 const mpage = await mobile.newPage();
 await mpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await mpage.waitForFunction(() => document.querySelector(".mf")?.classList.contains("is-live"), {
-  timeout: 10_000,
-});
+await specimenLive(mpage);
 await mpage.waitForTimeout(400);
 
+const drawStart375 = await mpage.evaluate(() => window.__jbDraws.frames.length);
 const fps375 = await sampleFps(mpage, FPS_WINDOW_MS);
 measured.fps375 = (fps375.frames / (fps375.ms / 1000)).toFixed(1);
+const draws375 = await drawsSince(mpage, drawStart375);
+if (!softwareRaster)
+  report(
+    `Frame rate at 375 with the specimen live (>= ${FPS_FLOOR_GPU}fps · GPU floor · ${measured.renderer})`,
+    Number(measured.fps375) >= FPS_FLOOR_GPU,
+    `${measured.fps375}fps · ${fps375.frames} rAF frames in ${fps375.ms.toFixed(0)}ms`,
+  );
+else note(`frame rate at 375 on a software rasterizer: ${measured.fps375}fps. The instrument's number, not a visitor's.`);
 report(
-  `Frame rate at 375 with every layer on (>= ${FPS_FLOOR}fps · ${floorLabel})`,
-  Number(measured.fps375) >= FPS_FLOOR,
-  `${measured.fps375}fps · ${fps375.frames} rAF frames in ${fps375.ms.toFixed(0)}ms`,
+  `Frame cost at 375: every drawn frame is <= ${DRAW_CALLS_PER_FRAME} WebGL draw calls`,
+  draws375.length > 0 && draws375.every((n) => n <= DRAW_CALLS_PER_FRAME),
+  `${draws375.length} drawn frames · calls per frame: ${[...new Set(draws375)].sort().join(", ")}`,
 );
 
-// Parallax is a pointer affordance and a touch context must not bind it.
-const touchParallax = await mpage.evaluate(
-  () => window.matchMedia("(hover: hover) and (pointer: fine)").matches,
-);
-report("Pointer parallax stands down on a touch context", touchParallax === false, `fine pointer: ${touchParallax}`);
+// On a touch screen the specimen must not take the page's scroll: its host
+// hands vertical pans back to the page (drag-to-turn stays horizontal).
+const touch = await mpage.evaluate(() => {
+  const host = document.querySelector(".fg-stage canvas")?.parentElement;
+  return host ? getComputedStyle(host).touchAction : "no specimen";
+});
+report("Touch: the specimen lets the page scroll (touch-action: pan-y)", touch === "pan-y", `touch-action: ${touch}`);
 
 const overflow375 = await mpage.evaluate(
   () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -498,7 +586,7 @@ await mpage.screenshot({ path: join(OUT, `home-375-hero-${LABEL}.png`) });
 /* ========================================================== reduced motion */
 
 await browser.close();
-browser = await chromium.launch();
+browser = await chromium.launch({ args: GPU_ARGS });
 
 const rm = await browser.newContext({
   viewport: { width: 1440, height: 900 },
@@ -506,53 +594,42 @@ const rm = await browser.newContext({
 });
 const rmPage = await rm.newPage();
 await rmPage.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await specimenLive(rmPage);
 await rmPage.waitForTimeout(1500);
 
+const rmClip = await stageClip(rmPage);
+const stillA = await rmPage.screenshot({ clip: rmClip });
+await rmPage.waitForTimeout(1000);
+const stillB = await rmPage.screenshot({ clip: rmClip });
+const stillness = await pixelDiff(rmPage, stillA, stillB);
 const rmState = await rmPage.evaluate(() => {
-  const mf = document.querySelector(".mf");
-  const glyph = document.querySelector(".mark__glyph");
-  const names = (sel) =>
-    [...document.querySelectorAll(sel)].map((el) => getComputedStyle(el).animationName);
+  const seconds = (d) => Math.max(...d.split(",").map((x) => parseFloat(x) * (x.trim().endsWith("ms") ? 0.001 : 1)));
+  const mark = document.querySelector(".fg-wordmark");
+  const moving = [...document.querySelectorAll(".fg-wordmark, .fg-door, .fg-fig__m, .fg-cta-row a")].filter((el) => {
+    const s = getComputedStyle(el);
+    return (s.animationName !== "none" && seconds(s.animationDuration) > 0.001) || seconds(s.transitionDuration) > 0.001;
+  });
   return {
-    live: mf.classList.contains("is-live"),
-    svgVisible: getComputedStyle(mf.querySelector("svg")).display !== "none",
-    mfAnimation: getComputedStyle(mf).animationName,
-    markNames: [
-      getComputedStyle(glyph).animationName,
-      ...names(".mark__glyph i"),
-      ...names(".mark__glyph b"),
-      // The glint is on a pseudo-element. A selector list that forgets it
-      // leaves a 20s animation running on a page that promised none.
-      ...[...document.querySelectorAll(".mark__glyph b")].map(
-        (el) => getComputedStyle(el, "::after").animationName,
-      ),
-    ],
-    // ...and the overlay must be invisible, not merely stopped.
-    glintOpacity: [...document.querySelectorAll(".mark__glyph b")].map(
-      (el) => getComputedStyle(el, "::after").opacity,
-    ),
-    markTransforms: names(".mark__glyph i").length
-      ? [...document.querySelectorAll(".mark__glyph i, .mark__glyph b")].map(
-          (el) => getComputedStyle(el).transform,
-        )
-      : [],
+    strike: sessionStorage.getItem("jb-strike"),
+    markAnimation: mark ? getComputedStyle(mark).animationName : "NO MARK",
+    moving: moving.map((el) => el.className),
+    checked: document.querySelectorAll(".fg-wordmark, .fg-door, .fg-fig__m, .fg-cta-row a").length,
     running: document.getAnimations().filter((a) => a.playState === "running").length,
   };
 });
+// A rasterizer may round a pixel differently from one frame to the next; a
+// turning specimen changes thousands, so the allowance is 0.05% of the stage.
 report(
-  "Reduced motion: canvas stands down, static SVG shown",
-  !rmState.live && rmState.svgVisible && rmState.mfAnimation === "none",
-  `is-live=${rmState.live} svg=${rmState.svgVisible} animation=${rmState.mfAnimation}`,
+  "Reduced motion: the specimen stands still and the strike never runs",
+  stillness.changed <= stillness.total * 0.0005 && rmState.strike === null,
+  `${stillness.changed} of ${stillness.total} px changed over 1s · strike ${rmState.strike === null ? "never ran" : "RAN"}`,
 );
 if (!BASELINE)
   report(
-  "Reduced motion: the mark is fully static, glint included",
-  rmState.markNames.every((n) => n === "none") &&
-    rmState.markTransforms.every((t) => t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)") &&
-    rmState.glintOpacity.every((o) => Number(o) === 0),
-  `animations ${[...new Set(rmState.markNames)].join(",")} · transforms ${[...new Set(rmState.markTransforms)].join(" ")}` +
-    ` · glint opacity ${[...new Set(rmState.glintOpacity)].join(",")}`,
-);
+    "Reduced motion: the mark and every transition are still (doors, figure methods, CTA links)",
+    rmState.markAnimation === "none" && rmState.checked > 0 && rmState.moving.length === 0,
+    `mark animation ${rmState.markAnimation} · ${rmState.checked} elements, ${rmState.moving.length} moving${rmState.moving.length ? `: ${rmState.moving.join(", ")}` : ""}`,
+  );
 report(
   "Reduced motion: ZERO animations running anywhere on the page",
   rmState.running === 0,

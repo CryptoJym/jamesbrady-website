@@ -16,9 +16,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { scanH3ro } from "./lib/h3ro-gate.mjs";
+import { H3RO_SOURCE_FACTS, scanH3ro, scanH3roSource } from "./lib/h3ro-gate.mjs";
 import { parseRootTokens, scanForLiterals, scanFrozen } from "./lib/token-gate.mjs";
 import { renderIcons } from "./lib/icon-raster.mjs";
+import { sameImage } from "./lib/png.mjs";
 import { renderMarkdown, toPlainText, PENDING_TOKEN } from "../lib/content/markdown.ts";
 
 const FIXTURES = join(process.cwd(), "scripts", "fixtures");
@@ -58,7 +59,7 @@ check("h3ro gate CATCHES F7 the retired domain as a destination", () => {
   assert.ok(domainHits > 0, `expected domainHits > 0, got ${domainHits}`);
 });
 
-check("h3ro gate ALLOWS the four permitted URL shapes (control)", () => {
+check("h3ro gate ALLOWS the permitted shapes (control)", () => {
   const { domainHits, brandHits } = scanH3ro(read("h3ro-allowed.txt"));
   assert.equal(domainHits, 0, "a permitted URL was counted as the retired domain");
   assert.equal(brandHits, 0, "a permitted URL was counted as brand copy");
@@ -69,6 +70,25 @@ check("h3ro gate is URL-ANCHORED, not token-global", () => {
   // must not license the bare token elsewhere on it.
   const mixed = "https://x.com/h3roai and, separately, the h3ro-dev collective.";
   assert.ok(scanH3ro(mixed).brandHits > 0, "an allowlisted URL licensed loose brand copy");
+});
+
+// 2026-09-27: the scheme became optional and a repository's full name became a
+// permitted shape. Every edge of those two widenings is asserted one line at a
+// time, so a line cannot pass by riding on a hit elsewhere in the file.
+check("h3ro gate CATCHES F11 every edge of the org-infrastructure shapes", () => {
+  const lines = read("h3ro-f11-shape-edges.txt").split("\n").slice(1).filter(Boolean);
+  assert.ok(lines.length >= 8, `fixture shrank to ${lines.length} lines`);
+  const missed = lines.filter((line) => scanH3ro(line).brandHits === 0);
+  assert.deepEqual(missed, [], `passed as permitted: ${missed.join(" | ")}`);
+});
+
+check("h3ro gate ALLOWS a pinned source fact in its own file ONLY", () => {
+  const [fact] = H3RO_SOURCE_FACTS;
+  const text = `{"method": "… ${fact.text} releases …"}`;
+  assert.equal(scanH3roSource(fact.file, text).brandHits, 0, "the pinned fact was flagged in its own file");
+  assert.ok(scanH3roSource("content/elsewhere.json", text).brandHits > 0, "the fact was allowed in another file");
+  const reworded = text.replace(fact.text, fact.text.replace("CryptoJym and h3ro-dev", "the h3ro-dev team"));
+  assert.ok(scanH3roSource(fact.file, reworded).brandHits > 0, "a reworded fact rode on the pin");
 });
 
 /* ------------------------------------------------------ the markdown renderer */
@@ -137,6 +157,25 @@ check("toPlainText marks EVERY gap, not just the first", () => {
   assert.equal((plain.match(/\[pending\]/g) ?? []).length, 2, plain);
 });
 
+// 2026-09-27, James: open questions render as third-person publicNotes. The
+// public render is what every page now uses, so it has to be shown refusing
+// the two silent failures verify-seo check 17 assumes it refuses.
+check("public render states each gap as its note, with no owner-facing mark", () => {
+  const html = renderMarkdown("Before. [JAMES: supply the figure] After.", {
+    mode: "public",
+    notes: ["The figure is not published yet."],
+  });
+  assert.ok(html.includes('<span class="pending-note">The figure is not published yet.</span>'), html);
+  assert.ok(!/class="pending"|Pending from James|supply the figure/.test(html), `owner-facing text leaked: ${html}`);
+});
+
+check("public render REFUSES a gap with no note", () => {
+  assert.throws(
+    () => renderMarkdown("A [JAMES: one] B [JAMES: two] C", { mode: "public", notes: ["Only one note."] }),
+    /no note for it/,
+  );
+});
+
 /* ------------------------------------------------------------ the token gate */
 //
 // New in wave 2. The rule is old (design-system-spec §7.2) but it was prose
@@ -172,17 +211,24 @@ check("token gate ALLOWS an exempt asset that froze the real token (control)", (
   assert.equal(bad.length, 0, `the shipped icon reported drift: ${JSON.stringify(bad)}`);
 });
 
+check("token gate ALLOWS the shipped specimen, which froze --bead from app/fg.css (control)", () => {
+  const tokens = parseRootTokens(readFileSync(join(process.cwd(), "app", "fg.css"), "utf8"));
+  const specimen = readFileSync(join(process.cwd(), "components", "specimen", "Specimen.tsx"), "utf8");
+  assert.ok(scanForLiterals(specimen).length > 0, "the specimen paints no literal, so this control proves nothing");
+  const bad = scanFrozen(specimen, tokens);
+  assert.equal(bad.length, 0, `the specimen painted a colour of its own: ${JSON.stringify(bad)}`);
+});
+
 check("icon raster is a FUNCTION of the SVG, not a memory of it", () => {
-  // Check 5 of verify-tokens compares bytes. Prove the comparison can fail:
-  // change one digit of the source and the raster must change with it.
+  // Check 5 of verify-tokens compares images (header + pixels). Prove that
+  // comparison can fail: change one digit of the source and it must see it.
   const svg = readFileSync(join(process.cwd(), "app", "icon.svg"), "utf8");
   const drifted = svg.replace('fill="#3FD9A0" fill-opacity="1"', 'fill="#3FD9A0" fill-opacity="0.5"');
   assert.notEqual(drifted, svg, "the fixture edit did not apply — the SVG shape changed");
-  assert.notEqual(
-    renderIcons(svg).apple.toString("base64"),
-    renderIcons(drifted).apple.toString("base64"),
-    "a changed SVG rendered identical bytes — the sync check cannot fail",
-  );
+  const [a, b] = [renderIcons(svg), renderIcons(drifted)];
+  assert.ok(sameImage(a.apple, renderIcons(svg).apple), "one SVG rendered two different images");
+  assert.ok(!sameImage(a.apple, b.apple), "a changed SVG rendered the same apple-icon — the sync check cannot fail");
+  assert.ok(!sameImage(a.ico, b.ico), "a changed SVG rendered the same favicon — the sync check cannot fail");
 });
 
 /* ------------------------------------------------------------- the offer gate */

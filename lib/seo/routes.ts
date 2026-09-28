@@ -44,6 +44,10 @@ function gitOr(paths: string[], fallback: string): string {
   return gitLastModified(paths) ?? fallback;
 }
 
+/** The /words capsule, shared by the route table and the page's JSON-LD. */
+export const WORDS_CAPSULE =
+  "In his words collects James Brady's own sentences, exactly as he said them, on why he builds, directing AI agents, questioning, cutting, credit and clients, each with its date and where it was said.";
+
 export function buildRoutes(): RouteRecord[] {
   const rows: RouteRecord[] = [];
 
@@ -145,8 +149,7 @@ export function buildRoutes(): RouteRecord[] {
     path: "/words",
     lastModified: gitOr(["app/(site)/words/page.tsx", "content/words/public.ts"], CONTENT_FLOOR),
     title: "In his words",
-    capsule:
-      "In his words collects James Brady's own sentences, exactly as he said them, on why he builds, directing AI agents, questioning, cutting, credit and clients, each with its date and where it was said.",
+    capsule: WORDS_CAPSULE,
     collection: "site",
   });
 
