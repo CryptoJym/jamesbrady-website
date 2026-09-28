@@ -16,18 +16,15 @@ export const WORK_GLOSSARY_ID = `${SITE.host}/#work-glossary`;
 export const OFFER_GLOSSARY_ID = `${SITE.host}/#offer-glossary`;
 
 /**
- * Exact list, ordered, no additions without a ruling. The X and TikTok entries
- * are plain profile links only, permitted by the 2026-08-11 ruling: the
- * retired brand token is allowed as a social handle and as an org
- * infrastructure path, and nowhere else. It never appears as brand copy, and
- * its domain is never used, anywhere on this site. verify-seo check 8 enforces
- * exactly that distinction.
+ * Exact list, ordered, no additions without a ruling. 2026-09-27: the X account
+ * was renamed from the retired handle to @of1ai (same account id), so the old
+ * URL returned 404; the TikTok profile no longer serves, so it is dropped rather
+ * than linked dead. The retired brand token now appears nowhere on this site.
  */
 export const SAME_AS = [
   "https://github.com/CryptoJym",
   "https://www.linkedin.com/in/jamesbrady1/",
-  "https://x.com/h3roai",
-  "https://www.tiktok.com/@h3ro.ai",
+  "https://x.com/of1ai",
   "https://bsky.app/profile/utlyzeit.bsky.social",
   "https://www.youtube.com/channel/UCA_9udyLWeGoJy12vc5TmfA",
 ] as const;

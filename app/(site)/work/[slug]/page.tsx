@@ -2,27 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  JsonLd,
-  Nameplate,
-  PageNameplate,
-  Prose,
-} from "@/components/site/instruments";
-import { CATEGORY_LABEL } from "@/lib/content/types";
+import { JsonLd, ProofList, Prose, RecordSection } from "@/components/fg/Reading";
+import { CaseLabel, TrayLabel } from "@/components/fg/Tray";
 import { work, workBySlug } from "@/lib/content";
-import { renderMarkdown } from "@/lib/content/markdown";
 import { serializeGraph, workGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { specimenFor } from "@/lib/tray";
 
 export function generateStaticParams() {
   return work.map((w) => ({ slug: w.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const entry = workBySlug(slug);
   if (!entry) return {};
@@ -37,205 +28,96 @@ export async function generateMetadata({
   });
 }
 
-export default async function WorkEntryPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function WorkEntryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const entry = workBySlug(slug);
   if (!entry) notFound();
 
-  const related = work.filter((w) => w.slug !== entry.slug).slice(0, 3);
+  const specimen = specimenFor(entry.slug);
+  // Same thread first, then the tray's editorial order.
+  const others = work.filter((w) => w.slug !== entry.slug);
+  const related = [
+    ...others.filter((w) => specimenFor(w.slug).thread.id === specimen.thread.id),
+    ...others.filter((w) => specimenFor(w.slug).thread.id !== specimen.thread.id),
+  ].slice(0, 3);
 
   return (
-    <main id="main" tabIndex={-1}>
+    <main id="main" tabIndex={-1} className="fg-page fga-page">
       <JsonLd json={serializeGraph(workGraph(entry))} />
 
-      <div className="wrap">
-        <div className="page-head">
-          <p className="kicker">
-            <Link href="/work">Work</Link>
-            <i aria-hidden="true">/</i>
-            <span>{entry.kicker}</span>
+      <div className="fga-doc">
+        <header className="fg-page__head fga-doc__head">
+          <p className="fg-eyebrow">
+            <Link href="/work">Work</Link> · {specimen.thread.name}
           </p>
-          <h1>{entry.title}</h1>
-          {/* Answer capsule: real prose in the body, self-contained and
-              pronoun-free, so an engine can quote it without this page. */}
-          <p className="page-lead">{entry.answerCapsule}</p>
-          <div className="chip-row">
-            {entry.categories.map((c) => (
-              <span className="chip" key={c}>
-                {CATEGORY_LABEL[c]}
-              </span>
-            ))}
-            {entry.anonymized ? <span className="chip">Anonymized</span> : null}
-          </div>
+          <h1 className="fg-h1">{entry.title}</h1>
+          {/* The answer capsule: real prose, self-contained and pronoun-free, so an engine can quote it without this
+              page. JSON-LD's DefinedTerm carries the same words (verify-seo check 5). */}
+          <p className="fg-p">{entry.answerCapsule}</p>
+        </header>
+
+        <div className="fga-doc__label">
+          <CaseLabel s={specimen} />
         </div>
 
-        <div className="article">
-          <div>
-            {/*
-              The render mode is a property of the ENTRY, not of the template.
-              A case study that carries `publicNotes` is one a buyer is being
-              sent to, and its gaps render as statements of absence; every
-              other case study keeps the owner-facing question inline, where a
-              technical reader treats an open question as a reason to trust the
-              rest. Both readings are honest. Only the address differs, and
-              /now carries the full second-person register either way.
-            */}
-            <Prose
-              html={renderMarkdown(
-                entry.body,
-                entry.publicNotes
-                  ? { mode: "public", notes: entry.publicNotes }
-                  : { mode: "inline" },
-              )}
-            />
+        <div className="fga-doc__body">
+          {/* An entry with publicNotes renders its [JAMES: …] gaps as those notes, in the third person. */}
+          <Prose body={entry.body} notes={entry.publicNotes} />
+        </div>
 
-            {entry.deltas.length > 0 ? (
-              <section aria-labelledby="deltas">
-                <h2 className="prose" id="deltas" style={{ fontSize: "var(--ts-h2)" }}>
-                  What changed, and how it was measured
-                </h2>
+        <aside className="fga-doc__record" aria-label="The record">
+          <RecordSection id="proof" title="Proof">
+            <ProofList proof={entry.proof} />
+            <p className="fga-rec__note">Every source above was read read-only on the date shown.</p>
+          </RecordSection>
+
+          {entry.deltas.length > 0 ? (
+            <RecordSection id="measured" title="What changed, and how it was measured">
+              <ul className="fga-deltas">
                 {entry.deltas.map((d) => (
-                  <div className="panel" key={d.metric} style={{ marginBottom: "var(--s-4)" }}>
-                    <div className="panel__head">
-                      <span>{d.metric}</span>
-                    </div>
-                    <div className="panel__body">
-                      {d.before ? (
-                        <p>
-                          {d.before} → {d.after ?? d.range}
-                        </p>
-                      ) : (
-                        <p>{d.after ?? d.range}</p>
-                      )}
-                    </div>
-                    <Nameplate
-                      fields={[
-                        { label: "Method", value: d.method },
-                        { label: "Timeframe", value: d.timeframe },
-                      ]}
-                    />
-                  </div>
+                  <li key={d.metric} className="fga-delta">
+                    <p className="fga-delta__k">{d.metric}</p>
+                    <p className="fga-delta__v">{d.before ? `${d.before} → ${d.after ?? d.range}` : (d.after ?? d.range)}</p>
+                    <p className="fga-delta__m">method: {d.method}</p>
+                    <p className="fga-delta__m">timeframe: {d.timeframe}</p>
+                  </li>
                 ))}
-              </section>
-            ) : null}
+              </ul>
+            </RecordSection>
+          ) : null}
 
-            <section aria-labelledby="stack">
-              <h2 className="prose" id="stack" style={{ fontSize: "var(--ts-h2)" }}>
-                Stack
-              </h2>
-              <div className="chip-row">
-                {entry.stack.map((s) => (
-                  <span className="chip" key={s}>
-                    {s}
-                  </span>
-                ))}
-              </div>
-            </section>
+          {entry.anonymized ? (
+            <RecordSection id="anonymization" title="Anonymization">
+              <p className="fga-rec__text">
+                Client names and identifying details are withheld per agreement. Industries are named, specific clients
+                are not. Screenshots and metrics are otherwise unaltered. A client is named only under a written
+                clearance record.
+              </p>
+            </RecordSection>
+          ) : null}
 
-            <section aria-labelledby="related" style={{ marginTop: "var(--s-8)" }}>
-              <h2 className="prose" id="related" style={{ fontSize: "var(--ts-h2)" }}>
-                Related work
-              </h2>
-              <div className="grid-work grid-work--3">
-                {related.map((r) => (
-                  <article className="card" key={r.slug}>
-                    <p className="card__kicker">{r.kicker}</p>
-                    <h3>
-                      <Link className="card__link" href={`/work/${r.slug}`}>
-                        {r.title}
-                      </Link>
-                    </h3>
-                    <p className="card__body">{r.summary}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          <aside className="article__aside" aria-label="Proof">
-            <div className="panel">
-              <div className="panel__head">
-                <span>Proof</span>
-                <span>{entry.proof.length} sources</span>
-              </div>
-              <div className="panel__body">
-                <ul style={{ display: "grid", gap: "var(--s-4)" }}>
-                  {entry.proof.map((p) => (
-                    <li key={p.label}>
-                      {p.url ? (
-                        <a
-                          href={p.url}
-                          rel="noopener noreferrer"
-                          style={{ color: "var(--t-hi)", textDecoration: "underline" }}
-                        >
-                          {p.label}
-                        </a>
-                      ) : (
-                        <span style={{ color: "var(--t-hi)" }}>
-                          {p.label}
-                          {p.redacted ? " (redacted)" : ""}
-                        </span>
-                      )}
-                      <Nameplate
-                        fields={[
-                          { label: "Method", value: p.method },
-                          { label: "Captured", value: p.capturedAt },
-                        ]}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <PageNameplate
-                source={entry.repo ? `github.com/${entry.repo.owner}/${entry.repo.name}` : "Live pages"}
-                method="Every source above was read read-only on the date shown"
-              />
-            </div>
-
-            {entry.anonymized ? (
-              <div className="panel">
-                <div className="panel__head">
-                  <span>Anonymization</span>
-                </div>
-                <div className="panel__body">
-                  Client names and identifying details are withheld per agreement.
-                  Industries are named, specific clients are not. Screenshots and metrics
-                  are otherwise unaltered. A client is named only under a written
-                  clearance record.
-                </div>
-              </div>
-            ) : null}
-
-            {entry.repo ? (
-              <div className="panel">
-                <div className="panel__head">
-                  <span>Repository</span>
-                  <span>{entry.repo.public ? "Public" : "Private"}</span>
-                </div>
-                <Nameplate
-                  fields={[
-                    { label: "Name", value: `${entry.repo.owner}/${entry.repo.name}` },
-                    ...(entry.repo.license
-                      ? [{ label: "License", value: entry.repo.license }]
-                      : []),
-                    ...(typeof entry.repo.stars === "number"
-                      ? [{ label: "Stars", value: String(entry.repo.stars) }]
-                      : []),
-                    entry.repo.lastPush
-                      ? { label: "Last push", value: entry.repo.lastPush }
-                      : { label: "Last push", placeholder: "computed at build" },
-                    { label: "Snapshot", value: entry.repo.snapshotAt ?? "" },
-                  ]}
-                />
-              </div>
-            ) : null}
-          </aside>
-        </div>
+          <RecordSection id="stack" title="Stack">
+            <ul className="fga-stack">
+              {entry.stack.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+          </RecordSection>
+        </aside>
       </div>
+
+      <section className="fga-related" aria-labelledby="related">
+        <h2 className="fga-row__h" id="related">
+          Related work
+        </h2>
+        <ul className="fga-labels">
+          {related.map((w) => (
+            <li key={w.slug}>
+              <TrayLabel s={specimenFor(w.slug)} />
+            </li>
+          ))}
+        </ul>
+      </section>
     </main>
   );
 }

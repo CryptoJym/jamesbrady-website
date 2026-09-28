@@ -185,6 +185,48 @@ check("icon raster is a FUNCTION of the SVG, not a memory of it", () => {
   );
 });
 
+/* ------------------------------------------------------------- the offer gate */
+//
+// 2026-09-27. James ruled words out of buyer copy (workstream, beta, production
+// testing, dedicated team, named people, "from" before a price), named the
+// people build-with-you coaches with a promise line that always follows the
+// name, and said New Reward's client price is never published. The offer rules
+// in lib/content/validate.ts enforce that; these show them REFUSING, each on a
+// copy of the real offers. /now is dated today in the copy, so the staleness
+// gate cannot answer for the offer gate.
+
+const { importTs } = await import("./lib/ts-register.mjs");
+const { validateAll } = await importTs("lib/content/validate.ts");
+const content = {
+  work: (await importTs("content/work/index.ts")).work,
+  theories: (await importTs("content/theories/index.ts")).theories,
+  lab: (await importTs("content/lab/index.ts")).lab,
+  learn: (await importTs("content/learn/index.ts")).learn,
+  now: [{ ...(await importTs("content/now/now.ts")).now, updated: new Date().toISOString().slice(0, 10) }],
+};
+const realOffers = (await importTs("content/offers/index.ts")).offers;
+const offerAt = (offers, slug) => offers.find((o) => o.slug === slug);
+const validateOffers = (mutate) => {
+  const offers = structuredClone(realOffers);
+  mutate(offers);
+  validateAll({ ...content, offers });
+};
+
+check("offer gate ALLOWS the real offers (control)", () => validateOffers(() => {}));
+for (const [label, mutate, expected] of [
+  ["a banned word (workstream)", (o) => (offerAt(o, "build-a-system").summary += " One workstream."), /workstream/],
+  ["'from' before a price", (o) => (offerAt(o, "build-a-system").price.statement = "Build is from $15,000 a month."), /from before a price/],
+  ["an old name for the coaches", (o) => (offerAt(o, "build-a-system").deliverables[0].detail = "Named people do it."), /named people/],
+  ["the coach name without its promise line", (o) => {
+    const b = offerAt(o, "build-a-system");
+    b.answerCapsule = b.answerCapsule.replace(/ They build your AI systems[\s\S]*$/, "");
+    b.published.people.lines = ["You work side by side with our build-with-you coaches."];
+  }, /promise line/],
+  ["a New Reward price with no source", (o) => (offerAt(o, "get-found").price.statement = "New Reward costs $3,000 a month."), /no price\.source/],
+]) {
+  check(`offer gate CATCHES ${label}`, () => assert.throws(() => validateOffers(mutate), expected));
+}
+
 console.log("─".repeat(72));
 console.log(`${passed}/${passed + failed} fixture checks passed${failed ? ` — ${failed} FAILED` : ""}`);
 process.exit(failed ? 1 : 0);

@@ -1,0 +1,183 @@
+/* Lane B: work-with-me, the offers and contact, in the Fulgurite system (see fg.css).
+ * Tokens only: every colour below is a var() from fg.css :root. Class names start fgb- so nothing here can reach
+ * another lane's page; the shared pieces (fg-page, fg-eyebrow, fg-h1, fg-p, fg-door, fg-label, fg-fig,
+ * fg-cta-row) come from fg.css unchanged. */
+
+/* ---- Page head ---------------------------------------------------------------------------------- */
+.fgb .fg-eyebrow a { color: inherit; text-decoration: none; }
+.fgb .fg-eyebrow a:hover { color: var(--ink); }
+.fgb-head .fg-cta-row { margin-top: 24px; }
+
+/* Who delivers the offer, in the record's voice. */
+.fgb-by { margin: 18px 0 0; max-width: 72ch; font: 400 12.5px/1.6 var(--f-rec); color: var(--ink-2); }
+.fgb-by__k { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.fgb .fgb-by a { color: var(--ink); }
+
+/* The provenance mark beside a company's own words. */
+.fgb-prov { margin: 14px 0 0; font: 400 12px/1.6 var(--f-rec); color: var(--ink-3); overflow-wrap: anywhere; }
+.fgb-prov__tag { display: inline-block; margin-right: 6px; padding: 0 6px; border: 1px solid var(--sand-dim); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sand); }
+.fgb .fgb-prov a { color: var(--ink-2); }
+
+/* ---- Rows: the heading at the left, its content at the right, like /words ----------------------- */
+.fgb-rows { margin-top: 16px; }
+.fgb-row { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 16px 48px; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--rule); scroll-margin-top: 72px; }
+.fgb-row__h { margin: 0; font: 600 20px/1.22 var(--f-narr); color: var(--ink); text-wrap: balance; }
+.fgb-row__note { margin-top: 10px; font: 400 12px/1.55 var(--f-rec); color: var(--ink-3); }
+.fgb-row__note .fgb-prov { margin-top: 0; }
+.fgb-row__body { min-width: 0; }
+.fgb-row__body > .fg-cta-row { margin-top: 20px; }
+@media (max-width: 800px) {
+  .fgb-row { grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 44px; padding-top: 22px; }
+  .fgb-row__h { font-size: 19px; }
+}
+
+/* The answer to the page's question, at reading size. */
+.fgb-capsule { margin: 0; max-width: 62ch; font: 400 clamp(18px, 1.5vw, 21px)/1.5 var(--f-narr); color: var(--ink); text-wrap: pretty; }
+.fgb-lead { margin: 0; max-width: var(--measure); font-size: 17px; line-height: 1.6; color: var(--ink); text-wrap: pretty; }
+
+/* Prose from the content source (lib/content/markdown.ts renders it inside .prose). */
+/* Margins come from preflight (0) and the sibling rule below, so no rule here may set a margin on p or ul. */
+.fgb-prose .prose > * + *, .fgb-prose > * + * { margin-top: 0.9em; }
+.fgb-prose p { max-width: var(--measure); font-size: 17px; line-height: 1.6; color: var(--ink); text-wrap: pretty; }
+.fgb-prose h2 { font: 600 20px/1.22 var(--f-narr); color: var(--ink); text-wrap: balance; }
+.fgb-prose .prose > h2 { margin-top: 1.7em; }
+.fgb-prose .prose > h2:first-child { margin-top: 0; }
+.fgb-prose .prose > h2 + * { margin-top: 0.55em; }
+.fgb-prose ul, .fgb-prose ol { padding: 0; list-style: none; max-width: var(--measure); }
+.fgb-prose li { position: relative; padding-left: 18px; font-size: 16.5px; line-height: 1.55; color: var(--ink); }
+.fgb-prose li + li { margin-top: 6px; }
+.fgb-prose li::before { content: ""; position: absolute; left: 0; top: 0.8em; width: 8px; height: 1px; background: var(--sand); }
+.fgb-prose strong { font-weight: 600; color: var(--ink); }
+.fgb-prose code { font: 400 0.9em var(--f-rec); }
+/* A fact that is not published yet, stated in the third person (the buyer reading of a [JAMES: …] gap). */
+.fgb-prose .pending-note-row { margin-top: 1.2em; padding: 0 0 0 16px; border-left: 2px solid var(--sand-dim); font: 400 13px/1.6 var(--f-rec); color: var(--ink-2); }
+.fgb-prose .pending-note { color: inherit; }
+
+/* ---- A company's own card, word for word --------------------------------------------------------- */
+.fgb-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.fgb-card { border: 1px solid var(--rule); background: var(--ground-2); padding: 20px 22px 22px; }
+.fgb-card--main { border-color: var(--sand-dim); }
+.fgb-card__name { margin: 0; font: 500 11.5px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.fgb-card__price { margin: 10px 0 0; font: 500 28px/1.15 var(--f-rec); color: var(--ink); }
+.fgb-card__terms { margin: 8px 0 0; font: 400 12.5px/1.5 var(--f-rec); color: var(--sand); }
+.fgb-card__value { margin: 16px 0 0; font-size: 16.5px; line-height: 1.5; color: var(--ink); text-wrap: pretty; }
+.fgb-card__points { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.fgb-card__points li { position: relative; padding-left: 18px; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+.fgb-card__points li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 8px; height: 1px; background: var(--sand); }
+.fgb-card__more { margin: 16px 0 0; font: 500 12.5px/1.4 var(--f-rec); }
+.fgb .fgb-card__more a { color: var(--sand); text-decoration: none; }
+.fgb .fgb-card__more a:hover { color: var(--ink); }
+.fgb-card__start { margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink); }
+.fgb-pace { margin: 18px 0 0; max-width: var(--measure); padding-left: 16px; border-left: 2px solid var(--sand-dim); font-size: 15.5px; line-height: 1.55; color: var(--ink-2); }
+@media (max-width: 1000px) { .fgb-cards { grid-template-columns: minmax(0, 1fr); } }
+
+/* The levels: one cell each, hairlines between, like the tip's figures on the home page. */
+.fgb-levels { margin: 20px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.fgb-level { background: var(--ground); padding: 16px 18px 18px; }
+.fgb-level__name { margin: 0; font: 600 17px/1.3 var(--f-narr); color: var(--ink); }
+.fgb-level__price { margin: 4px 0 0; font: 500 14px/1.3 var(--f-rec); color: var(--ink); }
+/* The level's name and price read "Build Plus · $25,000 a month" word for word; the dot is kept, out of sight. */
+.fgb-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.fgb-level__at { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink); }
+.fgb-level__adds { margin: 8px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.fgb-sub { margin: 26px 0 8px; font: 600 16px/1.3 var(--f-narr); color: var(--ink); }
+@media (max-width: 1000px) { .fgb-levels { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- Steps, what the client keeps, who it is for, and the sources ------------------------------- */
+.fgb-steps { margin: 0; padding: 0; list-style: none; counter-reset: fgb-step; }
+.fgb-step { counter-increment: fgb-step; display: grid; grid-template-columns: 40px minmax(0, 1fr); padding: 14px 0; border-top: 1px solid var(--rule); }
+.fgb-step:first-child { border-top: 0; padding-top: 0; }
+.fgb-step::before { content: counter(fgb-step, decimal-leading-zero); grid-row: 1 / span 2; font: 500 12px/1.9 var(--f-rec); color: var(--ink-3); }
+.fgb-step__label { margin: 0; font: 600 16px/1.4 var(--f-narr); color: var(--ink); }
+.fgb-step__detail { margin: 4px 0 0; max-width: var(--measure); font-size: 15.5px; line-height: 1.55; color: var(--ink-2); }
+
+.fgb-keeps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
+.fgb-keeps li { border-top: 1px solid var(--rule); padding-top: 12px; }
+.fgb-keeps__label { margin: 0; font: 600 15.5px/1.35 var(--f-narr); color: var(--ink); }
+.fgb-keeps__detail { margin: 6px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
+@media (max-width: 700px) { .fgb-keeps { grid-template-columns: minmax(0, 1fr); } }
+
+.fgb-chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.fgb-chips li { border: 1px solid var(--rule); padding: 6px 10px; font: 400 12.5px/1.4 var(--f-rec); color: var(--ink-2); }
+
+.fgb-proof { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+.fgb-proof .fg-label { height: 100%; }
+.fgb-proof .fg-label__row { overflow-wrap: anywhere; }
+.fgb-proof .fg-label__row + .fg-label__row { margin-top: 4px; }
+.fgb-proof .fg-label__row:nth-child(2) a { color: var(--ink); }
+
+/* The other ways in, at the foot of an offer. */
+.fgb-others__k { margin: 30px 0 10px; font: 500 11.5px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.fgb-others { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px; }
+.fgb-others .fg-door { height: 100%; padding: 14px 16px 16px; }
+.fgb-others__by { display: block; font: 500 11px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.fgb-others__t { display: block; margin-top: 6px; font: 600 16px/1.3 var(--f-narr); color: var(--ink); }
+
+/* ---- The hub's doors ------------------------------------------------------------------------------ */
+.fgb-doors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 48px; }
+.fgb-door { position: relative; padding: 20px 20px 22px; }
+.fgb-door .fgb-door__by { margin: 0; font: 500 11px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.fgb-door h2 { margin: 10px 0 8px; font: 600 21px/1.25 var(--f-narr); color: var(--ink); }
+/* The heading's link covers the card, so the whole door is one link; a figure sits above it and keeps its method. */
+.fgb-door__link { color: inherit; text-decoration: none; }
+.fgb-door__link::after { content: ""; position: absolute; inset: 0; }
+.fgb-door__link:focus-visible { outline: none; }
+.fgb-door:has(.fgb-door__link:focus-visible) { outline: 2px solid var(--heat); outline-offset: 3px; }
+.fgb-door p + p { margin-top: 8px; }
+.fgb-door .fgb-door__price { margin-top: 12px; font: 400 13px/1.5 var(--f-rec); color: var(--ink-2); }
+.fgb-door .fg-fig { z-index: 2; }
+@media (max-width: 760px) { .fgb-doors { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- Contact: the form, and what makes a strong fit ---------------------------------------------- */
+.fgb-contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); grid-template-areas: "side form"; gap: 40px 64px; align-items: start; margin-top: 48px; }
+.fgb-contact__form { grid-area: form; min-width: 0; }
+.fgb-contact__side { grid-area: side; min-width: 0; }
+@media (max-width: 960px) {
+  .fgb-contact { grid-template-columns: minmax(0, 1fr); grid-template-areas: "form" "side"; }
+}
+.fgb-status { margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--sand-dim); font: 400 13px/1.5 var(--f-rec); color: var(--ink-2); }
+.fgb-mail { margin: 14px 0 0; font: 400 13px/1.5 var(--f-rec); color: var(--ink-2); }
+.fgb .fgb-mail a { color: var(--ink); }
+
+.fgb-form { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 14px; border: 1px solid var(--rule); background: var(--ground-2); padding: 20px 22px 22px; }
+.fgb-form > * { grid-column: 1 / -1; }
+.fgb-form > .fgb-field--half { grid-column: auto; }
+@media (max-width: 520px) { .fgb-form > .fgb-field--half { grid-column: 1 / -1; } .fgb-form { padding: 18px 16px 20px; } }
+.fgb-form__head { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding-bottom: 12px; border-bottom: 1px solid var(--rule); font: 500 11.5px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.fgb-form__sent { color: var(--heat); }
+.fgb-form__msg { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink); }
+.fgb-form__err { margin: 0; padding: 10px 12px; border: 1px solid var(--heat); font-size: 14.5px; line-height: 1.5; color: var(--ink); }
+.fgb-form__note { margin: 0; font: 400 12px/1.55 var(--f-rec); color: var(--ink-3); }
+.fgb-field { display: grid; gap: 6px; min-width: 0; }
+.fgb-field label { font: 500 13.5px/1.4 var(--f-narr); color: var(--ink-2); }
+.fgb-field input, .fgb-field select, .fgb-field textarea {
+  box-sizing: border-box; width: 100%; min-width: 0; margin: 0; padding: 11px 12px;
+  appearance: none; border: 1px solid var(--rule); border-radius: 0; background-color: var(--ground);
+  font: 400 16px/1.4 var(--f-narr); color: var(--ink);
+}
+.fgb-field textarea { min-height: 150px; resize: vertical; }
+.fgb-field select {
+  padding-right: 36px; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%), linear-gradient(135deg, var(--ink-2) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.fgb-field select option { background: var(--ground-2); color: var(--ink); }
+.fgb-field :is(input, select, textarea):hover { border-color: var(--sand-dim); }
+body.fg .fgb-field :is(input, select, textarea):focus-visible { outline: 2px solid var(--heat); outline-offset: 1px; border-radius: 0; }
+.fgb-field [aria-invalid="true"] { border-color: var(--heat); }
+.fgb-field__err { margin: 0; font: 400 12.5px/1.45 var(--f-rec); color: var(--heat); }
+.fgb-send {
+  justify-self: start; display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 20px;
+  border: 1px solid color-mix(in srgb, var(--heat) 55%, transparent); background: transparent;
+  font: 600 15px/1 var(--f-narr); color: var(--heat); cursor: pointer;
+}
+.fgb-send:hover { border-color: var(--heat); background: color-mix(in srgb, var(--heat) 12%, transparent); }
+.fgb-send:disabled { opacity: 0.6; cursor: progress; }
+
+.fgb-faq { margin-top: 44px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.fgb-faq h2 { margin: 0 0 14px; font: 600 20px/1.22 var(--f-narr); color: var(--ink); }
+.fgb-faq__item + .fgb-faq__item { margin-top: 18px; }
+.fgb-faq h3 { margin: 0; font: 600 16px/1.35 var(--f-narr); color: var(--ink); }
+.fgb-faq p { margin: 6px 0 0; max-width: var(--measure); font-size: 15.5px; line-height: 1.55; color: var(--ink-2); }

@@ -14,6 +14,7 @@ import {
   discoverableTheories,
   work,
 } from "@/lib/content";
+import { BUILD, CONSULT } from "@/content/offers/build-card";
 import { gitLastModified } from "./git";
 
 export type RouteRecord = {
@@ -29,9 +30,15 @@ export type RouteRecord = {
 /** Fallback when git history is unavailable — the newest content date. */
 const CONTENT_FLOOR = maxModified([...work, ...theories, ...learn, ...lab, ...offers, now]);
 
-/** The hub capsule, shared by the route table and the page that renders it. */
-export const WORK_WITH_ME_CAPSULE =
-  "Work with me splits into three engagements: getting a business found in search and inside AI answers, delivered by the agency New Reward; building a system that ships in verified waves, delivered by the studio Utlyze; and background screening for new hires, delivered by Vuplicity. Each page states what the engagement measures or produces, who delivers it, and the budget band it normally sits in.";
+/** The work index capsule, shared by the route table and the page that renders it. */
+export const WORK_CAPSULE =
+  "The work index is a specimen tray: one catalogue label for each piece of work, grouped by the thread it grew on. Each label carries its repository, dates and condition, read from his public record on GitHub; private work is labelled as private.";
+
+/**
+ * The hub capsule, shared by the route table and the page that renders it. The two prices are Utlyze's published
+ * ones, read from the same card the Build page carries, so they cannot drift from it.
+ */
+export const WORK_WITH_ME_CAPSULE = `The ways to work with James Brady: building AI systems with Utlyze, on Consult at ${CONSULT.price} or Build at ${BUILD.price}; getting a business found in Google and in AI answers with New Reward; background checks on new hires, run by Vuplicity; or writing to him directly. Each offer page says who delivers the work, what it covers, and where its facts and prices were read.`;
 
 function gitOr(paths: string[], fallback: string): string {
   return gitLastModified(paths) ?? fallback;
@@ -56,8 +63,7 @@ export function buildRoutes(): RouteRecord[] {
     path: "/work",
     lastModified: maxModified(work),
     title: "Work",
-    capsule:
-      "The work index lists products, open-source projects, client work and experiments, filtered in the browser with a count read from what is on screen.",
+    capsule: WORK_CAPSULE,
     collection: "work",
   });
   for (const entry of work) {
@@ -76,7 +82,7 @@ export function buildRoutes(): RouteRecord[] {
   rows.push({
     path: "/work-with-me",
     lastModified: maxModified(offers),
-    title: "Work with me",
+    title: "Work with him",
     capsule: WORK_WITH_ME_CAPSULE,
     collection: "offers",
   });
@@ -136,6 +142,15 @@ export function buildRoutes(): RouteRecord[] {
   });
 
   rows.push({
+    path: "/words",
+    lastModified: gitOr(["app/(site)/words/page.tsx", "content/words/public.ts"], CONTENT_FLOOR),
+    title: "In his words",
+    capsule:
+      "In his words collects James Brady's own sentences, exactly as he said them, on why he builds, directing AI agents, questioning, cutting, credit and clients, each with its date and where it was said.",
+    collection: "site",
+  });
+
+  rows.push({
     path: "/contact",
     lastModified: gitOr(["app/(site)/contact/page.tsx", "lib/contact.ts"], CONTENT_FLOOR),
     title: "Contact",
@@ -152,25 +167,17 @@ export function buildRoutes(): RouteRecord[] {
     collection: "now",
   });
 
-  // /links keeps its URL (ruling G) and, from wave 3, its skin is Direction B
-  // like every other live surface. It was the site's only bridge from the
-  // social accounts and it pointed at a design nothing else on the site uses,
-  // so an arrival from a video landed somewhere that looked like a different
-  // person's website.
-  rows.push({
-    path: "/links",
-    lastModified: gitOr(["app/(site)/links/page.tsx"], CONTENT_FLOOR),
-    title: "Links",
-    capsule:
-      "The links page collects James Brady's public profiles, every way to work with him, and the recorded walkthroughs, in one place at its original URL. Profiles listed: GitHub, LinkedIn, X, TikTok, YouTube, Bluesky, and a direct email address.",
-    collection: "site",
-  });
+  // /links and /watch left the route table on 2026-09-27 and redirect
+  // permanently from next.config.ts: /links folded into /about#elsewhere, and
+  // /watch went to /learn because its recordings say a retired framing aloud.
+  // A redirected URL is not a page, so neither is in the sitemap, llms.txt,
+  // the manifest or the Ask pack any more.
 
-  // The three volumes and /watch. THE URLS ARE THE POINT: they have never
-  // moved and are not redirected (ruling G, link equity). Wave 4 reskinned all
-  // four onto Direction B in place, the way /links was reskinned in wave 3, so
-  // "archive" now describes the CONTENT — frozen, dated, no longer maintained —
-  // and no longer describes the design they happen to be wearing.
+  // The three volumes. THE URLS ARE THE POINT: they have never moved and are
+  // not redirected (ruling G, link equity). Wave 4 reskinned them onto
+  // Direction B in place, so "archive" now describes the CONTENT — frozen,
+  // dated, no longer maintained — and no longer describes the design they
+  // happen to be wearing.
   //
   // The git path list carries the historical locations as well as the current
   // one, so `lastModified` does not reset to the content floor on the commit
@@ -201,18 +208,6 @@ export function buildRoutes(): RouteRecord[] {
       ],
       title: "The Workshop",
       capsule: learn[2].answerCapsule,
-    },
-    {
-      path: "/watch",
-      files: [
-        "app/(site)/watch/page.tsx",
-        "content/watch/index.ts",
-        "app/(legacy)/watch/page.tsx",
-        "app/watch/page.tsx",
-      ],
-      title: "Watch",
-      capsule:
-        "The watch page holds recorded walkthroughs, frozen with the archive and kept at its original URL.",
     },
   ];
   for (const l of archive) {

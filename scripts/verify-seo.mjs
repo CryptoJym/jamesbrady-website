@@ -82,15 +82,13 @@ const STATIC_ROUTES = [
   "/about",
   "/contact",
   "/now",
-  // Reskinned in wave 3 onto Direction B, at the SAME URL. It is no longer a
-  // legacy route, so every check below applies to it with no deferral.
-  "/links",
   // The dated archives. URLs preserved, reskinned onto Direction B in wave 4,
-  // and held to every check below with no deferral.
+  // and held to every check below with no deferral. /links and /watch left this
+  // list on 2026-09-27: both redirect permanently (next.config.ts), and a
+  // redirect is not a page.
   "/primer",
   "/manuscript",
   "/workshop",
-  "/watch",
 ];
 
 /**
@@ -1158,8 +1156,8 @@ if (deferredLegacy.length) {
   // block existing.
   console.log(
     `\nNo deferred routes. Every check above ran against all ${STATIC_ROUTES.length} routes.\n` +
-      `/links cleared in wave 3; /primer, /manuscript, /workshop and /watch cleared in\n` +
-      `wave 4 when they were reskinned onto Direction B at the same URLs.\n`,
+      `/primer, /manuscript and /workshop cleared in wave 4 when they were reskinned\n` +
+      `onto Direction B at the same URLs; /links and /watch now redirect.\n`,
   );
 }
 

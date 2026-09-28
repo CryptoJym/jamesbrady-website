@@ -18,7 +18,7 @@ export const entry: TheoryEntry = {
   summary:
     "Prove function first: one honest happy path plus mandatory refusal tests, with every deferral written down.",
   datePublished: "2026-07-28",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze"],
   history: [
     { date: "2026-07-28", state: "sketched", note: "Named as a standing operating rule after test batteries outgrew the features they tested." },
@@ -36,6 +36,10 @@ export const entry: TheoryEntry = {
     image: "/og/theories.png",
     imageAlt: "James Brady — theory: Function-First Orchestration",
   },
+  // Its pending gap, as a reader sees it: one third-person note.
+  publicNotes: [
+    "The words that named the rule are not quoted here: they come from an internal working session and have not been cleared for publication.",
+  ],
   body: `The rule came out of watching build waves produce test batteries larger than the features they tested. The tests were not wrong. They were early. Every hour spent on a speculative test matrix was an hour not spent finding out whether the thing worked at all.
 
 So the standing rule is: great is the enemy of good. Prove function. Refine later.
@@ -56,5 +60,5 @@ Sketched. A standing operating rule with a clear origin and daily application. N
 
 - Related theory: [The Architect Loop](/theories/architect-loop)
 
-[JAMES: this rule came from your own words on 2026-07-28: "ensure that we do not over engineer the testing. We want to focus on function. We can refine later. Great is the enemy of good." Do you want that quoted on the page as yours? It is the strongest line on it, but it is from an internal working session.]`,
+[JAMES: this rule came from your own words in an internal working session on 2026-07-28. Do you want them quoted on the page as yours? The exact words are in the private session record, not in this public file.]`,
 };

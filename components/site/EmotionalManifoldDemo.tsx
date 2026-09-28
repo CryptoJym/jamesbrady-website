@@ -16,10 +16,12 @@ const AXES = [
 type AxisKey = (typeof AXES)[number]["key"];
 type Axes = Record<AxisKey, number>;
 
+// The first frame a visitor sees. At complexity 40 the map settles onto two points and the frame looks empty;
+// anywhere from 0 to 30 it draws the full field.
 const DEFAULT_AXES: Axes = {
   energy: 55,
   valence: 10,
-  complexity: 40,
+  complexity: 20,
   novelty: 35,
   introspection: 45,
   focus: 60,
@@ -53,8 +55,10 @@ function stillPath(axes: Axes) {
   for (let i = 0; i < STILL_STEPS; i++) {
     const nx = Math.sin(params.a * y) + params.c * Math.cos(params.a * x);
     const ny = Math.sin(params.b * x) + params.d * Math.cos(params.b * y);
-    x = nx;
-    y = ny;
+    // Rounded every step. The map is chaotic, so a last-bit difference between the server's Math.sin and the
+    // browser's would otherwise grow into a different drawing, and the still would fail to hydrate.
+    x = Math.round(nx * 1e6) / 1e6;
+    y = Math.round(ny * 1e6) / 1e6;
     if (i < 40) continue;
     const px = VIEWBOX_WIDTH * 0.5 + x * scale;
     const py = VIEWBOX_HEIGHT * 0.5 + y * scale;
@@ -73,9 +77,8 @@ function plot(
 ) {
   const params = paramsFor(axes);
   ctx.clearRect(0, 0, w, h);
-  const ink = getComputedStyle(document.documentElement)
-    .getPropertyValue("--sig")
-    .trim();
+  // The ink is the demo's own custom property (app/fg-a.css), so it follows the page's palette.
+  const ink = getComputedStyle(ctx.canvas).getPropertyValue("--fga-lens-ink").trim();
   if (!ink) return;
   ctx.fillStyle = ink;
   ctx.globalAlpha = 0.08;
@@ -108,8 +111,11 @@ export function EmotionalManifoldDemo() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Measure the frame, not the canvas: the canvas stays hidden until its first drawing, and a hidden box has no
+    // size, so measuring the canvas meant it never drew at all.
+    const frame = canvas.parentElement ?? canvas;
     const draw = () => {
-      const rect = canvas.getBoundingClientRect();
+      const rect = { width: frame.clientWidth, height: frame.clientHeight };
       if (!rect.width || !rect.height) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.floor(rect.width * dpr);
@@ -122,7 +128,7 @@ export function EmotionalManifoldDemo() {
 
     const observer =
       typeof ResizeObserver === "undefined" ? null : new ResizeObserver(draw);
-    observer?.observe(canvas);
+    observer?.observe(frame);
     motionQuery.addEventListener("change", draw);
     return () => {
       observer?.disconnect();
@@ -132,29 +138,29 @@ export function EmotionalManifoldDemo() {
 
   return (
     <div
-      className={`lens${canvasReady ? " lens--ready" : ""}`}
+      className={`fga-lens${canvasReady ? " fga-lens--ready" : ""}`}
       id="emotional-manifold"
       role="group"
       aria-labelledby="lens-title"
       aria-describedby="lens-note"
     >
-      <p className="lens__flag">Paused · a lens, not a measurement</p>
-      <h2 className="lens__title" id="lens-title">
+      <p className="fga-lens__flag">Paused · a lens, not a measurement</p>
+      <h2 className="fga-lens__title" id="lens-title">
         The emotional manifold
       </h2>
-      <div className="lens__visual" aria-hidden="true">
+      <div className="fga-lens__visual" aria-hidden="true">
         <svg
-          className="lens__still"
+          className="fga-lens__still"
           viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
           preserveAspectRatio="none"
         >
           <path d={fallbackPath} />
         </svg>
-        <canvas ref={canvasRef} className="lens__c" />
+        <canvas ref={canvasRef} className="fga-lens__c" />
       </div>
-      <div className="lens__axes">
+      <div className="fga-lens__axes">
         {AXES.map((axis) => (
-          <label key={axis.key} className="lens__axis">
+          <label key={axis.key} className="fga-lens__axis">
             <span id={`lens-${axis.key}-label`}>
               {axis.label}
               <b>{axes[axis.key]}</b>
@@ -176,7 +182,7 @@ export function EmotionalManifoldDemo() {
           </label>
         ))}
       </div>
-      <p className="lens__note" id="lens-note">
+      <p className="fga-lens__note" id="lens-note">
         Six axes arrived at in conversation with a language model, not derived
         from a study. Drag them. The field is Clifford ink from those numbers.
         It does not validate a feeling.

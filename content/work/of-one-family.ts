@@ -11,7 +11,7 @@ export const entry: WorkEntry = {
   summary:
     "A governed family of role-shaped domains for one-person businesses: two live applications, the rest deliberately staked ground.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze"],
   stack: ["Next.js", "Vercel", "Shared component library (ofone-ui)"],
   timeframe: { start: "2025-06" },
@@ -47,6 +47,11 @@ export const entry: WorkEntry = {
     image: "/og/work.png",
     imageAlt: "James Brady — case study: the Of One family, a thesis in progress",
   },
+  // Its pending gaps, as a reader sees them: one third-person note each, in gap order.
+  publicNotes: [
+    "No verdict is published yet on which of these draws real interest, or which will be dropped.",
+    "The full list of working applications is not confirmed yet; the two named above are the ones checked.",
+  ],
   body: `> **Read this first.** This entry is a thesis being tested, not a finished product line. Most of what is described below is staked ground: a registered domain and a landing page, nothing more. A small number are real, working applications. The page labels which is which, every time. Ideation repositories are not counted as products.
 
 ## The problem

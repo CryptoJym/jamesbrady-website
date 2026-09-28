@@ -11,7 +11,7 @@ export const entry: WorkEntry = {
   summary:
     "An interactive assessment scoring seven AI-competency domains across 28 role-filtered questions, with four views of the same result.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze"],
   stack: [
     "Next.js 15 App Router",
@@ -75,6 +75,11 @@ export const entry: WorkEntry = {
     image: "/og/work.png",
     imageAlt: "James Brady — case study: an AI-readiness assessment",
   },
+  // Its pending gaps, as a reader sees them: one third-person note each, in gap order.
+  publicNotes: [
+    "The sources behind the questions are not named here, so this page does not call them research-based.",
+    "Whether any real organization has run it is not recorded here.",
+  ],
   body: `## The problem
 
 Most organizations answer "are we ready for AI" with a feeling. The people who ask are usually executives, and the answer they get back is a vendor's opinion. There is no shared frame, so two departments in the same company can disagree without ever finding out why.

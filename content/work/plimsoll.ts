@@ -7,11 +7,11 @@ export const entry: WorkEntry = {
   kicker: "Spend telemetry",
   categories: ["open-source", "products"],
   answerCapsule:
-    "Plimsoll is a local-first collector that ties AI coding spend to shipped outcomes, so a team can say what its tokens actually bought. The collector watches Claude Code and Codex on your own machine, records what each session cost, and joins those sessions to merged pull requests and passing checks. Content is discarded before anything reaches disk and identifying strings are hashed. The published unit is cost per merged pull request.",
+    "Plimsoll is a local-first collector that ties AI coding spend to shipped outcomes, so a team can say what its tokens actually bought. The collector watches Claude Code, Gemini CLI, Grok and Codex on your own machine, records what each session cost, and joins those sessions to merged pull requests and passing checks. Content is discarded before anything reaches disk and identifying strings are hashed. The published unit is cost per merged pull request.",
   summary:
     "A local-first collector that joins AI coding spend to merged pull requests, so cost per shipped outcome stops being a guess.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze"],
   stack: [
     "TypeScript",
@@ -33,7 +33,7 @@ export const entry: WorkEntry = {
     snapshotAt: "2026-08-11",
     lastPush: "2026-07-20",
   },
-  liveUrls: [{ url: "https://plimsoll.dev", checkedAt: "2026-08-11", status: 200 }],
+  liveUrls: [{ url: "https://plimsoll-cloud.vercel.app", checkedAt: "2026-09-27", status: 200 }],
   deltas: [
     {
       metric: "Cost of one merged pull request, measured end to end",
@@ -63,10 +63,17 @@ export const entry: WorkEntry = {
       capturedAt: "2026-08-11",
     },
     {
-      label: "Project site — plimsoll.dev",
-      url: "https://plimsoll.dev",
+      label: "Hosted version — plimsoll-cloud.vercel.app",
+      url: "https://plimsoll-cloud.vercel.app",
       method: "HTTP GET, returned 200.",
-      capturedAt: "2026-08-11",
+      capturedAt: "2026-09-27",
+    },
+    {
+      label: "Supported agent tools — the project README",
+      url: "https://github.com/CryptoJym/plimsoll#readme",
+      method:
+        "Read from the README's opening line, which names the AI coding agents it collects from: \"Claude Code, Gemini CLI, Grok, and Codex today\".",
+      capturedAt: "2026-09-27",
     },
     {
       label: "Measured cost of PR #28",
@@ -80,19 +87,23 @@ export const entry: WorkEntry = {
     image: "/og/work.png",
     imageAlt: "James Brady — case study: plimsoll, telemetry for AI coding spend",
   },
+  // Its pending gap, as a reader sees it: one third-person note.
+  publicNotes: [
+    "No cost-per-merged-PR figure from the fleet itself is published here. The one cost figure on this page is the README's.",
+  ],
   body: `## The problem
 
 Teams spend real money on AI coding agents and cannot say what they got. Vendor dashboards stop at an org-level total. Nobody joins the spend to the thing that shipped. So the honest answer to "what did those tokens buy us" is a guess, and the guess is usually flattering.
 
 ## What I built
 
-Plimsoll is a local-first collector that watches Claude Code and Codex on your own machine, records what each session cost, and joins those sessions to shipped outcomes: merged pull requests and passing checks. Then it does the division: tokens per merged pull request, cost per validated outcome, and where the spend produced nothing.
+Plimsoll is a local-first collector that watches Claude Code, Gemini CLI, Grok and Codex on your own machine, records what each session cost, and joins those sessions to shipped outcomes: merged pull requests and passing checks. Then it does the division: tokens per merged pull request, cost per validated outcome, and where the spend produced nothing.
 
 The name comes from Samuel Plimsoll, who in 1876 forced shipowners to paint a load line on every hull. Deaths from overloading fell, not because the rule was clever, but because the limit became visible to anyone standing on the dock.
 
 ## How it works in plain words
 
-Claude Code sends hook events. Both tools send OpenTelemetry data. The collector listens on your machine at \`127.0.0.1:48271\` and writes to a local SQLite file. It does not send your work anywhere.
+Claude Code sends hook events. Claude Code and Codex send OpenTelemetry data. The collector listens on your machine at \`127.0.0.1:48271\` and writes to a local SQLite file. It does not send your work anywhere.
 
 Before anything is written to disk, the collector throws away the content: prompts, model outputs, command bodies, file contents, diffs, and tool arguments. It hashes the things that identify you: emails, file paths, branch names, repository remotes. It keeps the boring parts plain: timestamps, tool names, models, token counts, costs, durations, and commit hashes.
 

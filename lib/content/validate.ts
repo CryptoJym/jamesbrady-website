@@ -5,7 +5,7 @@
 // lib/content/index.ts, which means `next build` cannot produce a page from
 // content that breaks a contract.
 
-import { budgetRanges, helpTypes } from "@/lib/contact";
+import { helpTypes } from "@/lib/contact";
 import { extractGaps } from "./markdown";
 import {
   MATURITY_ORDER,
@@ -244,11 +244,47 @@ function validateTheory(entry: TheoryEntry) {
 }
 
 /**
+ * Words an offer may never use (James, 2026-09-27, for Utlyze's Build and the Of One sites; they hold for every
+ * offer here). Buyers do not know what a workstream is; "beta" and "production testing" describe the client as the
+ * test; "dedicated team" and "named people" were the old names for the build-with-you coaches; and "from" before a
+ * price read as a hidden price. "Build With You" in title case is another company's name, so the coach name stays
+ * lower case except at the start of a sentence: "Build-with-you coaches".
+ */
+const OFFER_BANNED: [RegExp, string][] = [
+  [/workstream/i, "workstream"],
+  [/\bbeta\b/i, "beta"],
+  [/production testing/i, "production testing"],
+  [/dedicated team/i, "dedicated team"],
+  [/named (people|engineers)/i, "named people"],
+  [/\bfrom \$\d/i, "from before a price"],
+  [/Build With You/, "Build With You, as a name"],
+];
+
+/** The promise line that follows the coach name wherever there is room (James, 2026-09-27). */
+const COACH_NAME = /build-with-you coach/i;
+const COACH_PROMISE =
+  "They build your AI systems with you and teach your team to run them. If you ever leave, the systems stay with you.";
+
+/** Every string anywhere inside a value, for the word gates. */
+function allStrings(value: unknown, out: string[] = []): string[] {
+  if (typeof value === "string") out.push(value);
+  else if (Array.isArray(value)) value.forEach((v) => allStrings(v, out));
+  else if (value && typeof value === "object") Object.values(value).forEach((v) => allStrings(v, out));
+  return out;
+}
+
+function assertSource(s: { label: string; url: string; capturedAt: string }, where: string, field: string) {
+  assert(s.label?.trim(), where, `${field}.label is required`);
+  assert(s.url?.startsWith("https://"), where, `${field}.url must be absolute https — a price is read from a page`);
+  assert(ISO_DATE.test(s.capturedAt), where, `${field}.capturedAt must be an ISO date — the day the price was read`);
+}
+
+/**
  * An offer is the one collection a buyer reads before deciding to pay, so the
- * fields that would let it overstate are the ones checked hardest: the budget
- * bands and the enquiry type must be real members of the /contact allowlists,
- * or the page prints a band the form cannot offer and a call to action that
- * preselects nothing.
+ * fields that would let it overstate are the ones checked hardest: the enquiry
+ * type must be a real member of the /contact allowlist, or the call to action
+ * preselects nothing; a price must say where and when it was read; and the
+ * words James has ruled out of buyer copy fail the build.
  */
 function validateOffer(entry: OfferEntry) {
   const where = `offers/${entry.slug}`;
@@ -272,20 +308,53 @@ function validateOffer(entry: OfferEntry) {
     where,
     `inquiryType "${entry.inquiryType}" is not in the /contact allowlist — the call to action would preselect nothing`,
   );
-  assert(entry.budgetBands.length > 0, where, "budgetBands is required");
-  for (const band of entry.budgetBands) {
-    assert(
-      budgetRanges.includes(band),
-      where,
-      `budget band "${band}" is not one the /contact form offers`,
-    );
-  }
   entry.steps.forEach((s, i) => {
     assertNoNumeral(s.label, where, `steps[${i}].label`);
   });
   entry.deliverables.forEach((d, i) => {
     assertNoNumeral(d.label, where, `deliverables[${i}].label`);
   });
+
+  // Money. A price is a published figure, so its method is the page it was read from and the day.
+  assert(entry.price?.statement?.trim(), where, "price.statement is required — say what the page says about money");
+  if (entry.price.source) assertSource(entry.price.source, where, "price.source");
+  assert(
+    !DIGIT.test(entry.price.statement) || entry.price.source,
+    where,
+    `price.statement carries a figure ("${entry.price.statement}") but no price.source: say where and when it was read`,
+  );
+  if (entry.published) {
+    const p = entry.published;
+    assert(p.sources.length > 0, where, "published.sources is required — it is the method for every figure in the card");
+    p.sources.forEach((s, i) => assertSource(s, where, `published.sources[${i}]`));
+    assert(p.cards.length > 0, where, "published.cards is required");
+    p.cards.forEach((c, i) => {
+      assert(c.name?.trim() && c.price?.trim() && c.value?.trim(), where, `published.cards[${i}] needs a name, a price and its value line`);
+      assertNoNumeral(c.name, where, `published.cards[${i}].name`);
+    });
+    assert(p.levels.items.length > 0, where, "published.levels.items is required");
+    assert(p.pace?.trim() && p.start?.trim(), where, "published.pace and published.start are required");
+    assert(
+      entry.price.source && p.sources.some((s) => s.url === entry.price.source!.url),
+      where,
+      "price.source must be one of published.sources, so the page and the card cite the same reading",
+    );
+  }
+
+  // The words James has ruled out, anywhere in the offer.
+  const strings = allStrings(entry);
+  for (const [pattern, name] of OFFER_BANNED) {
+    const hit = strings.find((s) => pattern.test(s));
+    assert(!hit, where, `uses "${name}", which is ruled out of buyer copy: "${hit?.slice(0, 120)}"`);
+  }
+  // The coach name never stands alone: its promise line follows it somewhere on the page.
+  if (strings.some((s) => COACH_NAME.test(s))) {
+    assert(
+      strings.some((s) => s.includes(COACH_PROMISE)),
+      where,
+      "names build-with-you coaches without their promise line: " + COACH_PROMISE,
+    );
+  }
 }
 
 function validateLab(entry: LabEntry) {
@@ -311,16 +380,20 @@ function validateNow(entries: NowEntry[]) {
   const entry = entries[0];
   assert(ISO_DATE.test(entry.updated), "now", "updated must be an ISO date");
 
-  // Staleness gate — geo-seo-spec §6. A stale /now is a defect, not a warning.
+  // The hand-written line on /now shows its own date and age on the page, and the rest of /now is computed from
+  // the public record at build. So an old line is stated, never a failure: on 2026-09-27 the old 42-day throw took
+  // /contact down in production. A build still says so, once.
   const ageDays = Math.floor(
     (Date.parse(`${buildDay()}T00:00:00Z`) - Date.parse(`${entry.updated}T00:00:00Z`)) / 86_400_000,
   );
-  if (ageDays > 42 && process.env.ALLOW_STALE_NOW !== "1") {
-    throw new ContentError(
-      "now",
-      `/now is ${ageDays} days old (limit 42). Update content/now/now.ts, or set ALLOW_STALE_NOW=1 locally for an unrelated hotfix.`,
-    );
+  if (ageDays > 42 && !isLiveRequest() && process.env.ALLOW_STALE_NOW !== "1") {
+    console.warn(`[content] now: the hand-written line is ${ageDays} days old; /now shows its age.`);
   }
+}
+
+/** True inside a running Next.js server (not during `next build`, and not in a plain Node script). */
+function isLiveRequest(): boolean {
+  return process.env.NEXT_RUNTIME !== undefined && process.env.NEXT_PHASE !== "phase-production-build";
 }
 
 function buildDay(): string {

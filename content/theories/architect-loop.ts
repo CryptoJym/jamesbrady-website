@@ -18,7 +18,7 @@ export const entry: TheoryEntry = {
   summary:
     "One model judges, others build, and the repository is the only memory. A hardened fork of Dan McInerney's architect-loop.",
   datePublished: "2026-04-20",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze"],
   artifactUrl: "https://github.com/DanMcInerney/architect-loop",
   artifactLabel: "Upstream project",
@@ -38,6 +38,10 @@ export const entry: TheoryEntry = {
     image: "/og/theories.png",
     imageAlt: "James Brady — theory: the Architect Loop",
   },
+  // Its pending gap, as a reader sees it: one third-person note.
+  publicNotes: [
+    "The hardened local copy, and a write-up of its v2.4 changes, are not published.",
+  ],
   body: `The separation is the whole idea. A model that writes code and also grades that code will grade it kindly. Not from dishonesty, but because the same context that produced the work produces the standard.
 
 So the loop puts a wall in the middle. One model holds judgment. One to four builders run in parallel, each in its own isolated git worktree. They never share a directory, because parallel agents in one directory tidy up after each other and destroy each other's work.
@@ -70,7 +74,7 @@ The trade is worth taking when the work is going to be judged by someone who was
 
 ## Attribution, stated plainly
 
-The Architect Loop is not mine. It is a fork of \`DanMcInerney/architect-loop\`, heavily customized, run daily, and hardened locally. Five audit findings were fixed in a local v2.4 pass, and one of those fixes was offered back upstream as a pull request. What I contribute is the hardening and the operating discipline, not the original design.
+The Architect Loop is not mine. It is a fork of \`DanMcInerney/architect-loop\`, heavily customized, run daily, and hardened locally. Five audit findings were fixed in a local v2.4 pass, and one of those fixes went back upstream as a pull request, [merged on 13 September 2026](https://github.com/DanMcInerney/architect-loop/pull/170). What I contribute is the hardening and the operating discipline, not the original design.
 
 I say that here rather than in a footnote because a portfolio that quietly absorbs other people's work is exactly the kind of thing this site is supposed to be the opposite of.
 
