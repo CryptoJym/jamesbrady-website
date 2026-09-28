@@ -17,8 +17,8 @@
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { join, relative } from "node:path";
 
 import { ROOT, importTs } from "./lib/ts-register.mjs";
 import { renderPackModule } from "./lib/pack-module.mjs";
@@ -579,6 +579,7 @@ if (OFFLINE) {
     }
   });
 
+  let dockMounts = [];
   check("route: the not-configured contract is the one the dock reads", () => {
     const source = readFileSync(join(ROOT, "app", "api", "ask", "route.ts"), "utf8");
     assert.ok(source.includes('export const runtime = "nodejs"'), "the route is not pinned to the Node runtime");
@@ -598,16 +599,38 @@ if (OFFLINE) {
       "the dock probes the route on load again — the state comes from the server layout",
     );
 
-    // The state is a boolean the server computed. If the layout ever passed
+    // The state is a boolean the server computed. If a mount ever passed
     // something richer, a key could ride along into the client bundle.
-    const layout = readFileSync(join(ROOT, "app", "(site)", "layout.tsx"), "utf8");
-    assert.ok(
-      /<Dock configured=\{askRails\(\)\.configured\}/.test(layout),
-      "the layout no longer hands the dock a plain configured boolean",
-    );
-    const layoutCode = layout.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-    assert.ok(!/apiKey|XAI_API_KEY/.test(layoutCode), "the layout touches the key itself");
+    //
+    // Direction B mounted the dock in app/(site)/layout.tsx and this asserted
+    // that one line. The Fulgurite chrome (2026-09-27) mounts no dock, so the
+    // assertion now covers EVERY mount under app/ and components/, however many
+    // there are, and the key rule covers every layout and page, not one file.
+    // How many mounts it found is printed, so "none" is visible, not silent.
+    const tsx = (dir) =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((d) =>
+        d.isDirectory() ? tsx(join(dir, d.name)) : /\.tsx$/.test(d.name) ? [join(dir, d.name)] : [],
+      );
+    const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const sources = [...tsx(join(ROOT, "app")), ...tsx(join(ROOT, "components"))].map((file) => ({
+      name: relative(ROOT, file),
+      code: strip(readFileSync(file, "utf8")),
+    }));
+    const mounts = sources.flatMap((s) => [...s.code.matchAll(/<Dock\b[^>]*>/g)].map((m) => ({ name: s.name, tag: m[0] })));
+    dockMounts = mounts.map((m) => m.name);
+    for (const m of mounts) {
+      assert.ok(
+        /^<Dock configured=\{askRails\(\)\.configured\}\s*\/?>$/.test(m.tag),
+        `${m.name} mounts the dock with something other than a plain configured boolean: ${m.tag}`,
+      );
+    }
+    for (const s of sources.filter((x) => /(^|\/)(layout|page)\.tsx$/.test(x.name) && !x.name.startsWith("app/api/"))) {
+      assert.ok(!/apiKey|XAI_API_KEY/.test(s.code), `${s.name} touches the key itself`);
+    }
   });
+  console.log(
+    `      dock mounts under app/ and components/: ${dockMounts.length ? dockMounts.join(", ") : "none — the Fulgurite chrome mounts no dock"}`,
+  );
 
   console.log("─".repeat(72));
   const total = passed + failed + unproven;

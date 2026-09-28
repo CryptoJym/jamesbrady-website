@@ -1,0 +1,9 @@
+F11 — the edges of the org-infrastructure shapes (2026-09-27). Every line below this one must be caught ON ITS OWN.
+The h3ro-dev org keeps its tools here.
+http://github.com/h3ro-dev/borg
+evilgithub.com/h3ro-dev/borg
+www.github.com/h3ro-dev/borg
+@h3ro-dev/borg
+h3ro-dev/ tools
+h3ro-dev.github.io/new-reward-seo-skills-os
+https://github.com/h3ro-dev

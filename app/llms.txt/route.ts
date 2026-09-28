@@ -100,7 +100,7 @@ export function GET() {
     ].join("\n"),
   );
 
-  const siteLines = ["/", "/about", "/now", "/contact"]
+  const siteLines = ["/", "/about", "/words", "/now", "/contact"]
     .filter(has)
     .map((path) => {
       const r = routes.find((x) => x.path === path)!;

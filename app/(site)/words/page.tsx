@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 
+import { JsonLd } from "@/components/site/instruments";
+import { collectionGraph, serializeGraph } from "@/lib/schema";
 import { allQuotes, hasPrivateWords, THEMES } from "@/lib/words";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { WORDS_CAPSULE } from "@/lib/seo/routes";
 
 export const metadata: Metadata = pageMetadata({
   path: "/words",
@@ -24,6 +27,7 @@ export default function WordsPage() {
   const groups = THEMES.map((t) => ({ ...t, quotes: allQuotes.filter((q) => q.theme === t.id) })).filter((g) => g.quotes.length);
   return (
     <main id="main" tabIndex={-1} className="fg-page">
+      <JsonLd json={serializeGraph(collectionGraph({ path: "/words", name: "In his words", description: WORDS_CAPSULE, items: [] }))} />
       <header className="fg-page__head">
         <p className="fg-eyebrow">In his words</p>
         <h1 className="fg-h1">Exactly as he said it.</h1>
