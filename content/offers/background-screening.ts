@@ -1,175 +1,161 @@
 import type { OfferEntry } from "@/lib/content/types";
 
 /*
- * THE NAMED-CLIENT EXCEPTION, AND WHERE IT STOPS.
+ * A NAMED OPTION, AND WHERE IT STOPS.
  *
- * Every other client on this site is anonymized by the 2026-08-11 policy:
- * industries are named, companies are not. This entry names Vuplicity, under a
- * single owner ruling made on 2026-08-12 ("list Vuplicity as an option too,
- * where they can work with me"). The ruling covers THIS OFFER SURFACE and
- * nothing else. /work/visibility-platform stays anonymized, the industries
- * list on /work-with-me/get-found stays an industries list, and no other page
- * gains a client name from this change. The CLIENT_DENYLIST secret was updated
- * the same day so the confidentiality gate permits the name here.
+ * Vuplicity is named on this site under one owner ruling (2026-08-12): as a way to work with James, on this offer
+ * and the Work-with-me hub, and nowhere else. It is never linked to his other work: no case study, no industry list
+ * and no other offer connects them, and this page says nothing about how the checks are built or marketed.
  *
- * SOURCES. Same discipline as content/work/seopr1.ts: nothing on this page
- * describes Vuplicity from memory or from an internal record. Every fact below
- * came from www.vuplicity.com on 2026-08-12, read over plain HTTP, and each is
- * either the page's own <title>, its own <meta name="description">, its own
- * JSON-LD Organization node, or a URL in its own sitemap.xml. Captured exactly:
+ * SOURCES. Every fact below comes from www.vuplicity.com, recaptured on 2026-09-27 over plain HTTP (each page
+ * returned 200), and each is the page's own title, its own description, or its own visible text:
  *
- *   /            <title>   "Nationwide background screening with clear pricing
- *                           and cleaner workflows | Vuplicity"
- *   /            <meta>    "Vuplicity helps hiring teams run nationwide
- *                           background screening with transparent pricing,
- *                           compliant workflows, and a direct path from
- *                           self-serve setup to guided rollout."
- *   /            JSON-LD   Organization "Vuplicity", url www.vuplicity.com,
- *                           support and privacy contact points.
- *   /pricing     <title>   "Background Check Pricing | Vuplicity"
- *   /pricing     <meta>    "Compare Vuplicity Basic, Essential, and Complete
- *                           background screening packages with clear public
- *                           package pricing and add-on guidance."
- *   /offerings   <meta>    "Review Vuplicity screening packages, add-ons,
- *                           monitoring options, candidate consent workflows,
- *                           and report release controls for hiring teams."
- *   /security    <meta>    "See how Vuplicity handles screening workflow
- *                           controls, audit trails, candidate consent, and
- *                           report release boundaries for hiring teams."
- *   /faq         <meta>    "Answers to common Vuplicity questions about
- *                           background screening packages, pricing, candidate
- *                           consent, report timing, and employer decision
- *                           boundaries."
- *   /sitemap.xml            lists /, /offerings, /pricing, /security, /faq,
- *                           /book-now, /developers, /privacy, /terms and
- *                           /fcra-rights.
+ *   /            title     "Vuplicity — The agent-first background check company"
+ *                meta      "Background checks your AI agents can run. MCP and API access, consent and FCRA workflows
+ *                           built in, the same data sources the big providers use" (then a price, not copied here)
+ *                text      "Gets a secure link to review the disclosure and give consent on their phone";
+ *                          "County and state courts, federal courts, a national criminal database, sex offender
+ *                          registries and global watchlists — depending on the package"; "Hiring decisions stay
+ *                          with you"; "Guidance, not legal advice. Vuplicity isn't a law firm"
+ *   /pricing     title     "Background Check Pricing | Vuplicity"; Basic, Essential, Complete and monitoring;
+ *                          "Package prices are not an all-in quote"
+ *   /offerings   title     "Background Screening Offerings | Vuplicity"; "One hosted flow: Disclosure, consent,
+ *                          candidate intake, and need-info loops stay in the same screening session"
+ *   /security    title     "Security and Compliance Overview | Vuplicity"; access and roles, audit trail
+ *                          ("Candidate state, source activity, and release decisions remain reviewable"), privacy
+ *                          handling, review support
+ *   /faq         title     "Background Screening FAQ | Vuplicity"; "Reports are released only after terminal source
+ *                          outcomes and compliance filtering gates are satisfied"; new organizations "begin on public
+ *                          package pricing"
  *
- * DELIBERATELY NOT USED. The same HTML also carries two JSON-LD blocks tagged
- * `data-newrewards-edge`, which are injected by the agency's edge layer rather
- * than authored by Vuplicity. They are on the public page, so they are public,
- * but their provenance is this side of the relationship, and a page that
- * quotes its own supplier's output back as the client's statement is quoting
- * itself. Their extra facts (a Lehi address, international checks, ATS
- * integrations) are therefore absent here rather than softened.
+ * What changed on that date: in August the home page's title was about nationwide screening with clear pricing;
+ * today Vuplicity calls itself the agent-first background check company, and this page follows its words.
  *
- * JAMES'S ROLE. Unstated on purpose. The ruling authorises naming Vuplicity as
- * a path a visitor can take, not a title or an ownership claim, and neither
- * exists in a public source. The body carries that as a pending mark, and
+ * Its prices are Vuplicity's and are not copied here: the page links to them, so none can go stale on this site.
+ *
+ * JAMES'S ROLE. Unstated on purpose. The ruling names Vuplicity as a path a visitor can take, not a title or an
+ * ownership claim, and neither exists in a public source. The body carries that as a pending mark, and
  * `publicNotes` renders it to a buyer as a statement of absence.
  */
 export const entry: OfferEntry = {
   collection: "offers",
   slug: "background-screening",
-  title: "Background screening for your hires, done clearly",
+  title: "Background checks for your hires, run by Vuplicity",
   kicker: "For an employer with people to hire",
   capsuleQuestion: "Who runs the background checks, and what does starting one here involve?",
   answerCapsule:
-    "Background screening means checking a person's record before hiring them, and the checks behind this page are run by Vuplicity. Vuplicity's public site describes nationwide background screening with clear pricing and cleaner workflows, publishes packages named Basic, Essential and Complete, and keeps separate pages for security, candidate consent and common questions. An enquiry started here reaches James Brady, and Vuplicity delivers the screening under its own published terms. No screening figure from any employer is published on this site.",
+    "Background screening means checking a person's record before hiring them, and the checks behind this page are run by Vuplicity. Vuplicity's own site calls it \"The agent-first background check company\": checks that AI agents or hiring teams can order, with consent and FCRA workflows built in and its package prices published. An enquiry started here reaches James Brady, and Vuplicity delivers the screening under its own terms. The hiring decision stays with the employer.",
   summary:
-    "Background checks for hiring, run by Vuplicity on its own published packages and pricing, with the enquiry starting here.",
+    "Background checks for hiring, run by Vuplicity on its own published packages and prices, with candidate consent and FCRA workflows built in.",
   datePublished: "2026-08-12",
-  dateModified: "2026-08-12",
+  dateModified: "2026-09-27",
   entities: ["person:james"],
   deliveredBy: {
     name: "Vuplicity",
     url: "https://www.vuplicity.com",
-    role: "the background screening company that runs the checks, on its own published pricing",
+    role: "the background check company that runs the checks, on its own published prices",
   },
   audience: [
-    "Employers hiring in more than one state",
-    "Small teams with no screening process yet",
-    "Operations and HR leads who own onboarding",
-    "Staffing and contract firms placing people",
-    "Anyone who has been quoted for screening and could not tell what was in the price",
+    "Employers with people to hire",
+    "Teams whose AI agents already source, screen and schedule",
+    "Hiring teams who want the price before a sales call",
+    "Teams that need the check inside their ATS or HRIS",
   ],
   steps: [
     {
-      label: "Say what you are hiring for",
+      label: "Order the check",
       detail:
-        "The enquiry form on this site is the same one every other engagement uses, and this page's button arrives with the screening enquiry type already selected. Roles, volume and where you hire are the three things that decide everything after this.",
+        "A hiring team starts a check on Vuplicity's site, or an AI agent orders one through its API, in sandbox mode first if it wants.",
     },
     {
-      label: "Pick a package from published prices",
+      label: "The candidate consents",
       detail:
-        "Vuplicity's pricing page is public and names three packages, Basic, Essential and Complete, with add-on guidance beside them. You can read the prices before anyone speaks to you, which is the part of screening that usually requires a call.",
+        "The candidate gets a secure link to review the disclosure and give consent on their phone, so sensitive details never pass through anyone's chat.",
     },
     {
-      label: "Candidates consent, then the check runs",
+      label: "The sources are searched",
       detail:
-        "Vuplicity's offerings page describes candidate consent workflows as part of the product rather than as paperwork you chase. Its frequently-asked-questions page covers consent and report timing.",
+        "County and state courts, federal courts, a national criminal database, sex offender registries and global watchlists, depending on the package.",
     },
     {
-      label: "Reports come back under release controls",
+      label: "The report comes back, and you decide",
       detail:
-        "Vuplicity's security page describes screening workflow controls, audit trails and report release boundaries. Who may see a report, and when, is a setting rather than an understanding.",
+        "The report lands in the employer's portal. Vuplicity releases it only after the sources have returned and its compliance checks are satisfied, and the hiring decision stays with the employer.",
     },
   ],
   deliverables: [
     {
-      label: "A price you could read before you asked",
+      label: "A price you can read before you ask",
       detail:
-        "Vuplicity publishes package pricing on a public page. Nothing on this site quotes a figure for it, because the figure belongs to Vuplicity and it can change without this page hearing about it.",
+        "Vuplicity publishes its package prices on its own pricing page, and says they are not an all-in quote: court and data-access fees can vary by jurisdiction.",
     },
     {
       label: "A consent record for every candidate",
-      detail:
-        "Candidate intake and consent are described on Vuplicity's own offerings page as part of the screening workflow.",
+      detail: "Disclosure, consent and candidate intake stay in one hosted screening session.",
     },
     {
-      label: "Reports with release boundaries around them",
-      detail:
-        "Vuplicity's security overview names report release controls and audit trails. The employer decision itself stays with the employer; Vuplicity's own frequently-asked-questions page draws that boundary.",
+      label: "An audit trail",
+      detail: "Vuplicity's security page says candidate state, source activity and release decisions remain reviewable.",
     },
     {
       label: "A route back to a person",
       detail:
-        "The enquiry lands with James Brady, and Vuplicity delivers the screening. Both halves of that are stated on this page, so neither is something you find out afterwards.",
+        "An enquiry sent from this site reaches James Brady, and Vuplicity delivers the screening. Both halves are stated here, so neither is something you find out afterwards.",
     },
   ],
-  budgetBands: ["not_applicable", "under_5k"],
+  price: {
+    statement:
+      "Vuplicity publishes its package prices on its own pricing page. This page copies none of them, because they are Vuplicity's to change.",
+  },
   inquiryType: "background_screening",
   ctaLabel: "Start a screening enquiry",
   proof: [
     {
       label: "Vuplicity, the company that runs the checks",
-      url: "https://www.vuplicity.com",
+      url: "https://www.vuplicity.com/",
       method:
-        "HTTP GET, returned 200. Its own page title reads \"Nationwide background screening with clear pricing and cleaner workflows\", and its own description says it helps hiring teams run nationwide background screening with transparent pricing and compliant workflows.",
-      capturedAt: "2026-08-12",
+        "HTTP GET, returned 200. Its own page title reads \"Vuplicity — The agent-first background check company\", and its description offers background checks AI agents can run, with consent and FCRA workflows built in.",
+      capturedAt: "2026-09-27",
     },
     {
-      label: "The published package pricing, readable without an enquiry",
+      label: "The published package prices",
       url: "https://www.vuplicity.com/pricing",
       method:
-        "HTTP GET, returned 200. Titled \"Background Check Pricing\", describing Basic, Essential and Complete packages with clear public package pricing and add-on guidance.",
-      capturedAt: "2026-08-12",
+        "HTTP GET, returned 200. Titled \"Background Check Pricing\": Basic, Essential and Complete packages and monitoring, with a note that package prices are not an all-in quote.",
+      capturedAt: "2026-09-27",
     },
     {
-      label: "What the packages contain, and the consent workflow",
+      label: "What the packages contain, and the consent flow",
       url: "https://www.vuplicity.com/offerings",
       method:
-        "HTTP GET, returned 200. Titled \"Background Screening Offerings\", describing packages, add-ons, monitoring options, candidate consent workflows and report release controls.",
-      capturedAt: "2026-08-12",
+        "HTTP GET, returned 200. Titled \"Background Screening Offerings\": three packages, add-ons, motor vehicle reports and monitoring, with disclosure and consent in one hosted flow.",
+      capturedAt: "2026-09-27",
     },
     {
       label: "The security and compliance overview",
       url: "https://www.vuplicity.com/security",
       method:
-        "HTTP GET, returned 200. Titled \"Security and Compliance Overview\", describing screening workflow controls, audit trails, candidate consent and report release boundaries.",
-      capturedAt: "2026-08-12",
+        "HTTP GET, returned 200. Titled \"Security and Compliance Overview\": access and roles, an audit trail, privacy handling and review support.",
+      capturedAt: "2026-09-27",
+    },
+    {
+      label: "Common questions, including when a report is released",
+      url: "https://www.vuplicity.com/faq",
+      method:
+        "HTTP GET, returned 200. Titled \"Background Screening FAQ\": reports are released only after the sources return and its compliance gates are satisfied, and Vuplicity gives no legal advice.",
+      capturedAt: "2026-09-27",
     },
   ],
   og: {
-    image: "/og/work-with-me.png",
-    imageAlt: "James Brady — background screening, delivered by Vuplicity",
+    image: "/og/default.png",
+    imageAlt: "James Brady — background checks for your hires, run by Vuplicity",
   },
   /*
    * BUYER RENDER MODE.
    *
    * One note per gap, in gap order. lib/content/validate.ts fails the build if
-   * the counts stop matching, and /now still prints the full second-person
-   * question. A buyer reading this page sees the absence stated plainly; the
-   * owner-facing version of it lives in the work log where it belongs.
+   * the counts stop matching. A buyer reading this page sees the absence stated
+   * plainly; the owner-facing question stays in the source.
    */
   publicNotes: [
     "James Brady's exact position at Vuplicity, and the date it started, are not published on this site yet. What this page states is that a screening enquiry reaches him and that Vuplicity delivers the work.",
@@ -177,23 +163,21 @@ export const entry: OfferEntry = {
   ],
   body: `## What this page is
 
-Hiring someone means trusting a stranger with your customers, your money, or your keys. A background check is how that trust gets a foundation under it, and most employers meet the process at its worst: a quote that does not say what is in it, a candidate who never got a clear consent request, and a report that arrives with no rule about who may read it.
+Hiring someone means trusting a stranger with your customers, your money or your keys. A background check is how that trust gets a foundation under it.
 
-The screening behind this page is run by [Vuplicity](https://www.vuplicity.com). Its own site describes nationwide background screening with clear pricing and cleaner workflows. You can start here, and the work is Vuplicity's.
+The checks behind this page are run by [Vuplicity](https://www.vuplicity.com). You can start here, and the work is Vuplicity's.
 
 ## What Vuplicity says about itself
 
-Everything in this section comes from Vuplicity's public site, read on the date in the proof list. Nothing here is a measurement taken by this site.
+Everything in this section comes from Vuplicity's public site, read on 27 September 2026. Nothing here is a measurement taken by this site.
 
-Its own description says it helps hiring teams run nationwide background screening with transparent pricing, compliant workflows, and a direct path from self-serve setup to guided rollout. That last phrase is worth reading twice, because it is the choice most employers actually face: set it up yourself, or be walked through it.
+Vuplicity calls itself "The agent-first background check company". Its home page describes background checks that AI agents can run, over MCP and an API, with consent and FCRA workflows built in and the same data sources the big providers use. A hiring team can start a check on the site itself, and its questions page says new organizations can begin on the public package prices.
 
-Its pricing page is public and names three packages, Basic, Essential and Complete, with add-on guidance beside them. A published price is a checkable fact. A price you have to ask for is a negotiation you did not know you had entered.
-
-Its offerings page describes packages, add-ons, monitoring options, candidate consent workflows and report release controls. Its security page describes screening workflow controls, audit trails, candidate consent and report release boundaries. Its questions page covers packages, pricing, candidate consent, report timing, and where the employer's own decision begins.
+Its pricing page publishes three packages, Basic, Essential and Complete, and a monthly monitoring option, and says the package prices are not an all-in quote, because court and data-access fees vary by jurisdiction. Its offerings page lists the add-ons and keeps disclosure, consent and candidate intake in one hosted flow. Its security page covers access and roles, an audit trail, privacy handling and review support. Its questions page says a report is released only after the sources have returned and its compliance checks are satisfied.
 
 ## Where the line sits
 
-Vuplicity runs the checks. The employer makes the hiring decision. Vuplicity's own questions page draws that boundary, and this page does not blur it: a screening company reports what the record says, and it does not tell you whom to hire.
+Vuplicity runs the checks. The employer makes the hiring decision. Vuplicity's own site says so, and says it is not a law firm: its compliance guidance is guidance, not legal advice. This page does not blur either line.
 
 [JAMES: state your exact relationship to Vuplicity in one publishable line, with the date it became true. Title, ownership, operator, adviser, whichever is accurate. Until you supply it, this page says only that a screening enquiry reaches you and that Vuplicity delivers the work.]
 
@@ -201,7 +185,7 @@ Vuplicity runs the checks. The employer makes the hiring decision. Vuplicity's o
 
 ## What this page does not claim
 
-No number from any screening engagement appears here. No claim is made about how fast a check comes back, how many have been run, or what any employer got out of it, because none of those has been measured on this site under a stated method.
+No number from any screening engagement appears here: nothing about how fast a check comes back, how many have been run, or what any employer got out of it, because none of those has been measured on this site under a stated method.
 
-The prices are Vuplicity's and they live on Vuplicity's page. This page links to them rather than copying them, so a price cannot go stale here without going stale there first.`,
+The prices are Vuplicity's, and they live on Vuplicity's page. This page links to them rather than copying them, so a price cannot go stale here without going stale there first.`,
 };

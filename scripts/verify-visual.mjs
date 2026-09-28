@@ -65,7 +65,8 @@ mkdirSync(OUT, { recursive: true });
  * They are checked here the way every other Direction B route is checked, not
  * against a previous build. See the retirement note at the top of this file.
  */
-const ARCHIVE_ROUTES = ["/primer", "/manuscript", "/workshop", "/watch"];
+// /watch left on 2026-09-27: it redirects permanently to /learn (next.config.ts).
+const ARCHIVE_ROUTES = ["/primer", "/manuscript", "/workshop"];
 
 let failed = 0;
 const report = (name, ok, detail) => {
@@ -293,7 +294,6 @@ for (const [path, file] of [
   ["/work-with-me/get-found", "offer-get-found-1440.png"],
   ["/work-with-me/build-a-system", "offer-build-a-system-1440.png"],
   ["/work-with-me/background-screening", "offer-background-screening-1440.png"],
-  ["/links", "links-1440.png"],
   ["/work", "work-1440.png"],
   ["/work/plimsoll", "work-plimsoll-1440.png"],
   ["/theories", "theories-1440.png"],
@@ -598,7 +598,6 @@ const NARROW_ROUTES = [
   ["/work-with-me/get-found", "offer-get-found-375.png"],
   ["/work-with-me/build-a-system", "offer-build-a-system-375.png"],
   ["/work-with-me/background-screening", "offer-background-screening-375.png"],
-  ["/links", "links-375.png"],
   ["/now", "now-375.png"],
 ];
 for (const [path, file] of NARROW_ROUTES) {

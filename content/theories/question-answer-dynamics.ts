@@ -18,7 +18,7 @@ export const entry: TheoryEntry = {
   summary:
     "A fixed battery of questions run on every research finding, because convenient findings are the ones that escape scrutiny.",
   datePublished: "2026-06-02",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:new-reward"],
   history: [
     { date: "2026-06-02", state: "sketched", note: "Two founding cases, both real engagements." },
@@ -38,6 +38,10 @@ export const entry: TheoryEntry = {
     image: "/og/theories.png",
     imageAlt: "James Brady — theory: Question-Answer Dynamics",
   },
+  // Its pending gap, as a reader sees it: one third-person note.
+  publicNotes: [
+    "The method's skill file is internal and not published as a repository.",
+  ],
   body: `Two failure modes started this.
 
 ## Failure mode one: gift acceptance

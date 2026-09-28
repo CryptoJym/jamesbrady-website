@@ -8,7 +8,7 @@
 // enforces the rules the type system cannot express, and it THROWS — an invalid
 // entry fails the build, it never warns.
 
-import type { BudgetRange, HelpType } from "@/lib/contact";
+import type { HelpType } from "@/lib/contact";
 
 export type EntityRef = "person:james" | "org:utlyze" | "org:new-reward";
 
@@ -231,6 +231,64 @@ export type NowEntry = BaseEntry & {
   updated: string;
 };
 
+/** Where a published price was read, and on what day: the method for every figure it covers. */
+export type PriceSource = {
+  label: string;
+  url: string;
+  capturedAt: string;
+};
+
+/**
+ * What an offer says about money, and the only place a price may enter one.
+ *
+ * Each delivering company decides what it publishes, and its offer repeats exactly that and nothing more:
+ *   · Utlyze publishes its prices, so the Build offer carries them word for word (`published`, below);
+ *   · Vuplicity publishes its package prices on its own site, so its offer links there and copies none;
+ *   · New Reward publishes no client price (James, 2026-09-27: "We don't publicly post our client price"),
+ *     so its offer prints none in any form: no figure, no band and no "from".
+ *
+ * `statement` is one plain sentence. A numeral in it is a price, and a price needs a `source`.
+ */
+export type OfferPrice = {
+  statement: string;
+  source?: PriceSource;
+};
+
+/** One card as the delivering company prints it. */
+export type OfferCard = {
+  name: string;
+  price: string;
+  /** The line under the price. */
+  terms: string;
+  /** The card's first sentence. */
+  value: string;
+  /** The card's points, word for word. */
+  points?: string[];
+};
+
+/**
+ * A delivering company's own published offer, carried word for word: Utlyze's Consult and Build, from
+ * content/offers/build-card.ts. The page frames it as the company's words and prints `sources` beside it,
+ * which is the method for every figure inside it.
+ */
+export type PublishedOffer = {
+  sources: PriceSource[];
+  cards: OfferCard[];
+  /** The card's link down to the levels. */
+  levelsLink: string;
+  /** Where to start, under the cards. */
+  start: string;
+  /** The pace note, word for word. */
+  pace: string;
+  levels: {
+    heading: string;
+    intro: string;
+    items: { name: string; price: string; atOnce: string; adds: string }[];
+    separately: { heading: string; body: string };
+  };
+  people: { heading: string; lines: string[] };
+};
+
 /**
  * An offer — what someone can actually hire, described in the words the buyer
  * would use rather than the words the builder would use.
@@ -239,9 +297,9 @@ export type NowEntry = BaseEntry & {
  * be bought from: nothing on it said what an engagement is, who delivers it,
  * or roughly what it costs. This collection is that path, and it is a typed
  * collection rather than page prose for the same reason everything else here
- * is: the budget bands, the delivering entity and the enquiry type each have
- * exactly one source, and the pages, the JSON-LD, llms.txt, the sitemap and
- * the Ask pack all read that one.
+ * is: the price statement, the delivering entity and the enquiry type each
+ * have exactly one source, and the pages, the JSON-LD, llms.txt, the sitemap
+ * and the Ask pack all read that one.
  */
 export type OfferEntry = BaseEntry & {
   collection: "offers";
@@ -256,8 +314,13 @@ export type OfferEntry = BaseEntry & {
   steps: { label: string; detail: string }[];
   /** What the client is left holding at the end. */
   deliverables: { label: string; detail: string }[];
-  /** Budget bands from lib/contact.ts — the same list the enquiry form offers. */
-  budgetBands: BudgetRange[];
+  /**
+   * What the page says about money. This replaced the budget bands on 2026-09-27: a band printed beside an
+   * offer reads as that company's price, and New Reward publishes none.
+   */
+  price: OfferPrice;
+  /** The delivering company's own published offer, word for word, where it publishes one. */
+  published?: PublishedOffer;
   /** The enquiry type this page's call to action preselects on /contact. */
   inquiryType: HelpType;
   ctaLabel: string;

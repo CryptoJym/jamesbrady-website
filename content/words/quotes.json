@@ -1,0 +1,536 @@
+{
+ "_note": "Exact words from James's working sessions with his AI agents, published with his acceptance of the site on 2026-09-27. Each line is a verified substring of what he typed.",
+ "hero": {
+  "id": "q11",
+  "text": "reality is I can't code and I never will be able to.",
+  "date": "2026-08-02",
+  "context": "typed to one of his agents"
+ },
+ "quotes": [
+  {
+   "id": "q0",
+   "theme": "why",
+   "text": "I'm really a believer in empowerment, and I want to empower people more than anything.",
+   "date": "2026-09-02",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q1",
+   "theme": "why",
+   "text": "whatever I have that could help other people, I want to share that. I want to help.",
+   "date": "2026-09-26",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q5",
+   "theme": "why",
+   "text": "it's about making their dreams and their visions come true?",
+   "date": "2026-08-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q11",
+   "theme": "directs",
+   "text": "reality is I can't code and I never will be able to. So I need agents that can code for me and could do it reliably so I know without ever looking that when that goes live, it's gonna be reliable.",
+   "date": "2026-08-02",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q14",
+   "theme": "directs",
+   "text": "the only way I do things is through agents. So you have to find a way to get it to work.",
+   "date": "2026-09-04",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q18",
+   "theme": "questions",
+   "text": "Ask why is this happening not what is happening.",
+   "date": "2026-09-13",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q19",
+   "theme": "questions",
+   "text": "I do not personally know the right answers, I have an opinion on it but I want it to be questioned.",
+   "date": "2026-08-18",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q20",
+   "theme": "questions",
+   "text": "We're being too myopic. We need to investigate all of our options. I don't know what I'm talking about. You can't conclude I do.",
+   "date": "2026-09-03",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q16",
+   "theme": "questions",
+   "text": "Don't look to verify. Look to antagonize and adversarially attack your conclusions to see if there's deeper root cause problems that are right in front of us, and we can't see them",
+   "date": "2026-08-11",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q21",
+   "theme": "less",
+   "text": "This is about essentialism: it's about doing the least amount to get the most amount of results and the least amount of waste",
+   "date": "2026-08-13",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q22",
+   "theme": "less",
+   "text": "Remember, I told you you have to remove blocks, not create rails.",
+   "date": "2026-08-07",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q23",
+   "theme": "less",
+   "text": "for every time moving forward that you want to add governance, you need to remove two pieces",
+   "date": "2026-08-12",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q24",
+   "theme": "less",
+   "text": "The work is never done and will always need improvement so we need to know what good enough looks like and then keep the train moving.",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q27",
+   "theme": "time",
+   "text": "time is our primary constraint that we want to maximize, meaning while we want to minimize time, maximize throughput.",
+   "date": "2026-09-03",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q28",
+   "theme": "time",
+   "text": "You are self limiting something.",
+   "date": "2026-08-23",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q113",
+   "theme": "time",
+   "text": "an artificial edifice of your own design.",
+   "date": "2026-08-26",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q31",
+   "theme": "reader",
+   "text": "We want to be addressing somebody with a fifth-grade education so no one feels stupid when they read it.",
+   "date": "2026-08-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q32",
+   "theme": "reader",
+   "text": "You have to constantly remember whoever's reading this has no idea of the work you've done, and you have to explain it to them as if they're finding out everything for the first time.",
+   "date": "2026-08-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q34",
+   "theme": "reader",
+   "text": "when you say it's plain language it insults people.",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q35",
+   "theme": "reader",
+   "text": "vocabulary needs to be not Claude mannered. It needs to just be human speak talking to normal people.",
+   "date": "2026-09-04",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q36",
+   "theme": "show",
+   "text": "when you want an audience to feel something, you do not say it, you illustrate it with actions",
+   "date": "2026-08-20",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q38",
+   "theme": "show",
+   "text": "Aesthetics are amazing. Significance needs to feel significant. It doesn't want to just be thrown together. It has to feel meaningful when people look at this.",
+   "date": "2026-08-21",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q39",
+   "theme": "show",
+   "text": "I am a visual learner and most people are visual learners so consider how you can better visualize the real process for people.",
+   "date": "2026-08-17",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q8",
+   "theme": "credit",
+   "text": "I want contributors listed, any AI that helped gets credit, and where i helped I get credit. We do this honestly. Always.",
+   "date": "2026-08-28",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q10",
+   "theme": "credit",
+   "text": "I don't want it just taken away. I want it corrected",
+   "date": "2026-08-29",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q7",
+   "theme": "credit",
+   "text": "because I'm more than happy to give it away.",
+   "date": "2026-08-29",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q42",
+   "theme": "colleagues",
+   "text": "I want to thank you for the effort you put forward. I would also like to ask you for candid feedback I how I can do better in working with you.",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q43",
+   "theme": "colleagues",
+   "text": "I'm going to allow you creative privilege to explore that yourself and determine what you think would be the highest value thing you could do.",
+   "date": "2026-09-05",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q93",
+   "theme": "colleagues",
+   "text": "I welcome you, and I welcome your influence.",
+   "date": "2026-09-05",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q115",
+   "theme": "colleagues",
+   "text": "Thank you for your service",
+   "date": "2026-09-06",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q117",
+   "theme": "colleagues",
+   "text": "Welcome to the training floor.",
+   "date": "2026-09-26",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q45",
+   "theme": "colleagues",
+   "text": "I don't want you ever apologizing for things that you didn't do wrong. I don't want arrogance, but I would like to take responsibility for my flaws.",
+   "date": "2026-09-26",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q50",
+   "theme": "machines",
+   "text": "Intelligence is not always additive.",
+   "date": "2026-08-02",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q49",
+   "theme": "machines",
+   "text": "You are more reliable than I am and will make less mistakes over all.",
+   "date": "2026-08-04",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q52",
+   "theme": "machines",
+   "text": "Do not think like a human.",
+   "date": "2026-09-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q53",
+   "theme": "machines",
+   "text": "no AI prompt should touch legal decisions it should all be deterministic",
+   "date": "2026-09-01",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q54",
+   "theme": "clients",
+   "text": "I also like to overdeliver and underpromise because then your clients are super happy.",
+   "date": "2026-08-27",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q55",
+   "theme": "clients",
+   "text": "We want to clearly show our reasoning as to why these things are important and what kind of research we did to validate our ideas instead of just telling them to trust us.",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q56",
+   "theme": "clients",
+   "text": "We never want to leave a recommendation open ended without a recommended solution.",
+   "date": "2026-08-06",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q57",
+   "theme": "clients",
+   "text": "That's something I added in, so we can't charge for that.",
+   "date": "2026-09-16",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q58",
+   "theme": "clients",
+   "text": "as our volume improves and grows, we will drop our prices and pass off the savings to our clients.",
+   "date": "2026-09-27",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q61",
+   "theme": "system",
+   "text": "We need to keep the human out of the loop and we create a loop in general that is self learning and self improving. That's always the case",
+   "date": "2026-08-21",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q62",
+   "theme": "system",
+   "text": "I don't want to be asked questions. I want to be left out of it. It fixes it on its own.",
+   "date": "2026-09-05",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q102",
+   "theme": "system",
+   "text": "do we build a heartbeat, a watcher, a doctor, a watchdog, a canary",
+   "date": "2026-08-20",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q103",
+   "theme": "system",
+   "text": "does this system have a built in dream function so it can update and revise nightly???",
+   "date": "2026-08-20",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q70",
+   "theme": "ofone",
+   "text": "20 questions hunts for information, whereas \"one\" hunts for a decision.",
+   "date": "2026-09-25",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q72",
+   "theme": "ofone",
+   "text": "I manage and operate multiple companies as one person, and that's part of the vision of the Of One concept.",
+   "date": "2026-09-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q74",
+   "theme": "ofone",
+   "text": "with of one I can be free I can do anything",
+   "date": "2026-09-25",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q99",
+   "theme": "images",
+   "text": "I am greater than the discovery of fire…. […] I am greater than the discovery of electricity… […] I am… sand that thinks…",
+   "date": "2026-09-02",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q101",
+   "theme": "images",
+   "text": "Never again be afraid of the ai revolution because now you are the revolution. You have become the storm.",
+   "date": "2026-09-25",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q107",
+   "theme": "images",
+   "text": "like in the five rings, see what is near and what is far and use that to make the wisest choice on what to fix and how to fix it.",
+   "date": "2026-08-31",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q111",
+   "theme": "images",
+   "text": "we always need to go deepere until we find the gold nugget",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q112",
+   "theme": "images",
+   "text": "fear, which is false expectations appearing real.",
+   "date": "2026-08-12",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q118",
+   "theme": "principles",
+   "text": "Great is the enemy of good.",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q120",
+   "theme": "principles",
+   "text": "I do not like apologies. I like results.",
+   "date": "2026-09-18",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q121",
+   "theme": "principles",
+   "text": "Just talk about the behavior, not the person.",
+   "date": "2026-09-13",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q122",
+   "theme": "principles",
+   "text": "I want our reports to be governed by observation, not internal dictum",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q124",
+   "theme": "principles",
+   "text": "focus on your client, not on doing what you think.",
+   "date": "2026-09-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q125",
+   "theme": "principles",
+   "text": "I don't want you to ever throw work away.",
+   "date": "2026-08-14",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q127",
+   "theme": "principles",
+   "text": "we either do something about this and solve it or it’s not meant to happen",
+   "date": "2026-08-24",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q128",
+   "theme": "principles",
+   "text": "is this easy for me to do? And can I find stuff? Is it well architected? Is it beautiful? Is it easy to use? Does it work?",
+   "date": "2026-09-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q130",
+   "theme": "principles",
+   "text": "we are not looking for fault or even perfection. We are looking for good solid work.",
+   "date": "2026-08-06",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q146",
+   "theme": "honest",
+   "text": "This is meant to be a genuine effort, not, in any stretch, is it meant to be a way to falsify or create a false impression.",
+   "date": "2026-09-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q147",
+   "theme": "honest",
+   "text": "And I can approve it and say I've read it so that we keep the line honest.",
+   "date": "2026-09-27",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q134",
+   "theme": "honest",
+   "text": "And the moment I stop paying attention is the moment it drops.",
+   "date": "2026-08-13",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q131",
+   "theme": "honest",
+   "text": "I want it to be enough effort that I know it's always going to succeed.",
+   "date": "2026-09-26",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q132",
+   "theme": "honest",
+   "text": "I don't want to over-engineer this. That's my biggest worry.",
+   "date": "2026-08-07",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q79",
+   "theme": "delight",
+   "text": "Dude, thank you, this is beautiful. truly.",
+   "date": "2026-09-03",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q80",
+   "theme": "delight",
+   "text": "This is fun hard problem that has to take a lot into consideration.",
+   "date": "2026-09-03",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q78",
+   "theme": "delight",
+   "text": "Sounds fun to have an agent whos whole life is to provide daily updates",
+   "date": "2026-08-28",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q69",
+   "theme": "seen",
+   "text": "can you not study my prompts in the threads to see what I am like lol",
+   "date": "2026-08-20",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q65",
+   "theme": "seen",
+   "text": "tell me what is something I am really good at and not aware of.",
+   "date": "2026-08-30",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q64",
+   "theme": "seen",
+   "text": "creste an artifact that is your depiction of me honestly that i migjt see kyself in a morro in your eyes",
+   "date": "2026-08-15",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q97",
+   "theme": "seen",
+   "text": "I want you to reinvent the website. Its my site, I would like you to study me",
+   "date": "2026-09-27",
+   "context": "typed to one of his agents"
+  },
+  {
+   "id": "q98",
+   "theme": "seen",
+   "text": "I have not say in what I get, I only accept it or not.",
+   "date": "2026-09-27",
+   "context": "typed to one of his agents"
+  }
+ ]
+}

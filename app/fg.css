@@ -1,0 +1,172 @@
+/* Fulgurite: the design system of the commissioned jamesbrady.org.
+ * One committed world, the night of the strike. Three voices, told apart by type:
+ *   James (his exact words)  — Newsreader italic   (--f-voice)
+ *   the narrator             — Archivo              (--f-narr)
+ *   the record (numbers)     — Martian Mono         (--f-rec)
+ * The only accent is heat, and it means "live" or "now". */
+
+:root {
+  color-scheme: dark;
+  --ground: #0d0c0a;
+  --ground-2: #15130f;
+  --ground-3: #1c1914;
+  --rule: #2b2722;
+  --ink: #ede7db;
+  --ink-2: #a69c8b;
+  --ink-3: #877e6e;
+  --sand: #bfa985;
+  --sand-dim: #6e6352;
+  --glass: #cfe0d6;
+  --heat: #ffb45c;
+  --strike: #dde6ff;
+  --f-voice: var(--font-voice), "Iowan Old Style", Georgia, serif;
+  --f-narr: var(--font-narr), "Helvetica Neue", Arial, sans-serif;
+  --f-rec: var(--font-rec), ui-monospace, "SF Mono", Menlo, monospace;
+  --gutter: clamp(16px, 4vw, 48px);
+  --measure: 62ch;
+}
+
+html { background: var(--ground); overflow-x: clip; }
+body.fg {
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 17px/1.6 var(--f-narr);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body.fg a { color: inherit; text-decoration-color: color-mix(in srgb, var(--sand) 55%, transparent); text-underline-offset: 3px; }
+body.fg a:hover { text-decoration-color: var(--heat); }
+body.fg :focus-visible { outline: 2px solid var(--heat); outline-offset: 3px; border-radius: 2px; }
+body.fg ::selection { background: color-mix(in srgb, var(--heat) 35%, transparent); color: var(--ink); }
+.fg-skip { position: absolute; left: -9999px; top: 8px; z-index: 50; background: var(--ink); color: var(--ground); padding: 8px 12px; font: 600 14px var(--f-narr); }
+.fg-skip:focus { left: 8px; }
+
+/* ---- The three voices --------------------------------------------------------------------------- */
+.fg-eyebrow { font: 500 11.5px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin: 0; }
+.fg-voice { font-family: var(--f-voice); font-style: italic; font-weight: 400; letter-spacing: -0.005em; color: var(--ink); margin: 0; text-wrap: balance; }
+.fg-voice q, .fg-voice blockquote { quotes: "\201C" "\201D"; }
+.fg-attrib { font: 400 12px/1.5 var(--f-rec); color: var(--ink-3); margin: 10px 0 0; letter-spacing: 0.02em; }
+.fg-attrib a { color: var(--ink-2); }
+.fg-narr { font-family: var(--f-narr); }
+.fg-rec { font-family: var(--f-rec); font-variant-numeric: tabular-nums; }
+.fg-h2 { font: 600 clamp(26px, 3.2vw, 38px)/1.08 var(--f-narr); font-stretch: 88%; letter-spacing: -0.015em; margin: 0; text-wrap: balance; }
+.fg-h3 { font: 600 19px/1.25 var(--f-narr); margin: 0; }
+.fg-p { max-width: var(--measure); color: var(--ink); margin: 0; text-wrap: pretty; }
+.fg-p + .fg-p { margin-top: 0.9em; }
+.fg-muted { color: var(--ink-2); }
+
+/* A number in the record's voice. Its method opens on hover or focus. */
+.fg-fig { position: relative; font: 500 1em var(--f-rec); font-variant-numeric: tabular-nums; color: var(--ink); border-bottom: 1px dotted var(--sand-dim); cursor: help; white-space: nowrap; }
+.fg-fig:focus { outline: none; border-bottom-color: var(--heat); }
+.fg-fig .fg-fig__m { display: none; position: absolute; left: 0; top: calc(100% + 8px); width: min(320px, 80vw); background: var(--ground-2); border: 1px solid var(--rule); padding: 10px 12px; font: 400 12px/1.5 var(--f-rec); color: var(--ink-2); white-space: normal; pointer-events: none; z-index: 20; }
+.fg-fig:hover .fg-fig__m, .fg-fig:focus .fg-fig__m { display: block; }
+@media (max-width: 720px) {
+  /* On a phone the method opens as a small sheet at the bottom of the screen, never off its edge. */
+  .fg-fig:hover .fg-fig__m, .fg-fig:focus .fg-fig__m { position: fixed; left: 16px; right: 16px; top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); width: auto; z-index: 60; box-shadow: 0 10px 40px rgb(0 0 0 / 0.5); }
+}
+.fg-live { color: var(--heat); }
+
+/* ---- The specimen label: the site's signature component ----------------------------------------- */
+.fg-label { border: 1px solid var(--rule); background: color-mix(in srgb, var(--ground-2) 70%, transparent); padding: 12px 14px; font: 400 12px/1.55 var(--f-rec); color: var(--ink-2); letter-spacing: 0.01em; }
+.fg-label__no { color: var(--ink-3); }
+.fg-label__name { color: var(--ink); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.fg-label__row { display: block; }
+.fg-label a { color: var(--ink-2); }
+.fg-label__state--active { color: var(--heat); }
+.fg-label__state--private { color: var(--glass); }
+
+/* ---- Chrome ------------------------------------------------------------------------------------- */
+.fg-head { position: fixed; inset: 0 0 auto 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: calc(env(safe-area-inset-top, 0px) + 14px) var(--gutter) 14px; background: var(--ground); pointer-events: none; }
+.fg-head::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 28px; background: linear-gradient(var(--ground), transparent); pointer-events: none; }
+.fg-head > * { pointer-events: auto; }
+.fg-wordmark { font: 700 15px/1 var(--f-narr); font-stretch: 112%; letter-spacing: 0.02em; text-decoration: none; color: var(--ink); }
+.fg-nav { display: flex; gap: clamp(12px, 2vw, 26px); font: 500 13.5px/1 var(--f-narr); }
+.fg-nav a { text-decoration: none; color: var(--ink-2); padding: 6px 0; }
+.fg-nav a:hover, .fg-nav a[aria-current="page"] { color: var(--ink); }
+.fg-nav .fg-nav__cta { color: var(--heat); }
+@media (max-width: 720px) { .fg-nav a:not(.fg-nav__keep) { display: none; } }
+
+.fg-foot { border-top: 1px solid var(--rule); margin-top: 96px; padding: 40px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 40px); display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); font-size: 14px; color: var(--ink-2); }
+.fg-foot h2 { font: 500 11px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+.fg-foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fg-foot a { text-decoration: none; color: var(--ink-2); }
+.fg-foot a:hover { color: var(--ink); }
+.fg-foot .fg-colophon { grid-column: 1 / -1; font: 400 12px/1.6 var(--f-rec); color: var(--ink-3); max-width: 80ch; }
+
+/* ---- Home: the text beside the specimen --------------------------------------------------------- */
+.fg-home { display: grid; grid-template-columns: minmax(0, 47fr) minmax(0, 53fr); }
+.fg-home > .fg-stage { grid-column: 2; grid-row: 1 / span 40; position: sticky; top: 0; height: 100vh; height: 100svh; }
+.fg-home > section { grid-column: 1; padding-inline: var(--gutter); }
+.fg-stage__poster { position: absolute; inset: 0; background: center / contain no-repeat; opacity: 0.9; }
+.fg-stage__scale { position: absolute; left: 0; top: 0; bottom: 0; width: 72px; pointer-events: none; font: 400 10.5px/1 var(--f-rec); color: var(--ink-3); letter-spacing: 0.04em; }
+.specimen-tip { background: var(--ground-2); border: 1px solid var(--rule); color: var(--ink); padding: 10px 12px; max-width: 280px; font: 400 13px/1.45 var(--f-narr); z-index: 5; }
+.specimen-tip b { display: block; font-weight: 600; margin-bottom: 3px; }
+.specimen-tip span { color: var(--ink-2); }
+
+.fg-surface { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-block: 120px 64px; }
+.fg-surface .fg-voice { font-size: clamp(34px, 4.6vw, 64px); line-height: 1.06; max-width: 15ch; margin-top: 22px; }
+.fg-surface .fg-lede { font: 400 clamp(19px, 1.7vw, 23px)/1.45 var(--f-narr); color: var(--ink); max-width: 34ch; margin: 28px 0 0; text-wrap: pretty; }
+.fg-cta-row { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 30px; font: 600 15px/1 var(--f-narr); }
+.fg-cta-row a { text-decoration: none; padding: 12px 0; border-bottom: 1px solid var(--sand-dim); }
+.fg-cta-row a:hover { border-bottom-color: var(--heat); }
+.fg-cta-row .fg-cta--primary { color: var(--heat); border-bottom-color: color-mix(in srgb, var(--heat) 50%, transparent); }
+
+.fg-what { padding-block: 64px 24px; }
+.fg-what .fg-p { font-size: 18px; }
+.fg-key { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 22px; margin-top: 26px; font: 400 12.5px/1.45 var(--f-rec); color: var(--ink-2); max-width: 560px; }
+.fg-key b { color: var(--ink); font-weight: 500; }
+@media (max-width: 520px) { .fg-key { grid-template-columns: 1fr; } }
+
+.fg-era { position: relative; padding-block: 72px 24px; border-top: 1px solid var(--rule); margin-top: 48px; }
+.fg-era__depth { font: 500 11.5px/1 var(--f-rec); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sand); margin: 0 0 14px; }
+.fg-era .fg-h2 { max-width: 20ch; }
+.fg-era .fg-p { margin-top: 18px; }
+.fg-era__labels { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 26px; }
+.fg-era__cut { margin-top: 18px; font: 400 12.5px/1.5 var(--f-rec); color: var(--ink-2); padding-left: 16px; border-left: 2px solid var(--sand-dim); max-width: var(--measure); }
+.fg-thread { border-bottom: 1px dotted var(--sand); cursor: default; }
+.fg-thread:hover, .fg-thread:focus { color: var(--glass); border-bottom-color: var(--glass); outline: none; }
+
+.fg-tip { padding-block: 96px 32px; }
+.fg-tip__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-top: 26px; }
+.fg-tip__cell { background: var(--ground); padding: 16px; }
+.fg-tip__n { font: 500 30px/1.05 var(--f-rec); font-variant-numeric: tabular-nums; color: var(--heat); display: block; }
+.fg-tip__k { font: 400 12px/1.45 var(--f-rec); color: var(--ink-2); display: block; margin-top: 8px; }
+
+.fg-said { padding-block: 96px 24px; }
+.fg-said__list { display: grid; gap: 34px; margin-top: 30px; }
+.fg-said .fg-voice { font-size: clamp(22px, 2.2vw, 29px); line-height: 1.28; max-width: 30ch; }
+
+.fg-doors { padding-block: 96px 40px; }
+.fg-doors__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 28px; }
+.fg-door { display: block; text-decoration: none; border: 1px solid var(--rule); padding: 18px 18px 20px; background: var(--ground-2); transition: border-color 0.15s, background-color 0.15s; }
+.fg-door:hover { border-color: var(--sand-dim); background: var(--ground-3); }
+.fg-door h3 { font: 600 18px/1.25 var(--f-narr); margin: 0 0 8px; color: var(--ink); }
+.fg-door p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.fg-door .fg-door__go { display: inline-block; margin-top: 12px; font: 500 12.5px/1 var(--f-rec); color: var(--sand); }
+
+/* Phones: the specimen becomes a window at the top that descends with you. */
+@media (max-width: 900px) {
+  .fg-home { grid-template-columns: minmax(0, 1fr); }
+  .fg-home > .fg-stage { grid-column: 1; grid-row: 1; height: 46vh; height: 46svh; z-index: 1; background: linear-gradient(var(--ground) 90%, transparent); }
+  .fg-home > section { grid-column: 1; }
+  .fg-surface { min-height: auto; padding-top: 28px; }
+  .fg-stage__scale { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fg-fig .fg-fig__m, .fg-door { transition: none; }
+}
+
+/* ---- Inner pages -------------------------------------------------------------------------------- */
+.fg-page { padding: 120px var(--gutter) 40px; max-width: 1180px; margin: 0 auto; }
+.fg-page__head { max-width: 760px; }
+.fg-page__head .fg-h1 { font: 600 clamp(34px, 5vw, 60px)/1.02 var(--f-narr); font-stretch: 86%; letter-spacing: -0.02em; margin: 14px 0 0; text-wrap: balance; }
+.fg-page__head .fg-p { margin-top: 18px; font-size: 18.5px; color: var(--ink-2); }
+.fg-words { display: grid; gap: 64px; margin-top: 64px; }
+.fg-words__theme { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 20px 48px; border-top: 1px solid var(--rule); padding-top: 28px; }
+.fg-words__theme h2 { font: 600 20px/1.2 var(--f-narr); margin: 0; }
+.fg-words__theme p.fg-muted { margin: 6px 0 0; font-size: 14.5px; }
+.fg-words__list { display: grid; gap: 30px; }
+.fg-words__list .fg-voice { font-size: clamp(20px, 1.9vw, 26px); line-height: 1.32; }
+@media (max-width: 800px) { .fg-words__theme { grid-template-columns: 1fr; } }

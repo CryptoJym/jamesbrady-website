@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { ComponentType } from "react";
 
+import { JsonLd, Prose, Provenance } from "@/components/fg/Reading";
+import { SpecimenLabel } from "@/components/fg/Tray";
 import { EmotionalManifoldDemo } from "@/components/site/EmotionalManifoldDemo";
-import {
-  Dot,
-  JsonLd,
-  PageNameplate,
-  Prose,
-  SectionHead,
-} from "@/components/site/instruments";
-import { Tally } from "@/components/site/work";
 import { lab } from "@/lib/content";
-import { renderMarkdown } from "@/lib/content/markdown";
 import { labGraph, serializeGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo/metadata";
 
@@ -23,53 +17,71 @@ export const metadata: Metadata = pageMetadata({
   og: { image: "/og/lab.png", imageAlt: "James Brady — the lab" },
 });
 
+/** The artifact itself, for the entries that have one on this page. It carries its own heading. */
+const DEMOS: Record<string, ComponentType> = {
+  "emotional-manifold": EmotionalManifoldDemo,
+};
+
 export default function LabPage() {
   return (
-    <main id="main" tabIndex={-1}>
+    <main id="main" tabIndex={-1} className="fg-page fga-page">
       <JsonLd json={serializeGraph(labGraph(lab))} />
-      <section className="work work--bare">
-        <div className="wrap" style={{ paddingTop: "var(--s-8)" }}>
-          <SectionHead
-            level={1}
-            eyebrow="Lab"
-            heading="Things you can poke at."
-            aside="Every artifact here ships with a written explanation page. One that does not is excluded from search engines by the loader, not by anyone remembering to set a flag."
-          />
-          <EmotionalManifoldDemo />
-          <div className="grid-work grid-work--3" style={{ marginTop: "var(--s-7)" }}>
-            {lab.map((entry) => (
-              <article className="card" key={entry.slug}>
-                <div className="card__top">
-                  <span className="card__idx" aria-hidden="true" />
-                  <span className="card__cat">
-                    <Dot state={entry.state} /> {entry.stateWord}
-                  </span>
-                </div>
-                <h2 className="card__title">{entry.title}</h2>
-                <p className="card__body">{entry.answerCapsule}</p>
-                <div className="prose" style={{ fontSize: "var(--ts-small)" }}>
-                  <Prose html={renderMarkdown(entry.body)} />
-                </div>
-                <p className="card__foot">
-                  {entry.explanationUrl ? (
-                    <Link className="card__link" href={entry.explanationUrl}>
-                      Read the explanation
-                    </Link>
-                  ) : (
-                    <span>No explanation page — not indexed</span>
-                  )}
-                  <span className="arw" aria-hidden="true">→</span>
-                </p>
-              </article>
-            ))}
-          </div>
-          <Tally />
-          <PageNameplate
-            source="The typed content source"
-            method="Artifacts counted by CSS from what is displayed; noindex is forced by the loader when an explanation page is missing"
-          />
-        </div>
-      </section>
+      <header className="fg-page__head">
+        <p className="fg-eyebrow">Lab</p>
+        <h1 className="fg-h1">Things you can poke at.</h1>
+        <p className="fg-p">
+          Every artifact here ships with a written explanation page. One that does not is excluded from search engines
+          by the loader, not by anyone remembering to set a flag.
+        </p>
+      </header>
+
+      {lab.map((entry, i) => {
+        const Demo = DEMOS[entry.slug];
+        return (
+          <section key={entry.slug} className="fga-lab">
+            {Demo ? <Demo /> : <h2 className="fga-row__h">{entry.title}</h2>}
+            <div className="fga-row fga-row--flush">
+              <div className="fga-row__side">
+                <SpecimenLabel
+                  no={`L-${String(i + 1).padStart(2, "0")}`}
+                  name={entry.title}
+                  rows={[
+                    `first published ${entry.datePublished}`,
+                    entry.dateModified !== entry.datePublished ? `last modified ${entry.dateModified}` : null,
+                    entry.explanationUrl ? (
+                      <>
+                        explained at <Link href={entry.explanationUrl}>{entry.explanationUrl}</Link>
+                      </>
+                    ) : (
+                      "no explanation page, so not indexed"
+                    ),
+                  ]}
+                  state={{
+                    text: entry.stateWord.toLowerCase(),
+                    kind: entry.state === "live" ? "active" : entry.state,
+                  }}
+                />
+              </div>
+              <div className="fga-row__main">
+                <p className="fga-row__lede">{entry.answerCapsule}</p>
+                <Prose body={entry.body} />
+                {entry.explanationUrl ? (
+                  <p className="fga-go">
+                    <Link href={entry.explanationUrl}>Read the explanation →</Link>
+                  </p>
+                ) : (
+                  <p className="fga-go">No explanation page — not indexed</p>
+                )}
+              </div>
+            </div>
+          </section>
+        );
+      })}
+
+      <Provenance
+        source="The typed content source"
+        method="noindex is forced by the loader when an explanation page is missing"
+      />
     </main>
   );
 }

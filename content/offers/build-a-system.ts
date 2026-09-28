@@ -1,127 +1,115 @@
 import type { OfferEntry } from "@/lib/content/types";
 
+import { BUILD, BUILD_CARD, CONSULT } from "./build-card";
+
+/*
+ * UTLYZE'S OFFER, AS IT IS LIVE ON ITS SITES.
+ *
+ * Rewritten on 2026-09-27. Until then this page described a scoped engagement shipped in "verified waves", which is
+ * not what Utlyze sells. It now carries Utlyze's Consult and Build word for word (content/offers/build-card.ts), read
+ * the same day from businessofone.ai and ctoofone.ai, where the Of One sites print one shared card.
+ *
+ * Everything outside the card is this site's own plain description of it, and each claim in it comes from the same
+ * pages: the steps from Business of One's "How it works", what the client keeps from its "What each becomes". Nothing
+ * here promises a saving or an outcome, and the three-month term appears only as the levels print it.
+ */
 export const entry: OfferEntry = {
   collection: "offers",
   slug: "build-a-system",
-  title: "Build a system that shows its work",
-  kicker: "For a founder or an operator with a build to run",
-  capsuleQuestion: "What does a build engagement with the studio look like?",
+  title: "Build your AI systems with Utlyze",
+  kicker: "For a business with work that repeats",
+  capsuleQuestion: "What does building with Utlyze look like, and what does it cost?",
   answerCapsule:
-    "Building a system, here, means a scoped engagement that ships in verified waves: a written scope, work landed in waves that each carry their own evidence, an evidence packet a non-technical owner can read, and a handoff where the client owns the repository, the checks and the deployment. Utlyze, the studio James Brady operates, does this work. Nothing is claimed as done until the place it lives has been read back.",
+    `Building with Utlyze, the company James Brady operates, has two ways in. Consult is ${CONSULT.price}, ${CONSULT.terms}. Build is ${BUILD.price}: each month you pick up to 5 business processes, and each one becomes a working automation in your own tools, tested on your real work and taught to your team. The work is done by build-with-you coaches. They build your AI systems with you and teach your team to run them. If you ever leave, the systems stay with you.`,
   summary:
-    "A scoped build that ships in verified waves, with an evidence packet at the end and the client owning the repository, the checks and the deployment.",
+    "Utlyze builds AI systems with you: Consult at $400 an hour in 5-hour blocks, or Build at $15,000 a month for up to 5 business processes at once.",
   datePublished: "2026-08-12",
-  dateModified: "2026-08-12",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze"],
   deliveredBy: {
     name: "Utlyze",
-    url: "https://utlyze.com",
-    role: "the studio that builds products and takes on custom software and systems work",
+    url: "https://www.utlyze.com",
+    role: "the company that builds custom AI systems around your work and the tools you already use",
   },
   audience: [
-    "Founders with a product to get in front of users",
-    "Operators with a manual process that has outgrown people",
-    "Teams that need agent work done without a research project attached",
-    "Anyone who has been handed a build they cannot inspect",
+    "Established businesses with real revenue",
+    "Owners who want to run lean and let AI carry the repeatable work",
+    "Technical leads who want people who build with them, not around them",
   ],
   steps: [
     {
-      label: "Scope",
+      label: "Map",
       detail:
-        "What is being built, what it has to be true of, and what would count as done. Written down before anything is built, because a scope agreed in conversation is a scope two people remember differently.",
+        "Utlyze and the client use the Of One method to agree on the outcomes, the constraints and the order of work.",
     },
     {
-      label: "Build in verified waves",
-      detail:
-        "Work lands in waves. Each wave has required checks that run on every change and a merge queue that tests changes together before they land, so two changes that pass alone and break together get caught before you see them.",
+      label: "Build",
+      detail: "Small working systems ship early and grow, measured by the work they finish.",
     },
     {
-      label: "Evidence packet",
-      detail:
-        "Each wave produces the evidence for its own claims: what was checked, what passed, what did not run, and what is still unknown. Missing checks are named as missing rather than left out.",
-    },
-    {
-      label: "Handoff",
-      detail:
-        "You get the repository, the checks, the deployment and the documentation. The engagement ends with you able to run it without me.",
+      label: "Adapt",
+      detail: "When models and tools change, the parts are swapped and the business keeps running.",
     },
   ],
   deliverables: [
     {
-      label: "The repository, owned by you",
-      detail: "Source, history and issues, under your account rather than mine.",
-    },
-    {
-      label: "The checks that hold it up",
+      label: "Working automations in your own accounts",
       detail:
-        "The required checks and the merge queue travel with the repository. They are the part that keeps working after the engagement ends.",
+        "Each process becomes an automation that runs on your real work, in your own accounts, and has passed a test your owner signed off.",
     },
     {
-      label: "A running deployment",
-      detail: "Live, under your own accounts and your own billing, with the setup written down.",
-    },
-    {
-      label: "An evidence packet per wave",
+      label: "A way back if one fails",
       detail:
-        "What was claimed, how it was checked, and the state of anything that was not checked. It is what makes the next person able to trust the last one.",
+        "A person approves anything that can't be undone. If an automation fails, it falls back to today's way, and your owner can run it.",
+    },
+    {
+      label: "A team that knows how it works",
+      detail: "Each one is taught to your team, and you learn how each system works and how to change it.",
+    },
+    {
+      label: "Everything that was built",
+      detail: "You own everything built for you. If you ever leave, the systems stay with you.",
     },
   ],
-  budgetBands: ["15k_50k", "50k_plus"],
+  price: {
+    statement: `Utlyze publishes its prices. Consult is ${CONSULT.price}, ${CONSULT.terms}. Build is ${BUILD.price}.`,
+    source: BUILD_CARD.sources[0],
+  },
+  published: BUILD_CARD,
   inquiryType: "production_build",
   ctaLabel: "Start a build enquiry",
   proof: [
     {
-      label: "plimsoll, the open-source cost collector, built this way",
-      url: "https://github.com/CryptoJym/plimsoll",
-      method: "Public repository, Apache-2.0 licensed. Signals read from the GitHub API.",
-      capturedAt: "2026-08-11",
+      label: "Utlyze’s Consult and Build cards and the pace note, live on Business of One",
+      url: "https://businessofone.ai/",
+      method:
+        "HTTP GET, returned 200. The two cards, the Build card’s five points and the pace note, read on the page.",
+      capturedAt: "2026-09-27",
     },
     {
-      label: "ofone-skillchain, the open method and its validator",
-      url: "https://github.com/CryptoJym/ofone-skillchain",
-      method: "Public repository, MIT licensed. Signals read from the GitHub API.",
-      capturedAt: "2026-08-11",
+      label: "The three levels, the three-month term and who does the work",
+      url: "https://businessofone.ai/build/",
+      method:
+        "HTTP GET, returned 200. The Three levels, Quoted separately and Who does the work sections, read on the page; ctoofone.ai/build/ prints the same levels and term.",
+      capturedAt: "2026-09-27",
     },
     {
-      label: "This site, which states the method it was built under",
-      url: "https://www.jamesbrady.org/about",
-      method: "The reliability answer on this site, in plain words rather than process vocabulary.",
-      capturedAt: "2026-08-11",
+      label: "Utlyze, the company that does the work",
+      url: "https://www.utlyze.com/",
+      method:
+        "HTTP GET, returned 200. Its own page says it builds custom AI systems around your work and the tools you already use.",
+      capturedAt: "2026-09-27",
     },
   ],
   og: {
-    image: "/og/work-with-me.png",
-    imageAlt: "James Brady — a scoped build that ships in verified waves",
+    image: "/og/default.png",
+    imageAlt: "James Brady — build your AI systems with Utlyze: Consult or Build",
   },
-  body: `## What you are actually buying
+  body: `## What this page does not claim
 
-Most build engagements sell you an outcome and hand you a black box. You get a thing that works on the day it is delivered, and no way to tell, six weeks later, whether it still does.
+No client of this offer is named on this site, and no outcome is promised or published: no hours saved, no errors avoided, no sales won. Client work here is anonymized by agreement, and a named result goes up only with written clearance.
 
-This one sells you the outcome and the machinery that proves it. The same discipline the rest of this site runs on: required checks on every change, a merge queue so changes are tested together before they land, and a rule that a claim is not a result. If a change is supposed to be live, the live page is what gets read, not the message saying it shipped.
+## Where these words come from
 
-That machinery is not overhead you pay for and never see. It is the thing you keep.
-
-## Why waves
-
-A build that lands in one delivery at the end gives you exactly one moment to find out it went wrong, and by then the budget is spent.
-
-Waves are smaller. Each one is scoped, built, checked, and shown to you with its evidence attached before the next one starts. If a wave produces something you did not want, you have lost a wave, not a project. If it produces something you did want, that value is live rather than sitting on a branch.
-
-## What "checked" means here
-
-Whatever grades the work is separate from what produced it, and the standard is frozen before the work starts. If the thing being tested can edit the test, the test decides nothing.
-
-Work moves along a ladder, and each rung is a different claim: open, then checks passing, then reviewed, then merged, then deployed, then checked live. Saying a higher rung than the true one is treated as a defect. The reliability answer on the about page goes through this in full.
-
-## What you own at the end
-
-The repository, the checks, the deployment and the documentation, under your accounts. No part of the system depends on me still being reachable.
-
-Where a third-party project does part of the work, the engagement says so and names it. A build that quietly absorbs someone else's project and calls it bespoke is the kind of thing this site exists to be the opposite of.
-
-## What this page does not claim
-
-No engagement of this shape has a published client name or a published outcome figure on this site yet. Client work is anonymized by agreement, and named results go up only with written clearance.
-
-What is checkable today is the open-source work, which is public and linked from this page, and this site itself, which is built under the method described above.`,
+The prices, the two cards, the three levels, the pace note and the description of who does the work are Utlyze's own, copied word for word from its sites on 27 September 2026. The one line this site chose is the example of a business process: a new enquiry becoming a booked job.`,
 };

@@ -28,10 +28,9 @@ import {
   offers,
   work,
 } from "@/lib/content";
-import { BUDGET_LABEL } from "@/lib/contact";
 import { toPlainText } from "@/lib/content/markdown";
 import { CATEGORY_LABEL, MATURITY_LABEL } from "@/lib/content/types";
-import type { AnyEntry, ProofSource } from "@/lib/content/types";
+import type { AnyEntry, ProofSource, PublishedOffer } from "@/lib/content/types";
 import { indexableRoutes } from "@/lib/seo/routes";
 import { SITE, absolute } from "@/lib/seo/site";
 
@@ -66,6 +65,24 @@ function changeSpan(delta: { before?: string; after?: string; range?: string }):
   if (delta.after) return `${delta.after}, with no earlier figure recorded`;
   if (delta.before) return `${delta.before}, with no later figure recorded`;
   return "no figure recorded";
+}
+
+/** A company's own published offer, word for word, with where it was read. */
+function publishedLines(p: PublishedOffer): string[] {
+  return [
+    "The company's own published offer, word for word:",
+    ...p.cards.flatMap((c) => [
+      `  - ${c.name}: ${c.price}, ${c.terms}. ${c.value}`,
+      ...(c.points ?? []).map((pt) => `    - ${pt}`),
+    ]),
+    `  - ${p.start}`,
+    `  - ${p.pace}`,
+    `  - ${p.levels.heading}: ${p.levels.intro}`,
+    ...p.levels.items.map((l) => `    - ${l.name} · ${l.price}. ${`${l.atOnce} ${l.adds}`.trim()}`),
+    `  - ${p.levels.separately.heading}: ${p.levels.separately.body}`,
+    `  - ${p.people.heading}: ${p.people.lines.join(" ")}`,
+    `Read from: ${p.sources.map((s) => `${s.url} (${s.capturedAt})`).join(", ")}.`,
+  ];
 }
 
 function proofLines(proof: ProofSource[]): string[] {
@@ -128,10 +145,10 @@ export function buildGroundingPack(): string {
   );
 
   // ---- Site pages -------------------------------------------------------
-  // Ruling (D), 2026-08-11: /links and /watch join the pack with the rest of
-  // the hand-built routes, from the same route table llms.txt and the sitemap
+  // The hand-built routes, from the same route table llms.txt and the sitemap
   // read. A page that is in the sitemap and not in the pack is a page the
-  // assistant would deny exists.
+  // assistant would deny exists. (/links and /watch joined under ruling (D) on
+  // 2026-08-11 and left on 2026-09-27, when both became redirects.)
   const entryPaths = new Set([
     ...work.map((w) => `/work/${w.slug}`),
     ...discoverableTheories.map((t) => `/theories/${t.slug}`),
@@ -146,27 +163,29 @@ export function buildGroundingPack(): string {
     ].join("\n\n"),
   );
 
-  // ---- Work with me -----------------------------------------------------
-  // The engagements, ahead of the portfolio. A visitor asking what they can
-  // hire should get an engagement and the entity that delivers it, not a list
-  // of repositories. Budget bands come from the /contact allowlist, so the
-  // assistant cannot state a band the form does not offer.
+  // ---- Work with him ----------------------------------------------------
+  // The offers, ahead of the portfolio. A visitor asking what they can hire
+  // should get an offer and the company that delivers it, not a list of
+  // repositories. Money comes only from each offer's price statement and, where
+  // a company publishes its prices, its own card word for word, so the
+  // assistant cannot state a price nobody published.
   parts.push(
     [
-      "## Work with me",
-      `Engagements offered: ${offers.length}. Each is described at ${absolute("/work-with-me")}.`,
+      "## Work with him",
+      `Offers: ${offers.length}. Each is described at ${absolute("/work-with-me")}.`,
       ...offers.map((entry) =>
         section(entry.title, `/work-with-me/${entry.slug}`, [
           `Delivered by: ${entry.deliveredBy.name}, ${toPlainText(entry.deliveredBy.role)}. ${entry.deliveredBy.url}`,
           ...commonLines(entry),
           `Who it is for: ${entry.audience.join(", ")}`,
+          `Price: ${entry.price.statement}${
+            entry.price.source ? ` Read from ${entry.price.source.url} on ${entry.price.source.capturedAt}.` : ""
+          }`,
+          ...(entry.published ? publishedLines(entry.published) : []),
           "What an engagement looks like:",
           ...entry.steps.map((s) => `  - ${s.label}: ${sentence(s.detail)}`),
           "What the client is left holding:",
           ...entry.deliverables.map((d) => `  - ${d.label}: ${sentence(d.detail)}`),
-          `Budget bands, from the enquiry form's own list: ${entry.budgetBands
-            .map((b) => BUDGET_LABEL[b])
-            .join(", ")}. These are orientation, not a quote.`,
           ...proofLines(entry.proof),
           ...bodyBlock(entry),
         ]),

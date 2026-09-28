@@ -1,0 +1,375 @@
+{
+ "_note": "Repositories cleared to be named on jamesbrady.org: the 2026-09-27 work study's privacy-screened public list (client-, vendor- and person-named repos withheld), minus one repository not approved for the site. Anything not listed is counted anonymously.",
+ "repos": [
+  {
+   "name": "h3ro-dev/ACE-Test"
+  },
+  {
+   "name": "h3ro-dev/ACE-Neurologicql"
+  },
+  {
+   "name": "h3ro-dev/loyalty-login"
+  },
+  {
+   "name": "h3ro-dev/Tanks-of-Glory"
+  },
+  {
+   "name": "h3ro-dev/STRIDE"
+  },
+  {
+   "name": "h3ro-dev/Fitnessfuntimes"
+  },
+  {
+   "name": "h3ro-dev/EEX-Graphic---Horizontal---SVG"
+  },
+  {
+   "name": "h3ro-dev/cats"
+  },
+  {
+   "name": "h3ro-dev/codexinstructions"
+  },
+  {
+   "name": "h3ro-dev/Astroevents"
+  },
+  {
+   "name": "h3ro-dev/Progress7bgc"
+  },
+  {
+   "name": "h3ro-dev/Agent-starter-kit"
+  },
+  {
+   "name": "h3ro-dev/loom-autopublisher"
+  },
+  {
+   "name": "h3ro-dev/super-duper-octo-waffle"
+  },
+  {
+   "name": "h3ro-dev/heygenagent"
+  },
+  {
+   "name": "h3ro-dev/heygen-mcp-adapter"
+  },
+  {
+   "name": "h3ro-dev/tiktok-mcp-adapter"
+  },
+  {
+   "name": "h3ro-dev/ReWrite-NDA"
+  },
+  {
+   "name": "h3ro-dev/UtlyzeAnimationSequence-BGC"
+  },
+  {
+   "name": "CryptoJym/Overseer"
+  },
+  {
+   "name": "h3ro-dev/TimingApp-MCP"
+  },
+  {
+   "name": "h3ro-dev/ai-image-animation-pipeline"
+  },
+  {
+   "name": "h3ro-dev/FlashCardsofPOWER"
+  },
+  {
+   "name": "h3ro-dev/vibe-coder-flashcards"
+  },
+  {
+   "name": "h3ro-dev/website-eater"
+  },
+  {
+   "name": "h3ro-dev/ai-trinity-data-extraction"
+  },
+  {
+   "name": "h3ro-dev/ceoofone"
+  },
+  {
+   "name": "h3ro-dev/directorofone"
+  },
+  {
+   "name": "h3ro-dev/vcofone"
+  },
+  {
+   "name": "h3ro-dev/vpofone"
+  },
+  {
+   "name": "h3ro-dev/companyofone"
+  },
+  {
+   "name": "h3ro-dev/lawyerofone"
+  },
+  {
+   "name": "CryptoJym/businessofone"
+  },
+  {
+   "name": "h3ro-dev/unicornofone"
+  },
+  {
+   "name": "h3ro-dev/hrofone"
+  },
+  {
+   "name": "CryptoJym/marketing-mcp-servers"
+  },
+  {
+   "name": "CryptoJym/utlyze-taskmaster-mem0"
+  },
+  {
+   "name": "h3ro-dev/ofone-ui"
+  },
+  {
+   "name": "h3ro-dev/cursor-admin-mcp"
+  },
+  {
+   "name": "h3ro-dev/motion-mcp-server"
+  },
+  {
+   "name": "h3ro-dev/limitless-mcp-server"
+  },
+  {
+   "name": "h3ro-dev/claude-power-tools"
+  },
+  {
+   "name": "CryptoJym/brain-visualization-app"
+  },
+  {
+   "name": "CryptoJym/knowledge-divergence-model"
+  },
+  {
+   "name": "CryptoJym/future-of-work-dashboard"
+  },
+  {
+   "name": "CryptoJym/ai-revolution-deck"
+  },
+  {
+   "name": "CryptoJym/ai-revolution-presentation"
+  },
+  {
+   "name": "CryptoJym/future-work-insights"
+  },
+  {
+   "name": "CryptoJym/fcra-cra-checklist"
+  },
+  {
+   "name": "CryptoJym/employment-analytics"
+  },
+  {
+   "name": "CryptoJym/bci-research"
+  },
+  {
+   "name": "CryptoJym/utlyze-futuristic"
+  },
+  {
+   "name": "CryptoJym/ai-analyzer-complete-docs"
+  },
+  {
+   "name": "CryptoJym/ai-opportunity-analyzer"
+  },
+  {
+   "name": "CryptoJym/fcra-compliance-researcher"
+  },
+  {
+   "name": "CryptoJym/utlyze-business-structure-site"
+  },
+  {
+   "name": "CryptoJym/ai-readiness-assessment"
+  },
+  {
+   "name": "CryptoJym/omnara-docs"
+  },
+  {
+   "name": "h3ro-dev/autonomous-project-manager"
+  },
+  {
+   "name": "CryptoJym/gamma-mcp-server"
+  },
+  {
+   "name": "CryptoJym/oss-120b-pm-mcp"
+  },
+  {
+   "name": "CryptoJym/ai-lead-gen-pro"
+  },
+  {
+   "name": "CryptoJym/Agent-Foundary"
+  },
+  {
+   "name": "CryptoJym/agent-foundry"
+  },
+  {
+   "name": "h3ro-dev/ceo-solace-hub"
+  },
+  {
+   "name": "h3ro-dev/code-relief-ai"
+  },
+  {
+   "name": "h3ro-dev/solo-advocate-ai"
+  },
+  {
+   "name": "h3ro-dev/people-first-hr-flow"
+  },
+  {
+   "name": "h3ro-dev/vp-bridgewise"
+  },
+  {
+   "name": "h3ro-dev/director-flow"
+  },
+  {
+   "name": "h3ro-dev/innovate-again"
+  },
+  {
+   "name": "h3ro-dev/unicorn-finder-ai"
+  },
+  {
+   "name": "h3ro-dev/revenue-unburdened"
+  },
+  {
+   "name": "h3ro-dev/solo-boss-boost"
+  },
+  {
+   "name": "h3ro-dev/founder-vision-unlocked"
+  },
+  {
+   "name": "h3ro-dev/unicorn-scale-ops"
+  },
+  {
+   "name": "h3ro-dev/tiny-team-tenx"
+  },
+  {
+   "name": "h3ro-dev/dev-people-ai"
+  },
+  {
+   "name": "h3ro-dev/solo-marketer-ignite"
+  },
+  {
+   "name": "h3ro-dev/cpo-vision-ai"
+  },
+  {
+   "name": "h3ro-dev/legal-zen-llc"
+  },
+  {
+   "name": "h3ro-dev/corp-scale-ai"
+  },
+  {
+   "name": "h3ro-dev/mission-amp-ai"
+  },
+  {
+   "name": "h3ro-dev/impact-amplify-ai"
+  },
+  {
+   "name": "h3ro-dev/meta-ai-lead"
+  },
+  {
+   "name": "h3ro-dev/alpha-deal-stream"
+  },
+  {
+   "name": "CryptoJym/ai-agent-village-monitor"
+  },
+  {
+   "name": "h3ro-dev/limitless-intake-pipeline"
+  },
+  {
+   "name": "CryptoJym/freshbooks-mcp-server"
+  },
+  {
+   "name": "CryptoJym/gohighlevel-mcp-server"
+  },
+  {
+   "name": "CryptoJym/gohighlevel-mcp"
+  },
+  {
+   "name": "CryptoJym/nanobanana-api"
+  },
+  {
+   "name": "CryptoJym/wrath-shield-v3"
+  },
+  {
+   "name": "CryptoJym/eeg-meditation-analysis"
+  },
+  {
+   "name": "CryptoJym/eeg-burst-recorder"
+  },
+  {
+   "name": "CryptoJym/jamesbrady-website"
+  },
+  {
+   "name": "CryptoJym/dbz-sidescroller"
+  },
+  {
+   "name": "CryptoJym/oracles-not-orgcharts"
+  },
+  {
+   "name": "CryptoJym/math-common-core-missions"
+  },
+  {
+   "name": "CryptoJym/maintenance-app-concept-v26"
+  },
+  {
+   "name": "CryptoJym/sundance-2026-guide"
+  },
+  {
+   "name": "CryptoJym/repo-atlas-saas"
+  },
+  {
+   "name": "CryptoJym/openclaw"
+  },
+  {
+   "name": "CryptoJym/bomberman-classic-web"
+  },
+  {
+   "name": "CryptoJym/seopr1-site"
+  },
+  {
+   "name": "CryptoJym/problem-solving-system"
+  },
+  {
+   "name": "CryptoJym/ofone-skillchain"
+  },
+  {
+   "name": "CryptoJym/symphony"
+  },
+  {
+   "name": "CryptoJym/CryptoJym"
+  },
+  {
+   "name": "CryptoJym/plimsoll"
+  },
+  {
+   "name": "h3ro-dev/visibility-portal"
+  },
+  {
+   "name": "CryptoJym/architect-loop"
+  },
+  {
+   "name": "CryptoJym/ember-dash"
+  },
+  {
+   "name": "h3ro-dev/agent-landing-fleet"
+  },
+  {
+   "name": "CryptoJym/ux-design-laws"
+  },
+  {
+   "name": "h3ro-dev/loop-distillery"
+  },
+  {
+   "name": "h3ro-dev/borg"
+  },
+  {
+   "name": "CryptoJym/hyrule-forge"
+  },
+  {
+   "name": "h3ro-dev/eegt"
+  },
+  {
+   "name": "CryptoJym/omnara-capability-audit"
+  }
+ ],
+ "upstream": [
+  {
+   "name": "DanMcInerney/architect-loop",
+   "label": "Dan McInerney's Architect Loop"
+  }
+ ],
+ "releasesFor": [
+  "CryptoJym/plimsoll",
+  "h3ro-dev/eegt"
+ ]
+}

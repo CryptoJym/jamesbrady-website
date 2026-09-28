@@ -56,3 +56,6 @@ next-env.d.ts
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# James approves these words by accepting the site; until then they never enter git (the repo is public).
+content/words/quotes.private.json

@@ -1,26 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Archivo, Martian_Mono, Newsreader } from "next/font/google";
 
 import { SITE } from "@/lib/seo/site";
 import "./globals.css";
+import "./fg.css";
+import "./fg-a.css";
+import "./fg-b.css";
+
+// Three voices, three faces (all SIL Open Font License, self-hosted by next/font):
+// James's own words in Newsreader italic, the narrator in Archivo, the record in Martian Mono.
+const voice = Newsreader({ subsets: ["latin"], style: ["italic"], variable: "--font-voice", display: "swap" });
+const narr = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-narr", display: "swap" });
+const rec = Martian_Mono({ subsets: ["latin"], variable: "--font-rec", display: "swap" });
 
 /**
- * Root layout. Holds only the document and the skip link — nothing that
- * paints. Page chrome lives in app/(site)/layout.tsx, which carries Direction
- * B: grain, console rail, nav, footer, Ask dock.
- *
- * The (legacy) route group is gone as of wave 4. /primer, /manuscript,
- * /workshop and /watch were the last routes on the old skin; they now render
- * on Direction B at the same URLs, so there is one chrome for the whole site
- * and no second layout for a change to leak across.
- *
- * NO WEBFONT. GeistSans and GeistMono were mounted here and consumed only by
- * the archived skin. Direction B is a system stack by design (design-system-
- * spec §1.5: "no webfont, no CLS"), so the fonts left with the skin that used
- * them.
- *
- * Every route's own metadata comes from lib/seo/metadata.ts. Nothing here sets
- * a canonical, because a layout-level canonical is exactly how the live site
- * ended up canonicalizing every subpage to the homepage.
+ * Root layout: the document, the three faces and the skip link. Chrome lives in app/(site)/layout.tsx.
+ * Every route's own metadata comes from lib/seo/metadata.ts; nothing here sets a canonical.
  */
 export const metadata: Metadata = {
   title: { default: SITE.title, template: "%s — James Brady" },
@@ -30,29 +25,16 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-/**
- * The icons themselves are file-convention assets, not entries here:
- * app/icon.svg, app/apple-icon.png and app/favicon.ico are discovered by Next
- * and emitted as <link rel> tags. Declaring them twice is how one of the two
- * declarations goes stale.
- *
- * RASTERIZED BRAND ASSET — TOKEN VALUE FROZEN BY HAND, EXEMPT FROM THE NO-HEX
- * LINT (allowlisted by name in scripts/verify-tokens.mjs, which then asserts
- * this literal still EQUALS --c-base). It cannot be var(--c-base): the browser
- * paints its own chrome with this value before, and outside, any stylesheet.
- */
 export const viewport: Viewport = {
   colorScheme: "dark",
-  themeColor: "#0A0E11", // --c-base
+  themeColor: "#0D0C0A",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
-      <body>
-        <a className="skip" href="#main">
+    <html lang="en" data-scroll-behavior="smooth" className={`${voice.variable} ${narr.variable} ${rec.variable}`}>
+      <body className="fg">
+        <a className="fg-skip" href="#main">
           Skip to content
         </a>
         {children}

@@ -11,7 +11,7 @@ export const entry: WorkEntry = {
   summary:
     "An open-source decision compiler: a hard question becomes a typed, validated map, and the prose you read is a rendering of that map.",
   datePublished: "2026-08-11",
-  dateModified: "2026-08-11",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:utlyze"],
   stack: [
     "Node.js",
@@ -87,6 +87,8 @@ export const entry: WorkEntry = {
     image: "/og/work.png",
     imageAlt: "James Brady — case study: OfOne, a decision compiler",
   },
+  // Its pending gap, as a reader sees it: one third-person note.
+  publicNotes: ["How well each feature of the of1.ai product front works is not assessed here."],
   body: `## The problem
 
 Ask an expert a hard question and you get an essay back. The essay reads well. You cannot check it. You cannot see which facts it rests on, how old those facts are, what would change the answer, or where a person was supposed to sign off. When the world moves, the whole essay has to be rewritten, because nobody can tell which parts still hold.
@@ -95,7 +97,7 @@ Ask an expert a hard question and you get an essay back. The essay reads well. Y
 
 OfOne turns a hard question into a map before it writes a single sentence of answer. The map is made of typed objects: evidence, claims, unknowns, kill tests, causal edges, options, triggers, and human gates. A validator program checks the map. Only a map that passes gets turned into prose. The answer you read is a rendering of the map, the way a photograph is a rendering of a building. The blueprint stays attached.
 
-Two pieces ship. \`ofone-skillchain\` is the open method: the skill file, the schemas, the validator, the adapters, and a live walkthrough site. \`of1.ai\` is the product front that teaches the same method as three steps, Prism, Map, and Forge.
+Two pieces ship. \`ofone-skillchain\` is the open method: the skill file, the schemas, the validator, the adapters, and a live walkthrough site. \`of1.ai\` is the product front that teaches the same method as three steps, Ask, Map, and Move.
 
 ## How it works in plain words
 

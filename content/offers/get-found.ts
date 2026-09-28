@@ -1,5 +1,28 @@
 import type { OfferEntry } from "@/lib/content/types";
 
+/*
+ * NEW REWARD, AS ITS OWN SITE DESCRIBES IT.
+ *
+ * Checked against www.newreward.com on 2026-09-27, over plain HTTP, and rewritten to match. Every claim below comes
+ * from one of these pages, each of which returned 200 that day:
+ *
+ *   /                      the free score, "Each month, you approve a clear plan, we build it, and we measure what
+ *                          changed", and the monthly report
+ *   /ai-visibility-score   a 0–100 readiness score in about two minutes, with the issues ranked; "no access required
+ *                          for the public score"; the free audit turns it into a ranked gap list
+ *   /framework             score, diagnose, fix, then show the improvements; "no one can honestly promise AI will
+ *                          mention you"; the price is "A flat monthly rate — simple, sized to your market", with no figure
+ *   /industries            eight buyer paths, which are this page's audience list
+ *   /faq                   "Pricing is scoped through the right engagement path"; every account it sets up is created
+ *                          with the client as the transferable owner
+ *
+ * What changed on that date: the "fixed rubric of 12 axes and 76 measures" is gone, because newreward.com no longer
+ * describes its scoring that way (it describes the 0–100 score), and the audience list is New Reward's own published
+ * industries rather than a list compiled here.
+ *
+ * NO PRICE. James, 2026-09-27: "We don't publicly post our client price... We don't have any public listing and we
+ * won't." So this offer carries no figure, no band and no "from" anywhere, and its price statement says so.
+ */
 export const entry: OfferEntry = {
   collection: "offers",
   slug: "get-found",
@@ -7,100 +30,112 @@ export const entry: OfferEntry = {
   kicker: "For a business with customers to win",
   capsuleQuestion: "What does getting found in search and in AI answers actually mean?",
   answerCapsule:
-    "Getting found means two things now: ranking in an ordinary Google search, and being the source an AI assistant answers from. New Reward, the agency James Brady operates, measures both from outside a business, scores what it finds against a fixed rubric of 12 axes and 76 measures, and reports which gaps are worth closing first. Missing evidence is written down as missing. No outcome figure from a client engagement is published on this site yet.",
+    "Getting found means two things now: showing up in an ordinary Google search, and being named when a buyer asks an AI assistant. New Reward, the agency James Brady operates, scores how a business appears across Google and the major AI assistants, ranks the gaps, and then does the approved work month by month, with evidence of what changed. New Reward claims results only where the data supports them, and no client outcome figure is published on this site.",
   summary:
-    "Measuring how findable a business is in Google and in AI answers, scoring it against a fixed rubric, and fixing what the score exposes.",
+    "New Reward scores how findable a business is in Google and in AI answers, ranks the gaps, and does the approved work each month, with evidence of what changed.",
   datePublished: "2026-08-12",
-  dateModified: "2026-08-12",
+  dateModified: "2026-09-27",
   entities: ["person:james", "org:new-reward"],
   deliveredBy: {
     name: "New Reward",
-    url: "https://newreward.com",
-    role: "the agency that runs the measurement and the work that follows it",
+    url: "https://www.newreward.com",
+    role: "the agency that scores how you appear in Google and AI answers, then does the work and shows what changed",
   },
   audience: [
-    "Medical and health services",
-    "HVAC",
-    "Roofing",
-    "Concrete",
-    "Gutters",
-    "Financial and commercial lending",
-    "Custom software and IT staffing",
-    "Pet breeding",
-    "Background screening",
-    "Promotional products",
-    "Call-center software",
+    "Hospitality",
+    "Contractors",
+    "Medical and wellness",
+    "Financial services",
+    "Legal",
+    "Dental",
+    "Pest control",
+    "Agencies",
   ],
   steps: [
     {
-      label: "Measure from outside",
+      label: "Score",
       detail:
-        "A first run uses only what any member of the public can see, so nothing waits on account access. Where a connection already exists, Search Console and analytics are read directly.",
+        "A scan starts from the website address and returns a readiness score from 0 to 100 in about two minutes, with the issues ranked. It reads Google Search and the answers of the major AI assistants, and the public score needs no access to your accounts.",
     },
     {
-      label: "Score against a fixed rubric",
-      detail:
-        "The same 12 axes and 76 measures every time. A fixed rubric is what makes this month comparable to last month, and one business comparable to a competitor.",
+      label: "Rank the gaps",
+      detail: "The free audit turns the score into a ranked list of gaps for that one business.",
     },
     {
-      label: "Report the decision, not the dashboard",
-      detail:
-        "The report leads with the comparison and what it means for the business. The checklist and the formula sit under the score. The technical evidence goes in an appendix.",
+      label: "Do the work, month by month",
+      detail: "Each month the client approves a plan, New Reward builds it, and what changed is measured.",
     },
     {
-      label: "Close the gaps that are worth closing",
+      label: "Show what changed",
       detail:
-        "The findings come back as work, in the order that pays. A finding nobody acts on was a cost, not a result.",
+        "Each approved fix ships with evidence of what changed. Movement is claimed only where the source data supports it.",
     },
   ],
   deliverables: [
     {
-      label: "A report an owner can act on without a translator",
+      label: "A score and a plan",
       detail:
-        "Plain language, the business conclusion first, and a visible checklist under every score.",
+        "One number from 0 to 100 for how often AI named the business when buyers asked, and the moves in the order that would change the answers most.",
     },
     {
-      label: "The evidence under every finding",
+      label: "The work itself",
       detail:
-        "Each finding carries its source, the date it was collected, and the vantage point it was seen from, because the same page can look different to different visitors.",
+        "Technical and on-page SEO, structured data, content built around real searches, reviews and reputation, distribution and lead response, as the approved plan calls for them.",
     },
     {
-      label: "A fix list in priority order",
-      detail: "What to do first, what it should change, and how the change will be checked.",
+      label: "A monthly report",
+      detail: "The work finished, what changed, and what comes next.",
     },
     {
-      label: "A repeatable baseline",
+      label: "Accounts in your name",
       detail:
-        "The same rubric run again later, so movement is measured rather than asserted.",
+        "Every profile, listing and account New Reward sets up is created with the client as the transferable owner.",
     },
   ],
-  budgetBands: ["5k_15k", "15k_50k", "50k_plus"],
+  price: {
+    statement:
+      "New Reward does not publish a client price, and neither does this site. Its own site describes one flat monthly rate, sized to your market and the work it takes, and scopes it with each client.",
+  },
   inquiryType: "get_found",
   ctaLabel: "Start a visibility enquiry",
   proof: [
     {
-      label: "New Reward, the agency that delivers this work",
-      url: "https://newreward.com",
-      method: "HTTP GET, returned 200.",
-      capturedAt: "2026-08-11",
-    },
-    {
-      label: "The published scoring method, in full",
-      url: "https://h3ro-dev.github.io/new-reward-seo-skills-os/",
+      label: "New Reward, the agency that does this work",
+      url: "https://www.newreward.com/",
       method:
-        "HTTP GET, returned 200. The underlying repository is private; the method site is public.",
-      capturedAt: "2026-08-11",
+        "HTTP GET, returned 200. Its home page describes the free score, the monthly plan the client approves, and the monthly report.",
+      capturedAt: "2026-09-27",
     },
     {
-      label: "The platform that runs the measurement, described in full",
+      label: "How the score works",
+      url: "https://www.newreward.com/ai-visibility-score",
+      method:
+        "HTTP GET, returned 200. A 0–100 readiness score in about two minutes, the issues ranked, and no account access needed for the public score.",
+      capturedAt: "2026-09-27",
+    },
+    {
+      label: "How the work runs, and how it is priced",
+      url: "https://www.newreward.com/framework",
+      method:
+        "HTTP GET, returned 200. Score, diagnose, fix, then show the improvements; one flat monthly rate sized to the market, with no figure published.",
+      capturedAt: "2026-09-27",
+    },
+    {
+      label: "The industries it works in",
+      url: "https://www.newreward.com/industries",
+      method: "HTTP GET, returned 200. Its buyer paths, from hospitality to agencies, are the list on this page.",
+      capturedAt: "2026-09-27",
+    },
+    {
+      label: "The platform behind the measurement, on this site",
       url: "https://www.jamesbrady.org/work/visibility-platform",
       method: "The case study on this site, built from the same typed content source as this page.",
       capturedAt: "2026-08-11",
     },
   ],
   og: {
-    image: "/og/work-with-me.png",
-    imageAlt: "James Brady — getting a business found in search and in AI answers",
+    image: "/og/default.png",
+    imageAlt: "James Brady — getting a business found in Google and in AI answers, with New Reward",
   },
   body: `## The thing you have probably heard
 
@@ -112,21 +147,17 @@ So the question is not "how do I rank" or "how do I get into ChatGPT". It is: wh
 
 ## How it gets measured
 
-From outside first. A run collects what any member of the public can see, which means the first measurement does not wait on logins, agency handovers, or anyone finding a password. Where you already have Search Console and analytics connected, those get read too.
+From outside first. The scan starts from the website address, with no setup and no access to anyone's accounts. It reads what Google and the major AI assistants can find: the structured data and discovery files, the trust signals such as reviews and listings, and whether the assistants actually name the business on the questions buyers ask. The result is a score from 0 to 100, with the gaps ranked.
 
-Everything found is scored against a fixed rubric: 12 axes, with 76 measures underneath them. The axes do not change between runs, and that is the point. A rubric that moves cannot tell you whether you improved.
+Where a business approves access to its own Search Console and analytics, those are read too. New Reward's own site draws the line plainly: nobody can honestly promise that an AI assistant will mention a business, so it claims movement only where the data shows it.
 
-Where the evidence is not there, the report says the evidence is not there. It never scores a gap as a zero. A zero and an unknown are different facts, and a report that blurs them will send you to fix the wrong thing.
+## What happens after the score
 
-## What you get
-
-A report that leads with the comparison and the business conclusion, so you can act on it without reading the technical part. Under the score sits a plain checklist and the formula, so you can check the number rather than trust it. The technical evidence goes in an appendix for whoever maintains your site.
-
-Then the findings come back as work, in the order that pays. Measurement that nobody acts on is a bill.
+The free audit turns the score into a ranked list of gaps. If New Reward then does the work, each month the client approves a plan, New Reward builds it, and the monthly report shows what was finished, what changed and what comes next. Every profile, listing and account it sets up is created with the client as the owner.
 
 ## What this page does not claim
 
-No outcome figure from a client engagement is published on this site yet. Client work here is anonymized by agreement, and a named result only goes up when a client gives written clearance. When one does, it will appear as a case study with the method and the window stated, not as a number in a headline.
+No outcome figure from a client engagement is published on this site. Client work here is anonymized by agreement, and a named result goes up only with written clearance, as a case study with its method and window stated, not as a number in a headline.
 
-What can be checked today is the platform itself, the published scoring method, and the agency front. All three are linked from this page.`,
+What can be checked today is New Reward's own site, and the free score, which anyone can run on their own business.`,
 };

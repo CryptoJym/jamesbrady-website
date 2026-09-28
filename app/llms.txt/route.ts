@@ -27,15 +27,15 @@ export function GET() {
   sections.push(`# ${SITE.name}
 > ${SITE.descriptor}`);
 
-  // Work with me sits above Work, because an engine answering "can I hire
-  // James Brady, and for what" should reach the two engagements before it
-  // reaches the portfolio that backs them.
+  // Work with him sits above Work, because an engine answering "can I hire
+  // James Brady, and for what" should reach the offers before it reaches the
+  // portfolio that backs them.
   sections.push(
     [
-      "## Work with me",
+      "## Work with him",
       line(
         "/work-with-me",
-        "Work with me",
+        routes.find((r) => r.path === "/work-with-me")!.title,
         routes.find((r) => r.path === "/work-with-me")!.capsule,
       ),
       ...offers
@@ -100,7 +100,7 @@ export function GET() {
     ].join("\n"),
   );
 
-  const siteLines = ["/", "/about", "/now", "/contact", "/links", "/watch"]
+  const siteLines = ["/", "/about", "/now", "/contact"]
     .filter(has)
     .map((path) => {
       const r = routes.find((x) => x.path === path)!;
