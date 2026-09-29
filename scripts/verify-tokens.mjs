@@ -54,14 +54,11 @@ const ALLOWLIST = new Map([
     "viewport.themeColor (--ground) — the browser paints its own chrome with " +
       "this value before, and outside, any stylesheet of ours",
   ],
-  [
-    "components/specimen/Specimen.tsx",
-    "the bead material (--bead) — three.js paints it into a WebGL canvas, where " +
-      "no stylesheet is in scope and var(--bead) would resolve to nothing. The " +
-      "GLSL shading constants (vec3 floats) are light, not paint, and are not " +
-      "hex/rgb() literals; three restate tokens: glass, strike and the fog's ground",
-  ],
 ]);
+// RETIRED 2026-09-29: "components/specimen/Specimen.tsx" (the bead material, --bead, painted into WebGL). The live
+// three.js drawing of the specimen is gone: visitors now see the Blender render of it, and the three.js light laid
+// over that render (components/specimen/light.ts) reads --glass from :root at run time, so no source file needs a
+// colour literal for it. The exemption is removed, not moved: one fewer file may carry a literal.
 
 let failed = 0;
 const report = (name, ok, detail) => {

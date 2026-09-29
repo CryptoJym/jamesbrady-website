@@ -19,9 +19,9 @@
   --glass: #cfe0d6;
   --heat: #ffb45c;
   --strike: #dde6ff;
-  /* Named so no colour lives outside :root (npm run verify:tokens). --bead is the glass bead on the specimen, painted in
-     WebGL: components/specimen/Specimen.tsx repeats the value and the gate pins it here. --shade is the method sheet's
-     shadow on phones. */
+  /* Named so no colour lives outside :root (npm run verify:tokens). --bead is the glass bead's colour in the specimen's
+     palette (the sculpture is now the Blender render, whose beads are clear glass). --shade is the method sheet's shadow
+     on phones. The sculpture's three.js light reads --glass from here at run time, so no source file repeats it. */
   --bead: #eef4ec;
   --shade: rgb(0 0 0 / 0.5);
   --f-voice: var(--font-voice), "Iowan Old Style", Georgia, serif;
@@ -91,6 +91,24 @@ body.fg ::selection { background: color-mix(in srgb, var(--heat) 35%, transparen
 .fg-nav a:hover, .fg-nav a[aria-current="page"] { color: var(--ink); }
 .fg-nav .fg-nav__cta { color: var(--heat); }
 @media (max-width: 720px) { .fg-nav a:not(.fg-nav__keep) { display: none; } }
+/* The wordmark's tap target is the header's height, not its 15 px of type; the margin gives the space back. */
+.fg-wordmark { padding-block: 12px; margin-block: -12px; }
+/* A phone's way to the other pages (components/fg/PhoneMenu.tsx): the same links, behind a Menu button. */
+.fg-menu { display: none; }
+@media (max-width: 720px) {
+  .fg-head { gap: 14px; }
+  .fg-nav { margin-left: auto; }
+  .fg-menu { display: block; }
+  .fg-menu__btn { display: flex; align-items: center; min-height: 44px; margin-block: -12px; padding: 0 2px 0 6px; list-style: none; cursor: pointer; font: 500 13.5px/1 var(--f-narr); color: var(--ink-2); }
+  .fg-menu__btn::-webkit-details-marker { display: none; }
+  .fg-menu__btn::after { content: ""; width: 7px; height: 7px; margin: -3px 0 0 8px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); }
+  .fg-menu[open] .fg-menu__btn { color: var(--ink); }
+  .fg-menu[open] .fg-menu__btn::after { margin-top: 5px; transform: rotate(225deg); }
+  .fg-menu__panel { position: absolute; top: 100%; left: 0; right: 0; display: grid; padding: 4px var(--gutter) 14px; background: var(--ground); border-bottom: 1px solid var(--rule); box-shadow: 0 18px 30px var(--shade); }
+  .fg-menu__panel a { display: block; padding: 13px 0; border-top: 1px solid var(--rule); font: 500 17px/1.3 var(--f-narr); color: var(--ink); text-decoration: none; }
+  .fg-menu__panel a:first-child { border-top: 0; }
+  .fg-menu__panel a[aria-current="page"] { color: var(--heat); }
+}
 
 .fg-foot { border-top: 1px solid var(--rule); margin-top: 96px; padding: 40px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 40px); display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); font-size: 14px; color: var(--ink-2); }
 .fg-foot h2 { font: 500 11px/1.4 var(--f-rec); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
@@ -103,9 +121,38 @@ body.fg ::selection { background: color-mix(in srgb, var(--heat) 35%, transparen
 .fg-home { display: grid; grid-template-columns: minmax(0, 47fr) minmax(0, 53fr); }
 .fg-home > .fg-stage { grid-column: 2; grid-row: 1 / span 40; position: sticky; top: 0; height: 100vh; height: 100svh; }
 .fg-home > section { grid-column: 1; padding-inline: var(--gutter); }
-.fg-stage__poster { position: absolute; inset: 0; background: center / contain no-repeat; opacity: 0.9; }
-.fg-stage__scale { position: absolute; left: 0; top: 0; bottom: 0; width: 72px; pointer-events: none; font: 400 10.5px/1 var(--f-rec); color: var(--ink-3); letter-spacing: 0.04em; }
-.specimen-tip { background: var(--ground-2); border: 1px solid var(--rule); color: var(--ink); padding: 10px 12px; max-width: 280px; font: 400 13px/1.45 var(--f-narr); z-index: 5; }
+
+/* The sculpture: the Blender render of the record (components/fg/HomeStage.tsx). It stands in the stage's own column,
+   below the fixed header (--sculpt-top) and clear of the strike link (--sculpt-bottom); the plate is twice as tall as
+   it is wide. Without script, or with reduced motion, this is where it stays; with script the descent moves it. */
+.fg-stage { --sculpt-top: 76px; --sculpt-bottom: 20px; overflow: hidden; }
+.fg-sculpt { position: absolute; inset: 0; touch-action: pan-y pinch-zoom; }
+.fg-sculpt__cam { position: absolute; left: 50%; top: var(--sculpt-top); height: calc(100% - var(--sculpt-top) - var(--sculpt-bottom)); aspect-ratio: 1 / 2; transform: translateX(-50%); }
+.fg-sculpt__plate { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.fg-sculpt__plate[hidden] { display: none; }
+.fg-sculpt__cam canvas, .fg-window canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.specimen-tip { background: var(--ground-2); border: 1px solid var(--rule); color: var(--ink); padding: 10px 12px; max-width: 280px; font: 400 13px/1.45 var(--f-narr); z-index: 40; }
+
+/* The strike, next to the sculpture: the Blender film, only when asked for (components/fg/StrikeFilm.tsx). */
+.fg-strike { position: absolute; right: var(--gutter); bottom: 18px; z-index: 2; display: inline-flex; align-items: baseline; gap: 10px; min-height: 36px; box-sizing: border-box; padding: 10px 12px; background: var(--ground); border: 1px solid var(--rule); color: var(--ink-2); font: 500 12.5px/1.2 var(--f-rec); letter-spacing: 0.02em; text-decoration: none; }
+body.fg .fg-strike { text-decoration: none; }
+.fg-strike::before { content: ""; align-self: center; width: 0; height: 0; border-style: solid; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent var(--heat); }
+.fg-strike:hover { color: var(--ink); border-color: var(--sand-dim); }
+/* It belongs to the whole object: while the sculpture travels down the glass it steps aside. */
+.fg-strike { transition: opacity 0.2s, visibility 0.2s; }
+.fg-stage[data-view="descent"] .fg-strike { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .fg-strike { transition: none; } }
+.fg-strike__len { color: var(--ink-3); }
+.fg-film { box-sizing: border-box; width: 100vw; max-width: 100vw; height: 100vh; height: 100svh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--ground); color: var(--ink); }
+.fg-film::backdrop { background: var(--ground); }
+.fg-film[open] { display: flex; flex-direction: column; }
+.fg-film__v { display: block; flex: 1 1 auto; min-height: 0; width: 100%; height: auto; object-fit: contain; background: var(--ground); }
+.fg-film__bar { display: flex; justify-content: flex-end; padding: 10px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 12px); }
+.fg-film__close { min-height: 44px; padding: 0 18px; background: transparent; border: 1px solid var(--sand-dim); color: var(--ink); font: 600 15px/1 var(--f-narr); cursor: pointer; }
+.fg-film__close:hover { border-color: var(--heat); }
+
+/* An era's own window onto the glass: only where the sculpture can't stand beside the text (see the 900px block). */
+.fg-window { display: none; }
 .specimen-tip b { display: block; font-weight: 600; margin-bottom: 3px; }
 .specimen-tip span { color: var(--ink-2); }
 
@@ -180,13 +227,18 @@ body.fg ::selection { background: color-mix(in srgb, var(--heat) 35%, transparen
 .fg-door p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
 .fg-door .fg-door__go { display: inline-block; margin-top: 12px; font: 500 12.5px/1 var(--f-rec); color: var(--sand); }
 
-/* Phones: the specimen becomes a window at the top that descends with you. */
+/* Phones and tablets: the sculpture gets its own space at the top and scrolls away with the page; it is never pinned
+   over the words. The descent is told era by era instead, each era with its own window onto the glass. */
 @media (max-width: 900px) {
   .fg-home { grid-template-columns: minmax(0, 1fr); }
-  .fg-home > .fg-stage { grid-column: 1; grid-row: 1; height: 46vh; height: 46svh; z-index: 1; background: linear-gradient(var(--ground) 90%, transparent); }
+  .fg-stage { --sculpt-top: calc(env(safe-area-inset-top, 0px) + 60px); --sculpt-bottom: 54px; }
+  .fg-home > .fg-stage { grid-column: 1; grid-row: 1; position: relative; top: auto; height: calc(var(--sculpt-top) + clamp(300px, 42svh, 520px) + var(--sculpt-bottom)); }
   .fg-home > section { grid-column: 1; }
   .fg-surface { min-height: auto; padding-top: 28px; }
-  .fg-stage__scale { display: none; }
+  .fg-strike { right: auto; left: 50%; bottom: 8px; transform: translateX(-50%); white-space: nowrap; }
+  .fg-window { display: block; position: relative; margin: 20px calc(-1 * var(--gutter)) 24px; }
+  .fg-window__img { display: block; width: 100%; height: auto; }
+  .fg-tip .fg-window { margin-block: 18px 6px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

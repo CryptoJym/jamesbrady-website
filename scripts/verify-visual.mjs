@@ -102,6 +102,40 @@
 //                                   work live today; that figure is compared
 //                                   with content/built the same way
 
+//
+// HIGH-FIDELITY SCULPTURE — 2026-09-29. James: "The thing you made doesn't
+// really function" and "The sculpture needs to be high fidelity." The live
+// three.js drawing of the specimen is replaced by the Blender render of the
+// same geometry (scripts/specimen/fulgurite.py --variant plate), and on a phone
+// the specimen was pinned over the text it was meant to sit beside. Checks that
+// read the live drawing now read the rendered sculpture, each for the same
+// purpose, none looser:
+//
+//   the specimen animates (1 s)     → the sculpture travels down the glass with
+//                                   the reader: two depths of the descent differ
+//                                   by as many pixels as the turning object did,
+//                                   and the stage says it is in the descent
+//   specimen live (canvas, no img)  → the rendered plate is loaded, and on a wide
+//                                   screen its sharp copy has replaced the first
+//                                   paint (data-sculpture-state="plate")
+//   375: a sticky window above the  → 375: the sculpture has its own space: not
+//   text, h1 below it (at load)       sticky, not fixed, the h1 below it, AND at
+//                                   every half screen of scroll no word is
+//                                   covered by the sculpture or drawn over it.
+//                                   The old check passed at load and missed the
+//                                   words sliding under the pinned canvas, which
+//                                   is the defect James saw
+//   reduced motion: stands still    → the same stillness, plus: scrolled into the
+//                                   descent, the plate has not moved, and no film
+//                                   plays
+//   no WebGL: the poster stands in  → no WebGL: the rendered plate is shown and no
+//                                   canvas is made (the render never needed one)
+//   no JS: the stage described      → the same, plus the first-paint plate is an
+//                                   <img> in the server response
+//
+// Added: on a phone the header's Menu reaches the four pages its hidden links
+// name; on a phone every era carries its window of glass; and at 1024 every
+// home figure's method opens whole on screen.
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -149,15 +183,33 @@ const report = (name, ok, detail) => {
 
 const browser = await chromium.launch();
 
-/** The WebGL canvas has taken over from the poster: it drew its first frame. */
-const specimenLive = (p) =>
+/**
+ * The rendered sculpture is up: its first-paint plate is decoded, and on a wide screen (the descent) its sharp copy has
+ * replaced it. A phone keeps the first paint; nothing there magnifies it.
+ */
+const sculptureReady = (p) =>
   p.waitForFunction(
     () => {
-      const stage = document.querySelector(".fg-stage");
-      return Boolean(stage?.querySelector("canvas") && !stage.querySelector("img"));
+      const host = document.querySelector(".fg-stage [data-sculpture]");
+      const img = host?.querySelector('img[data-layer="plate"]');
+      if (!img || !img.complete || !img.naturalWidth) return false;
+      const wide = matchMedia("(min-width: 901px)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+      return !wide || host.getAttribute("data-sculpture-state") === "plate";
     },
     { timeout: 30_000 },
   );
+
+/** Scroll so the middle of the viewport sits a fraction of the way into an element; wait for the stage to follow. */
+const scrollInto = async (p, selector, frac = 0.5) => {
+  await p.evaluate(
+    ([sel, f]) => {
+      const r = document.querySelector(sel).getBoundingClientRect();
+      window.scrollTo({ top: scrollY + r.top + r.height * f - innerHeight / 2, behavior: "instant" });
+    },
+    [selector, frac],
+  );
+  await p.waitForTimeout(400);
+};
 
 /** The stage's box, cut to the viewport. */
 const stageClip = async (p) => {
@@ -231,18 +283,24 @@ const rowsOf = (doors) => {
 const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const page = await desktop.newPage();
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await specimenLive(page);
+await sculptureReady(page);
 await page.waitForTimeout(400);
 
 const clip1440 = await stageClip(page);
 const frameA = await page.screenshot({ clip: clip1440 });
-await page.waitForTimeout(1000);
+await scrollInto(page, '[data-era="2025-10-2026-03"]', 0.5);
+const travelled = await page.evaluate(() => ({
+  view: document.querySelector(".fg-stage")?.getAttribute("data-view") ?? null,
+  transform: getComputedStyle(document.querySelector(".fg-sculpt__cam")).transform,
+}));
 const frameB = await page.screenshot({ clip: clip1440 });
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+await page.waitForTimeout(400);
 const motion = await pixelDiff(page, frameA, frameB);
 report(
-  "The specimen animates (stage pixel diff over 1s)",
-  motion.changed > 1000,
-  `${motion.changed} of ${motion.total} px changed (${((motion.changed / motion.total) * 100).toFixed(2)}%)`,
+  "The sculpture travels down the glass with the reader (stage pixels, the whole object vs an era of the descent)",
+  motion.changed > 1000 && travelled.view === "descent",
+  `${motion.changed} of ${motion.total} px changed (${((motion.changed / motion.total) * 100).toFixed(2)}%) · stage ${travelled.view} · ${travelled.transform}`,
 );
 
 // Figures, read off the rendered page — and the same values read from the
@@ -343,7 +401,7 @@ report(
 );
 
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await specimenLive(page);
+await sculptureReady(page);
 await page.waitForTimeout(500);
 await page.screenshot({ path: join(OUT, "home-1440-hero.png") });
 await page.screenshot({ path: join(OUT, "home-1440-full.png"), fullPage: true });
@@ -351,6 +409,32 @@ await page.screenshot({ path: join(OUT, "home-1440-full.png"), fullPage: true })
 // No horizontal overflow at desktop.
 const overflow1440 = await overflowOf(page);
 report("No horizontal overflow at 1440", overflow1440 <= 0, `${overflow1440}px`);
+
+// Every figure's method opens whole, on screen, on a smaller desktop too: at 1024 the numbers near a column's right
+// edge used to open their method past the edge of the screen, where the page's overflow clip cut it off unread.
+const d1024 = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+const p1024 = await d1024.newPage();
+const offScreen = [];
+let methods1024 = 0;
+for (const path of ["/", "/work/plimsoll", "/about"]) {
+  await p1024.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+  for (const f of await p1024.$$(".fg-fig")) {
+    await f.focus();
+    await p1024.waitForTimeout(60);
+    const box = await f.evaluate((el) => {
+      const b = el.querySelector(".fg-fig__m").getBoundingClientRect();
+      return { l: Math.round(b.left), r: Math.round(b.right), t: Math.round(b.top), b: Math.round(b.bottom), n: el.childNodes[0].textContent.trim() };
+    });
+    methods1024++;
+    if (box.l < 0 || box.r > 1024 || box.t < 0 || box.b > 768) offScreen.push(`${path} ${box.n}: ${box.l}..${box.r} x ${box.t}..${box.b}`);
+  }
+}
+await d1024.close();
+report(
+  "At 1024 every figure's method opens whole on screen (the home page, a case study, about)",
+  methods1024 > 0 && offScreen.length === 0,
+  offScreen.length ? offScreen.slice(0, 6).join(" | ") : `${methods1024} methods opened, each inside the 1024x768 screen`,
+);
 
 /* ---------------------------------------------------------- inner surfaces */
 
@@ -528,13 +612,15 @@ const mobile = await browser.newContext({
 });
 const mpage = await mobile.newPage();
 await mpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await specimenLive(mpage);
+await sculptureReady(mpage);
 await mpage.waitForTimeout(600);
 const overflow375 = await overflowOf(mpage);
 report("No horizontal overflow at 375", overflow375 <= 0, `${overflow375}px`);
 
-// On a phone the specimen is a window at the top that descends with the
-// reader. It must stick, and the text must start below it, never under it.
+// On a phone the sculpture has its own space at the top of the page and
+// scrolls away with it; each era then carries its own window of glass. It is
+// never pinned, and at no scroll position does it cover a word or have one
+// drawn over it: measured every half screen, down the whole page.
 const window375 = await mpage.evaluate(() => {
   const stage = document.querySelector(".fg-stage");
   const r = stage.getBoundingClientRect();
@@ -546,11 +632,88 @@ const window375 = await mpage.evaluate(() => {
     vh: window.innerHeight,
   };
 });
+const overText375 = await mpage.evaluate(async () => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const pictures = () =>
+    [...document.querySelectorAll(".fg-stage img, .fg-stage canvas, .fg-stage video, [data-sculpture] img, [data-sculpture] canvas")]
+      .filter((el) => getComputedStyle(el).visibility !== "hidden" && getComputedStyle(el).display !== "none")
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight);
+  const hits = [];
+  let positions = 0;
+  for (let y = 0; y < document.documentElement.scrollHeight; y += Math.round(innerHeight / 2)) {
+    window.scrollTo({ top: y, behavior: "instant" });
+    await sleep(80);
+    positions++;
+    const pics = pictures();
+    const walker = document.createTreeWalker(document.querySelector("main"), NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const el = n.parentElement;
+      if (!n.nodeValue.trim() || !el || el.closest(".fg-stage, [data-sculpture]")) continue;
+      if (getComputedStyle(el).display === "none" || getComputedStyle(el).visibility === "hidden") continue;
+      range.selectNodeContents(n);
+      for (const t of range.getClientRects()) {
+        if (t.width < 1 || t.bottom <= 0 || t.top >= innerHeight) continue;
+        const onTop = document.elementFromPoint(t.left + t.width / 2, t.top + t.height / 2);
+        const covered = onTop && onTop.closest(".fg-stage, [data-sculpture]");
+        const over = pics.some((r) => t.left < r.right && t.right > r.left && t.top < r.bottom && t.bottom > r.top);
+        if (covered || over) hits.push(`y=${y} "${n.nodeValue.trim().slice(0, 30)}" ${covered ? "covered" : "over the sculpture"}`);
+      }
+    }
+  }
+  window.scrollTo({ top: 0, behavior: "instant" });
+  return { positions, hits };
+});
 report(
-  "At 375 the specimen is a sticky window above the text, and the h1 starts below it",
-  window375.position === "sticky" && window375.h1Top >= window375.bottom && window375.height < window375.vh * 0.6,
-  `${window375.position}, ${window375.height}px of ${window375.vh}px · stage ends ${window375.bottom}px · h1 at ${window375.h1Top}px`,
+  "At 375 the sculpture has its own space: not pinned, the h1 below it, and no word covered or drawn over it at any scroll position",
+  window375.position !== "sticky" &&
+    window375.position !== "fixed" &&
+    window375.h1Top >= window375.bottom &&
+    window375.height < window375.vh * 0.75 &&
+    overText375.hits.length === 0,
+  `${window375.position}, ${window375.height}px of ${window375.vh}px · stage ends ${window375.bottom}px · h1 at ${window375.h1Top}px · ${overText375.positions} scroll positions, ${overText375.hits.length} words under or over it${overText375.hits.length ? `: ${overText375.hits.slice(0, 4).join(" | ")}` : ""}`,
 );
+
+// Each era's own window of glass, on a phone: one per era and one at the tip, each a loaded image in its own space.
+await mpage.evaluate(async () => {
+  for (const f of document.querySelectorAll("[data-window]")) {
+    f.scrollIntoView({ block: "center" });
+    await new Promise((r) => setTimeout(r, 150));
+  }
+  window.scrollTo({ top: 0, behavior: "instant" });
+});
+await mpage.waitForTimeout(600);
+const windows375 = await mpage.evaluate(() =>
+  [...document.querySelectorAll("[data-window]")].map((f) => {
+    const img = f.querySelector("img");
+    return { id: f.getAttribute("data-window"), shown: getComputedStyle(f).display !== "none", loaded: Boolean(img?.complete && img.naturalWidth > 1), src: img?.currentSrc?.split("/").pop() ?? "" };
+  }),
+);
+report(
+  "At 375 every era carries its own window of glass (six eras and the tip), each loaded",
+  windows375.length === 7 && windows375.every((w) => w.shown && w.loaded && /^era-/.test(w.src)),
+  windows375.map((w) => `${w.id}:${w.loaded ? w.src : "NOT LOADED"}`).join(" · "),
+);
+
+// The header keeps only its call to action on a phone; the Menu reaches the rest.
+await mpage.goto(`${BASE}/about`, { waitUntil: "networkidle" });
+const hiddenNav = await mpage.$$eval(".fg-head .fg-nav a", (as) => as.filter((a) => getComputedStyle(a).display === "none").map((a) => a.getAttribute("href")));
+await mpage.tap(".fg-menu__btn");
+await mpage.waitForTimeout(250);
+const menuLinks = await mpage.$$eval(".fg-menu__panel a", (as) =>
+  as.filter((a) => { const r = a.getBoundingClientRect(); return r.height >= 44 && r.top >= 0 && r.bottom <= innerHeight; }).map((a) => a.getAttribute("href")),
+);
+await mpage.tap('.fg-menu__panel a[href="/words"]');
+await mpage.waitForURL("**/words");
+const menuAfter = await mpage.$eval(".fg-menu", (d) => d.open);
+report(
+  "At 375 the header's Menu reaches every page its hidden links name, and closes on arrival",
+  hiddenNav.length > 0 && hiddenNav.every((h) => menuLinks.includes(h)) && !menuAfter,
+  `hidden in the header: ${hiddenNav.join(", ")} · in the open Menu (44 px or taller): ${menuLinks.join(", ")} · closed after following one: ${!menuAfter}`,
+);
+await mpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await sculptureReady(mpage);
 await mpage.screenshot({ path: join(OUT, "home-375-hero.png") });
 await mpage.screenshot({ path: join(OUT, "home-375-full.png"), fullPage: true });
 
@@ -632,21 +795,27 @@ const rm = await browser.newContext({
 });
 const rmPage = await rm.newPage();
 await rmPage.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await specimenLive(rmPage);
+await sculptureReady(rmPage);
 await rmPage.waitForTimeout(1200);
 const rmClip = await stageClip(rmPage);
 const stillA = await rmPage.screenshot({ clip: rmClip });
 await rmPage.waitForTimeout(1000);
 const stillB = await rmPage.screenshot({ clip: rmClip });
 const stillness = await pixelDiff(rmPage, stillA, stillB);
-const strike = await rmPage.evaluate(() => sessionStorage.getItem("jb-strike"));
-// A rasterizer may round a pixel differently from one frame to the next; a
-// turning specimen changes thousands (see the first check), so the allowance
-// is 0.05% of the stage.
+const plateAt = () => rmPage.evaluate(() => { const r = document.querySelector('.fg-stage img[data-layer="plate"]').getBoundingClientRect(); return [r.x, r.y, r.width, r.height].map(Math.round).join(","); });
+const restBox = await plateAt();
+await scrollInto(rmPage, '[data-era="2026-04-2026-07"]', 0.5);
+const descentBox = await plateAt();
+const rmFilm = await rmPage.evaluate(() => ({ strike: sessionStorage.getItem("jb-strike"), playing: [...document.querySelectorAll("video")].some((v) => !v.paused) }));
+await rmPage.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+await rmPage.waitForTimeout(300);
+// A rasterizer may round a pixel differently from one frame to the next; the
+// descent moves thousands (see the first check), so the allowance is 0.05% of
+// the stage.
 report(
-  "Reduced motion: the specimen stands still and the strike never runs",
-  stillness.changed <= stillness.total * 0.0005 && strike === null,
-  `${stillness.changed} of ${stillness.total} px changed over 1s · strike ${strike === null ? "never ran" : "RAN"}`,
+  "Reduced motion: the high-fidelity still stands: nothing changes over 1s, the descent does not move it, no film plays",
+  stillness.changed <= stillness.total * 0.0005 && restBox === descentBox && rmFilm.strike === null && !rmFilm.playing,
+  `${stillness.changed} of ${stillness.total} px changed over 1s · plate at ${restBox} at rest and ${descentBox} in the descent · film ${rmFilm.playing ? "PLAYING" : "not playing"}`,
 );
 await rmPage.screenshot({ path: join(OUT, "home-1440-reduced-motion.png") });
 
@@ -662,19 +831,22 @@ await noGl.addInitScript(() => {
 const ngPage = await noGl.newPage();
 await ngPage.goto(`${BASE}/`, { waitUntil: "networkidle" });
 await ngPage.waitForTimeout(1500);
+// With WebGL gone the light can't be laid on the glass, and nothing else changes: the sculpture is a render.
+await ngPage.mouse.move(1060, 400);
+await ngPage.waitForTimeout(300);
 const poster = await ngPage.evaluate(() => {
-  const img = document.querySelector(".fg-stage img");
+  const img = [...document.querySelectorAll(".fg-stage img")].find((i) => getComputedStyle(i).visibility !== "hidden" && !i.hidden);
   return {
-    src: img?.getAttribute("src") ?? null,
+    src: (img?.currentSrc || img?.getAttribute("src") || "").replace(location.origin, ""),
     loaded: Boolean(img?.complete && img.naturalWidth > 0),
     shown: img ? getComputedStyle(img).display !== "none" && img.getBoundingClientRect().width > 0 : false,
     canvas: Boolean(document.querySelector(".fg-stage canvas")),
   };
 });
 report(
-  "No WebGL: the specimen's poster stands in, loaded and shown",
-  poster.src === "/specimen/poster.webp" && poster.loaded && poster.shown && !poster.canvas,
-  `poster ${poster.src} loaded=${poster.loaded} shown=${poster.shown} · canvas ${poster.canvas ? "present" : "absent"}`,
+  "No WebGL: the rendered sculpture is shown, loaded, and no canvas is made",
+  /^\/specimen\/plate-\d+\.webp$/.test(poster.src) && poster.loaded && poster.shown && !poster.canvas,
+  `plate ${poster.src} loaded=${poster.loaded} shown=${poster.shown} · canvas ${poster.canvas ? "present" : "absent"}`,
 );
 await ngPage.screenshot({ path: join(OUT, "home-1440-no-webgl.png") });
 
@@ -692,12 +864,20 @@ const quoteHtml = heroQuote.text
   .replace(/>/g, "&gt;")
   .replace(/"/g, "&quot;")
   .replace(/'/g, "&#x27;");
+const njPlate = await njPage.evaluate(() => {
+  const img = document.querySelector('.fg-stage img[data-layer="plate"]');
+  return { loaded: Boolean(img?.complete && img.naturalWidth > 0), width: Math.round(img?.getBoundingClientRect().width ?? 0) };
+});
 report(
-  "No JS: the home page's words are in the server response (h1, hero quote, CTA, the stage described)",
+  "No JS: the home page's words and its sculpture are in the server response (h1, hero quote, CTA, the stage described, the plate shown)",
   njHtml.includes("James Brady · Lehi, Utah") &&
     (njHtml.includes(heroQuote.text) || njHtml.includes(quoteHtml)) &&
     njHtml.includes('href="#descent"') &&
-    /<aside class="fg-stage" aria-label="[^"]+"/.test(njHtml),
+    /<aside class="fg-stage" aria-label="[^"]+"/.test(njHtml) &&
+    /<img[^>]+data-layer="plate"[^>]+src="\/specimen\/plate-\d+\.webp"/.test(njHtml) &&
+    njPlate.loaded &&
+    njPlate.width > 0,
+  `plate ${njPlate.loaded ? "loaded" : "NOT loaded"}, ${njPlate.width}px wide`,
 );
 report(
   "No JS: full theory text is in the server response",

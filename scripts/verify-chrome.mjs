@@ -72,6 +72,26 @@
 //   page's ground as the browser renders it, read from the page rather than
 //   typed here.
 
+//
+// HIGH-FIDELITY SCULPTURE — 2026-09-29. The live three.js drawing is replaced
+// by the Blender render of the same geometry; three.js stays, drawing only the
+// light it lays on that render when a thread is lit (components/specimen/
+// light.ts). What each claim reads now, none looser:
+//
+//   FRAME RATE — the page's motion is the sculpture travelling with the scroll,
+//   so the rate is measured during a scripted slow scroll through the descent,
+//   not at rest; the same GPU floor of 55fps, the same software-rasterizer note.
+//
+//   FRAME COST — still at most 3 WebGL draw calls in any drawn frame, and now
+//   asserted twice: at rest and while scrolling the sculpture costs NO draw call
+//   (it is an image), and with a thread lit every drawn frame is at most 3 (depth,
+//   veil, the thread). A light that drew per tube would fail here on any runner.
+//
+//   PRESENCE — the same floor (peak >= 0.30, >= 1% of the stage lit), sampled
+//   down the whole descent instead of across two moments of a spin.
+//
+//   TOUCH — the sculpture lets the page scroll: its host keeps pan-y (and now
+//   pinch-zoom: there is no drag-to-turn left to protect).
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -213,31 +233,37 @@ const pixelDiff = (page, a, b) =>
     [a.toString("base64"), b.toString("base64")],
   );
 
-/** rAF callbacks per second, over a fixed window. */
-const sampleFps = (page, ms) =>
+/** The rendered sculpture is up: first paint decoded, and on a wide screen its sharp copy swapped in. */
+const sculptureReady = (page) =>
+  page.waitForFunction(
+    () => {
+      const host = document.querySelector(".fg-stage [data-sculpture]");
+      const img = host?.querySelector('img[data-layer="plate"]');
+      if (!img || !img.complete || !img.naturalWidth) return false;
+      const wide = matchMedia("(min-width: 901px)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+      return !wide || host.getAttribute("data-sculpture-state") === "plate";
+    },
+    { timeout: 30_000 },
+  );
+
+/** rAF callbacks per second while the page scrolls itself 3 px a frame, starting where the descent begins. */
+const sampleFpsScrolling = (page, ms) =>
   page.evaluate(
     (window_ms) =>
       new Promise((res) => {
+        const d = document.getElementById("descent");
+        window.scrollTo({ top: Math.max(0, scrollY + d.getBoundingClientRect().top - innerHeight), behavior: "instant" });
         let frames = 0;
         const t0 = performance.now();
         const tick = () => {
           frames++;
+          window.scrollBy({ top: 3, behavior: "instant" });
           if (performance.now() - t0 < window_ms) requestAnimationFrame(tick);
-          else res({ frames, ms: performance.now() - t0 });
+          else res({ frames, ms: performance.now() - t0, y: scrollY });
         };
         requestAnimationFrame(tick);
       }),
     ms,
-  );
-
-/** The WebGL canvas has taken over from the poster: it drew its first frame. */
-const specimenLive = (page) =>
-  page.waitForFunction(
-    () => {
-      const stage = document.querySelector(".fg-stage");
-      return Boolean(stage?.querySelector("canvas") && !stage.querySelector("img"));
-    },
-    { timeout: 30_000 },
   );
 
 const stageClip = async (page) => {
@@ -287,19 +313,21 @@ const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 
 await desktop.addInitScript(COUNT_DRAWS);
 const page = await desktop.newPage();
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await specimenLive(page);
+await sculptureReady(page);
 await page.waitForTimeout(400);
 
 const glRenderer = String(await rendererOf(page));
 const softwareRaster = /swiftshader|llvmpipe|software/i.test(glRenderer);
 measured.renderer = glRenderer.slice(0, 80);
 const drawStart1440 = await page.evaluate(() => window.__jbDraws.frames.length);
-const fps1440 = await sampleFps(page, FPS_WINDOW_MS);
+const fps1440 = await sampleFpsScrolling(page, FPS_WINDOW_MS);
 measured.fps1440 = (fps1440.frames / (fps1440.ms / 1000)).toFixed(1);
-const draws1440 = await drawsSince(page, drawStart1440);
+const restDraws1440 = await drawsSince(page, drawStart1440);
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+await page.waitForTimeout(400);
 if (!softwareRaster)
   report(
-    `Frame rate at 1440 with the specimen live (>= ${FPS_FLOOR_GPU}fps · GPU floor · ${measured.renderer})`,
+    `Frame rate at 1440 while the sculpture travels (a 3 px-a-frame scroll through the descent; >= ${FPS_FLOOR_GPU}fps · GPU floor · ${measured.renderer})`,
     Number(measured.fps1440) >= FPS_FLOOR_GPU,
     `${measured.fps1440}fps · ${fps1440.frames} rAF frames in ${fps1440.ms.toFixed(0)}ms`,
   );
@@ -308,32 +336,56 @@ else
     `frame rate at 1440 on a software rasterizer: ${measured.fps1440}fps (${measured.renderer}). ` +
       `The instrument's number, not a visitor's; the GPU floor is asserted on a GPU run.`,
   );
+// With a thread lit, the light draws: every frame it draws must stay inside the budget.
+const drawLit = await page.evaluate(() => window.__jbDraws.frames.length);
+await page.focus('.fg-thread[data-thread="teaching"]');
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+await page.waitForTimeout(1200);
+const draws1440 = await drawsSince(page, drawLit);
+// A fresh page for what follows: a focused thread would move Tab's starting point off the header.
+await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await sculptureReady(page);
+await page.waitForTimeout(400);
 report(
-  `Frame cost at 1440: every drawn frame is <= ${DRAW_CALLS_PER_FRAME} WebGL draw calls`,
-  draws1440.length > 0 && draws1440.every((n) => n <= DRAW_CALLS_PER_FRAME),
-  `${draws1440.length} drawn frames · calls per frame: ${[...new Set(draws1440)].sort().join(", ")}`,
+  `Frame cost at 1440: the sculpture draws nothing at rest or while travelling; with a thread lit every drawn frame is <= ${DRAW_CALLS_PER_FRAME} WebGL draw calls`,
+  restDraws1440.length === 0 && draws1440.length > 0 && draws1440.every((n) => n <= DRAW_CALLS_PER_FRAME),
+  `travelling: ${restDraws1440.length} drawn frames · lit: ${draws1440.length} drawn frames, calls per frame: ${[...new Set(draws1440)].sort().join(", ")}`,
 );
 measured.drawsPerFrame = Math.max(0, ...draws1440);
 
-/* --------------------------------------------------- motion proof, 1s apart */
-// Two captures of the stage a full second apart. A still frame of a canvas
-// proves it painted; a pair proves it is alive.
+/* ------------------------------------------------ motion proof, two depths */
+// The stage at the whole object and at an era of the descent: a pair proves the
+// sculpture travels with the reader.
 const clip1440 = await stageClip(page);
 const stageT0 = await page.screenshot({ clip: clip1440 });
-await page.waitForTimeout(1000);
-const stageT1 = await page.screenshot({ clip: clip1440 });
+const depthOf = async (selector, frac) => {
+  await page.evaluate(
+    ([sel, f]) => {
+      const r = document.querySelector(sel).getBoundingClientRect();
+      window.scrollTo({ top: scrollY + r.top + r.height * f - innerHeight / 2, behavior: "instant" });
+    },
+    [selector, frac],
+  );
+  await page.waitForTimeout(350);
+  return page.screenshot({ clip: clip1440 });
+};
+const stageT1 = await depthOf('[data-era="2026-04-2026-07"]', 0.5);
 writeFileSync(join(OUT, `stage-1440-${LABEL}-t0.png`), stageT0);
 writeFileSync(join(OUT, `stage-1440-${LABEL}-t1.png`), stageT1);
 
 /* --------------------------------------------------- the specimen's presence */
-// The floor from the presence pass, applied to the living layer the site has
-// now: the specimen must actually be drawn. Sampled across frames while it
-// turns, and the WORST frame must clear it.
+// The floor from the presence pass, applied to the sculpture the site has now:
+// it must actually be shown. Sampled at the whole object, down every era of the
+// descent and at the tip, and the WORST frame must clear it.
 const presence = [];
 for (const shot of [stageT0, stageT1]) presence.push(await peakLuminance(page, shot.toString("base64")));
-while (presence.length < 12) {
-  presence.push(await peakLuminance(page, (await page.screenshot({ clip: clip1440 })).toString("base64")));
-}
+const depths = [
+  ['[data-era="2023-2024"]', 0.5], ['[data-era="2025"]', 0.3], ['[data-era="2025"]', 0.8], ['[data-era="2025-10-2026-03"]', 0.5],
+  ['[data-era="2026-04-2026-07"]', 0.2], ['[data-era="2026-08"]', 0.5], ['[data-era="2026-09"]', 0.5], [".fg-lessons", 0.5], [".fg-tip", 0.4], [".fg-doors", 0.5],
+];
+for (const [sel, f] of depths) presence.push(await peakLuminance(page, (await depthOf(sel, f)).toString("base64")));
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+await page.waitForTimeout(350);
 const worstPeak = Math.min(...presence.map((p) => p.peak));
 const worstLit = Math.min(...presence.map((p) => p.lit));
 measured.specimenPeakMin = worstPeak.toFixed(3);
@@ -552,33 +604,41 @@ const mobile = await browser.newContext({
 await mobile.addInitScript(COUNT_DRAWS);
 const mpage = await mobile.newPage();
 await mpage.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await specimenLive(mpage);
+await sculptureReady(mpage);
 await mpage.waitForTimeout(400);
 
 const drawStart375 = await mpage.evaluate(() => window.__jbDraws.frames.length);
-const fps375 = await sampleFps(mpage, FPS_WINDOW_MS);
+const fps375 = await sampleFpsScrolling(mpage, FPS_WINDOW_MS);
 measured.fps375 = (fps375.frames / (fps375.ms / 1000)).toFixed(1);
-const draws375 = await drawsSince(mpage, drawStart375);
+const restDraws375 = await drawsSince(mpage, drawStart375);
 if (!softwareRaster)
   report(
-    `Frame rate at 375 with the specimen live (>= ${FPS_FLOOR_GPU}fps · GPU floor · ${measured.renderer})`,
+    `Frame rate at 375 while scrolling through the eras and their windows (3 px a frame; >= ${FPS_FLOOR_GPU}fps · GPU floor · ${measured.renderer})`,
     Number(measured.fps375) >= FPS_FLOOR_GPU,
     `${measured.fps375}fps · ${fps375.frames} rAF frames in ${fps375.ms.toFixed(0)}ms`,
   );
 else note(`frame rate at 375 on a software rasterizer: ${measured.fps375}fps. The instrument's number, not a visitor's.`);
+// On a phone a tapped thread's name lights that thread in its era's own window.
+const drawLit375 = await mpage.evaluate(() => window.__jbDraws.frames.length);
+await mpage.tap('[data-era="2025"] .fg-thread[data-thread="studio"]');
+await mpage.waitForTimeout(1500);
+const draws375 = await drawsSince(mpage, drawLit375);
+const lit375 = await mpage.evaluate(() => Boolean(document.querySelector('[data-window="2025"] canvas')));
 report(
-  `Frame cost at 375: every drawn frame is <= ${DRAW_CALLS_PER_FRAME} WebGL draw calls`,
-  draws375.length > 0 && draws375.every((n) => n <= DRAW_CALLS_PER_FRAME),
-  `${draws375.length} drawn frames · calls per frame: ${[...new Set(draws375)].sort().join(", ")}`,
+  `Frame cost at 375: nothing drawn while scrolling; a tapped thread lit in its era's window, every drawn frame <= ${DRAW_CALLS_PER_FRAME} WebGL draw calls`,
+  restDraws375.length === 0 && lit375 && draws375.length > 0 && draws375.every((n) => n <= DRAW_CALLS_PER_FRAME),
+  `scrolling: ${restDraws375.length} drawn frames · lit in the 2025 window: ${lit375} · ${draws375.length} drawn frames, calls per frame: ${[...new Set(draws375)].sort().join(", ")}`,
 );
+await mpage.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+await mpage.waitForTimeout(300);
 
-// On a touch screen the specimen must not take the page's scroll: its host
-// hands vertical pans back to the page (drag-to-turn stays horizontal).
+// On a touch screen the sculpture must not take the page's scroll: its host
+// hands vertical pans (and pinch-zoom) back to the page.
 const touch = await mpage.evaluate(() => {
-  const host = document.querySelector(".fg-stage canvas")?.parentElement;
-  return host ? getComputedStyle(host).touchAction : "no specimen";
+  const host = document.querySelector(".fg-stage [data-sculpture]");
+  return host ? getComputedStyle(host).touchAction : "no sculpture";
 });
-report("Touch: the specimen lets the page scroll (touch-action: pan-y)", touch === "pan-y", `touch-action: ${touch}`);
+report("Touch: the sculpture lets the page scroll (touch-action keeps pan-y)", /\bpan-y\b/.test(touch), `touch-action: ${touch}`);
 
 const overflow375 = await mpage.evaluate(
   () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -597,7 +657,7 @@ const rm = await browser.newContext({
 });
 const rmPage = await rm.newPage();
 await rmPage.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await specimenLive(rmPage);
+await sculptureReady(rmPage);
 await rmPage.waitForTimeout(1500);
 
 const rmClip = await stageClip(rmPage);

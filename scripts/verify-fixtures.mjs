@@ -211,12 +211,16 @@ check("token gate ALLOWS an exempt asset that froze the real token (control)", (
   assert.equal(bad.length, 0, `the shipped icon reported drift: ${JSON.stringify(bad)}`);
 });
 
-check("token gate ALLOWS the shipped specimen, which froze --bead from app/fg.css (control)", () => {
+// 2026-09-29: this control read components/specimen/Specimen.tsx, the live WebGL specimen, which froze --bead. That
+// file is gone (the site shows the Blender render; its three.js light reads its colours from :root) and so is its
+// allowlist entry. The control keeps its purpose on the allowlisted file that still freezes an app/fg.css token: the
+// layout's themeColor, which is --ground.
+check("token gate ALLOWS the shipped layout, which froze --ground from app/fg.css (control)", () => {
   const tokens = parseRootTokens(readFileSync(join(process.cwd(), "app", "fg.css"), "utf8"));
-  const specimen = readFileSync(join(process.cwd(), "components", "specimen", "Specimen.tsx"), "utf8");
-  assert.ok(scanForLiterals(specimen).length > 0, "the specimen paints no literal, so this control proves nothing");
-  const bad = scanFrozen(specimen, tokens);
-  assert.equal(bad.length, 0, `the specimen painted a colour of its own: ${JSON.stringify(bad)}`);
+  const layout = readFileSync(join(process.cwd(), "app", "layout.tsx"), "utf8");
+  assert.ok(scanForLiterals(layout).length > 0, "the layout paints no literal, so this control proves nothing");
+  const bad = scanFrozen(layout, tokens);
+  assert.equal(bad.length, 0, `the layout painted a colour of its own: ${JSON.stringify(bad)}`);
 });
 
 check("icon raster is a FUNCTION of the SVG, not a memory of it", () => {

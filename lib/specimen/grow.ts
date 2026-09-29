@@ -72,7 +72,7 @@ const toDay = (d: string) => Math.floor(Date.parse(d.slice(0, 10) + "T00:00:00Z"
 const fromDay = (n: number) => new Date(n * DAY).toISOString().slice(0, 10);
 
 /** The surface: nothing grows above his first public work with AI. */
-const SURFACE = "2023-03-01";
+export const SURFACE = "2023-03-01";
 
 /** A content date (YYYY, YYYY-MM or YYYY-MM-DD) as a day: a month's start, middle or end. */
 function dayOf(d: string, at: "start" | "mid" | "end"): string {
@@ -82,7 +82,7 @@ function dayOf(d: string, at: "start" | "mid" | "end"): string {
 }
 
 /** Time warp: quiet years are short, busy months are long. The page's depth scale shows the real dates. */
-function makeDepth(now: string) {
+export function makeDepth(now: string) {
   const anchors: [number, number][] = [
     [toDay(SURFACE), 0.0],
     [toDay("2024-09-01"), 0.05],

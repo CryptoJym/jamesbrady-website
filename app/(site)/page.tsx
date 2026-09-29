@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Fig, Label } from "@/components/fg/Fig";
 import { JsonLd } from "@/components/site/instruments";
+import EraWindow from "@/components/fg/EraWindow";
 import HomeStage from "@/components/fg/HomeStage";
 import { FLEET_NOTES, STATUS_METHOD, built, builtById, builtDate, countStatus, latestClientResult, mentionedOnly, outcomes } from "@/content/built";
 import snapshot from "@/content/history/history.snapshot.json";
@@ -10,6 +11,7 @@ import { X_BIO } from "@/content/words/public";
 import { hasPrivateWords, heroQuote, quoteById, type Quote } from "@/lib/words";
 import { homeGraph, serializeGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo/metadata";
+import type { ERAS } from "@/lib/specimen/eras";
 
 export const metadata: Metadata = pageMetadata({
   path: "/",
@@ -137,7 +139,7 @@ export default function Home() {
       </section>
 
       <div id="descent" style={{ gridColumn: 1 }}>
-        <Era depth="2023 to 2024" title="Learning AI, and teaching it." thread="teaching">
+        <Era era="2023-2024" depth="2023 to 2024" title="Learning AI, and teaching it." thread="teaching">
           <p className="fg-p">
             In 2023 he started giving it away: free guides on LinkedIn, among them{" "}
             <Thread id="teaching">a library of 50 problem-solving techniques</Thread> with prompts, and recipes that pair GPT with
@@ -154,7 +156,7 @@ export default function Home() {
           <p className="fg-era__also">Also from those years: {listOf(mentionedOnly.map((m) => m.text))}.</p>
         </Era>
 
-        <Era depth="2025" title="Building companies with AI." thread="studio">
+        <Era era="2025" depth="2025" title="Building companies with AI." thread="studio">
           <p className="fg-p">
             In April 2025 he co-founded <Thread id="studio">Utlyze</Thread>, an AI studio that builds custom AI systems for
             businesses. His public record bursts: <Fig n={sprayRepos} m={`Public repositories created from May to September 2025. ${METHOD}`} />{" "}
@@ -174,7 +176,7 @@ export default function Home() {
           </p>
         </Era>
 
-        <Era depth="October 2025 to March 2026" title="The first clients." thread="clients">
+        <Era era="2025-10-2026-03" depth="October 2025 to March 2026" title="The first clients." thread="clients">
           <p className="fg-p">
             In October his <Thread id="fleet">agent fleet</Thread> began: Macs running Claude, Codex and Grok agents under one
             lead agent that writes the briefs. The same month he began a{" "}
@@ -201,7 +203,7 @@ export default function Home() {
           </p>
         </Era>
 
-        <Era depth="April to July 2026" title="The deep systems." thread="plimsoll">
+        <Era era="2026-04-2026-07" depth="April to July 2026" title="The deep systems." thread="plimsoll">
           <p className="fg-p">
             More clients. A new website for an <Thread id="outside">HVAC company</Thread> brought it leads within days. A{" "}
             <Thread id="clients">dog-breeding and kennel business</Thread> got a new site, visibility reports, a records portal
@@ -230,7 +232,7 @@ export default function Home() {
           </p>
         </Era>
 
-        <Era depth="August 2026" title="The fleet goes public." thread="fleet">
+        <Era era="2026-08" depth="August 2026" title="The fleet goes public." thread="fleet">
           <p className="fg-p">
             In the week of 22 to 27 August his agents merged <Fig n={147} m={FLEET_NOTES} /> changes across six repositories,
             with <Fig n={102} m={FLEET_NOTES} /> agents running at the peak. <Thread id="fleet">BORG</Thread>, the shared memory
@@ -252,7 +254,7 @@ export default function Home() {
           </p>
         </Era>
 
-        <Era depth="September 2026" title="Clients, a classroom, a case study." thread="studio">
+        <Era era="2026-09" depth="September 2026" title="Clients, a classroom, a case study." thread="studio">
           <p className="fg-p">
             On 2 September Utlyze’s home page became <Thread id="studio">the Advisor</Thread>, a chat and voice guide that
             maps where AI would be worth it in a visitor’s business. That week he prepared a{" "}
@@ -314,6 +316,7 @@ export default function Home() {
 
       <section className="fg-tip" aria-labelledby="tip">
         <p className="fg-eyebrow" id="tip">The tip · now</p>
+        <EraWindow id="tip" />
         <h2 className="fg-h2" style={{ marginTop: 14 }}>Still hot.</h2>
         <div className="fg-tip__grid fg-tip__grid--four">
           <div className="fg-tip__cell">
@@ -394,15 +397,19 @@ export default function Home() {
   );
 }
 
-function Era({ depth, title, thread, children }: { depth: string; title: string; thread?: string; children: React.ReactNode }) {
+function Era({ era, depth, title, thread, children }: { era: EraId; depth: string; title: string; thread?: string; children: React.ReactNode }) {
   return (
-    <section className="fg-era" style={{ paddingInline: "var(--gutter)" }} data-thread={thread}>
+    <section className="fg-era" style={{ paddingInline: "var(--gutter)" }} data-thread={thread} data-era={era}>
       <p className="fg-era__depth">Depth · {depth}</p>
+      <EraWindow id={era} />
       <h2 className="fg-h2">{title}</h2>
       {children}
     </section>
   );
 }
+
+/** An era of the descent: its window onto the glass, and its depth in the specimen (lib/specimen/eras.ts). */
+type EraId = (typeof ERAS)[number]["id"];
 
 function Thread({ id, children }: { id: string; children: React.ReactNode }) {
   return (
