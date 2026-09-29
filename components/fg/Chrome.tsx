@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import PhoneMenu from "@/components/fg/PhoneMenu";
 import { SAME_AS } from "@/lib/schema/entities";
 import { SITE } from "@/lib/seo/site";
 
@@ -26,6 +27,7 @@ export function FgHeader() {
           Work with him
         </Link>
       </nav>
+      <PhoneMenu items={NAV} />
     </header>
   );
 }
