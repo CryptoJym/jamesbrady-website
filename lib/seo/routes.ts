@@ -32,7 +32,7 @@ const CONTENT_FLOOR = maxModified([...work, ...theories, ...learn, ...lab, ...of
 
 /** The work index capsule, shared by the route table and the page that renders it. */
 export const WORK_CAPSULE =
-  "The work index is a specimen tray: one catalogue label for each piece of work, grouped by the thread it grew on. Each label carries its repository, dates and condition, read from his public record on GitHub; private work is labelled as private.";
+  "The work index lists what James Brady has built, won and made work: work for clients named by industry, his companies, his teaching, the tools he gave away and his agent fleet, each with its dates and its status. Below it, his public record on GitHub is a specimen tray, one catalogue label for each repository with a story of its own, grouped by the thread it grew on.";
 
 /**
  * The hub capsule, shared by the route table and the page that renders it. The two prices are Utlyze's published
@@ -46,7 +46,7 @@ function gitOr(paths: string[], fallback: string): string {
 
 /** The /words capsule, shared by the route table and the page's JSON-LD. */
 export const WORDS_CAPSULE =
-  "In his words collects James Brady's own sentences, exactly as he said them, on why he builds, directing AI agents, questioning, cutting, credit and clients, each with its date and where it was said.";
+  "In his words collects James Brady's own sentences, exactly as he said them, on why he builds, teaching, directing AI agents, questioning, credit, clients and owning what goes wrong, each with its date and where it was said.";
 
 export function buildRoutes(): RouteRecord[] {
   const rows: RouteRecord[] = [];
@@ -59,7 +59,7 @@ export function buildRoutes(): RouteRecord[] {
     ),
     title: "James Brady — builds AI systems that show their work",
     capsule:
-      "James Brady builds AI systems that show their work, and every figure on this site is computed from its source at build rather than typed by hand.",
+      "James Brady builds AI systems with a small team and a fleet of AI agents: work for businesses named by industry, open tools and teaching, through Utlyze and New Reward. The site shows what he built and what went wrong, and every figure on it is computed or sourced, with its method.",
     collection: "site",
   });
 

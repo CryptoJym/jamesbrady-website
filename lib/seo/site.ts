@@ -13,8 +13,8 @@ export const SITE = {
   title: "James Brady — builds AI systems that show their work",
   /** The one-line site descriptor used by llms.txt and ai-manifest. */
   descriptor:
-    "James Brady builds AI systems that show their work. One person, operating at fleet scale — documenting what actually works.",
-  description: "One person, operating at fleet scale — documenting what actually works.",
+    "James Brady builds AI systems that show their work. One person, a small team and many agents — documenting what actually works, and what didn't.",
+  description: "One person, a small team and many agents — documenting what actually works, and what didn't.",
   location: "Lehi, UT",
   email: "james@utlyze.com",
   citationPolicy:

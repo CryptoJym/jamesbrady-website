@@ -83,6 +83,24 @@
 //   · the /now open-items register: retired by the 2026-09-27 ruling.
 // The star count beside a work card went with the card: Fulgurite labels carry
 // no star count, so there is nothing for that half of the check to read.
+//
+// REBUILD — 2026-09-28. The home page now leads with what he built: outcome
+// proofs under the lede, the merge count moved into the specimen's key, and the
+// tip counts the work that is live today. Each check keeps its purpose and reads
+// the new page; none is loosened:
+//
+//   home figures === their sources → the same comparison, over more figures: the
+//                                   merge count (now in the key, data-fig
+//                                   "merged-all"), the water-filtration and
+//                                   set-up proofs, the live count in the key and
+//                                   in the tip, all read from content/built and
+//                                   the snapshot on disk
+//   method opens on focus          → focused on the first figure of the hero, the
+//                                   first proof, instead of a lede figure that
+//                                   is no longer there
+//   "threads still growing"        → retired from the tip, which now shows the
+//                                   work live today; that figure is compared
+//                                   with content/built the same way
 
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -120,8 +138,8 @@ const RETIRED_COLOURS = ["212, 168, 83", "63, 217, 160", "10, 14, 17"];
 const SNAPSHOT = JSON.parse(
   readFileSync(join(process.cwd(), "content", "history", "history.snapshot.json"), "utf8"),
 );
-const { threads } = await importTs("content/history/threads.ts");
 const { heroQuote } = await importTs("lib/words.ts");
+const BUILT = await importTs("content/built/index.ts");
 
 let failed = 0;
 const report = (name, ok, detail) => {
@@ -228,9 +246,9 @@ report(
 );
 
 // Figures, read off the rendered page — and the same values read from the
-// history snapshot and threads.ts on disk, so the page is not checking itself.
+// history snapshot and content/built on disk, so the page is not checking itself.
 const shownFigures = await page.evaluate(() => ({
-  hero: document.querySelector(".fg-lede .fg-fig")?.innerText.trim(),
+  fig: Object.fromEntries([...document.querySelectorAll("[data-fig]")].map((f) => [f.getAttribute("data-fig"), f.innerText.trim()])),
   tip: [...document.querySelectorAll(".fg-tip__cell")].map((c) => ({
     k: c.querySelector(".fg-tip__k")?.textContent?.trim() ?? "",
     n: c.querySelector(".fg-tip__n")?.innerText.trim() ?? "",
@@ -238,15 +256,21 @@ const shownFigures = await page.evaluate(() => ({
 }));
 const tipValue = (label) => shownFigures.tip.find((t) => t.k.startsWith(label))?.n;
 const plimsollReleases = [...(SNAPSHOT.releases["CryptoJym/plimsoll"] ?? [])].sort((a, b) => a.date.localeCompare(b.date));
+const liveToday = String(BUILT.countStatus("live"));
+const water = BUILT.builtById("water-filtration-texting").outcomes[0].figure.n;
 const expectedFigures = [
-  ["merged in public, all time", shownFigures.hero, SNAPSHOT.totals.mergedPublicAll.toLocaleString("en-US")],
+  ["merged in public, all time (the key)", shownFigures.fig["merged-all"], SNAPSHOT.totals.mergedPublicAll.toLocaleString("en-US")],
+  ["water filtration, past customers back (proof)", shownFigures.fig["water-back"], water.toLocaleString("en-US")],
+  ["trade businesses set up (proof)", shownFigures.fig["setups"], String(BUILT.builtById("utlyze-ai-setups-for-businesses").outcomes.length)],
+  ["outcomes, one bead each (the key)", shownFigures.fig["outcomes"], String(BUILT.outcomes.length)],
+  ["live today (the key)", shownFigures.fig["live-key"], liveToday],
   ["merged in the last thirty days", tipValue("in the last thirty"), SNAPSHOT.totals.mergedPublic30d.toLocaleString("en-US")],
+  ["live today (the tip)", tipValue("pieces of work live today"), liveToday],
   ["latest Plimsoll release", tipValue("latest Plimsoll release"), plimsollReleases.at(-1)?.tag],
-  ["threads still growing", tipValue("threads still growing"), String(threads.filter((t) => t.status === "active").length)],
 ];
 const figureMismatches = expectedFigures.filter(([, shown, source]) => !source || shown !== source);
 report(
-  "Home figures === the record they are computed from (history snapshot, threads.ts)",
+  "Home figures === the record they are computed from (history snapshot, content/built)",
   figureMismatches.length === 0,
   figureMismatches.length
     ? figureMismatches.map(([k, shown, source]) => `${k}: page ${shown} vs source ${source}`).join(" | ")
@@ -261,9 +285,9 @@ const figures = await page.evaluate(() =>
     return { m, labelled: Boolean(m) && (f.getAttribute("aria-label") ?? "").endsWith(`Method: ${m}`), focusable: f.tabIndex === 0 };
   }),
 );
-await page.focus(".fg-lede .fg-fig");
+await page.focus(".fg-surface .fg-fig");
 const methodOpens = await page.evaluate(
-  () => getComputedStyle(document.querySelector(".fg-lede .fg-fig .fg-fig__m")).display !== "none",
+  () => getComputedStyle(document.querySelector(".fg-surface .fg-fig .fg-fig__m")).display !== "none",
 );
 await page.evaluate(() => document.activeElement?.blur());
 report(

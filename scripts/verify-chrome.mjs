@@ -384,6 +384,9 @@ const textColours = await page.evaluate(() => {
     ...pick(".fg-surface #hero", 7),
     ...pick(".fg-surface .fg-attrib", 4.5),
     ...pick(".fg-surface .fg-lede", 7),
+    // The outcome proofs under the lede (rebuild, 2026-09-28): first-screen text, held to AA.
+    ...pick(".fg-surface .fg-proof__k", 4.5),
+    ...pick(".fg-surface .fg-proof__t", 4.5),
     ...pick(".fg-surface .fg-cta-row a", 4.5),
   ];
 });
@@ -395,7 +398,7 @@ const ratios = textColours.map((t) => {
 const lowContrast = ratios.filter((r) => r.ratio < r.need);
 measured.heroContrast = ratios.map((r) => `${r.sel.replace(".fg-surface ", "")} ${r.ratio.toFixed(2)}`);
 report(
-  "Hero text clears contrast against that ground (4.5:1; 7:1 for the quote and lede)",
+  "Hero text clears contrast against that ground (4.5:1; 7:1 for the quote and lede; the proofs at 4.5:1)",
   textColours.length >= 5 && lowContrast.length === 0,
   lowContrast.length
     ? lowContrast.map((r) => `${r.sel} ${r.ratio.toFixed(2)}:1 < ${r.need}:1`).join(" | ")

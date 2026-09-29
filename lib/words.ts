@@ -1,6 +1,7 @@
-// His words, from two sources: public posts (content/words/public.ts) and exact words from his working sessions
-// (content/words/quotes.json), published when James accepted the site on 2026-09-27. Without the sessions file
-// the site renders the public quotes only, and every page still builds.
+// His words, from two sources: his public words, posts and what he said on podcasts and in videos
+// (content/words/public.ts), and exact words from his working sessions (content/words/quotes.json), published when
+// James accepted the site on 2026-09-27. Without the sessions file the site renders the public quotes only, and every
+// page still builds.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -30,12 +31,19 @@ export const heroQuote: Quote = priv?.hero ?? {
   url: "https://x.com/of1ai",
 };
 
-export const allQuotes: Quote[] = [...(priv?.quotes ?? []), ...publicQuotes.map((q: PublicQuote) => q)];
+/**
+ * Quotes that stay off the site even though they are in the files: the 2026-09-28 rebuild's rule is no family,
+ * health, faith or money anywhere on it, and these two are about what his clients are charged.
+ */
+const OFF_SITE = new Set(["q57", "q58"]);
+
+export const allQuotes: Quote[] = [...(priv?.quotes ?? []), ...publicQuotes.map((q: PublicQuote) => q)].filter((q) => !OFF_SITE.has(q.id));
 
 export const quoteById = (id: string) => allQuotes.find((q) => q.id === id) ?? null;
 
 export const THEMES: { id: string; title: string; lede: string }[] = [
   { id: "why", title: "Why he builds", lede: "Power, handed to people who didn't have it." },
+  { id: "teaching", title: "Teaching", lede: "The light turning on." },
   { id: "directs", title: "He directs. The agents code.", lede: "The fact everything else follows from." },
   { id: "questions", title: "Question it first", lede: "Including his own opinions." },
   { id: "less", title: "Less, then more", lede: "Cut what doesn't add value, and keep moving." },
@@ -45,7 +53,9 @@ export const THEMES: { id: string; title: string; lede: string }[] = [
   { id: "credit", title: "Credit, honestly", lede: "The machines get credit too." },
   { id: "colleagues", title: "Machines as colleagues", lede: "Thanked, welcomed, relieved, re-seated." },
   { id: "machines", title: "What machines are", lede: "More reliable than him, and not always additive." },
-  { id: "clients", title: "Clients", lede: "Do the work, show the reasoning, charge fairly." },
+  { id: "clients", title: "Clients", lede: "Do the work, and show the reasoning." },
+  { id: "owning", title: "Owning it", lede: "When it goes wrong, it's his." },
+  { id: "people", title: "People", lede: "Strangers included." },
   { id: "system", title: "A system that runs itself", lede: "Heartbeats, watchdogs, and a dream each night." },
   { id: "ofone", title: "Of One", lede: "One person, many agents." },
   { id: "images", title: "His images", lede: "Fire, electricity, storms, gold, and cut branches." },

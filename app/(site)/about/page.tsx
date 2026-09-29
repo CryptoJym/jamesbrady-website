@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Fig } from "@/components/fg/Fig";
 import { JsonLd } from "@/components/site/instruments";
+import { FLEET_NOTES, builtById } from "@/content/built";
 import snapshot from "@/content/history/history.snapshot.json";
 import { SAME_AS } from "@/lib/schema/entities";
 import { aboutGraph, serializeGraph } from "@/lib/schema";
@@ -14,13 +15,15 @@ export const metadata: Metadata = pageMetadata({
   path: "/about",
   title: "About",
   description:
-    "Who James Brady is, what Utlyze and New Reward are, what isn't his, where to find him, and how this site was made.",
+    "Who James Brady is, what Utlyze and New Reward are, who builds with him, what went wrong, what isn't his, where to find him, and how this site was made.",
   og: { image: "/og/fulgurite.jpg", imageAlt: "James Brady, about" },
   type: "profile",
 });
 
 /** The day James accepted the commission. */
 const ACCEPTED_ON: string | null = "27 September 2026";
+/** The day he accepts this rebuild, which leads with what he built. Null while it is a preview he is deciding on. */
+const REBUILD_ACCEPTED_ON: string | null = null;
 
 const FAQ = [
   {
@@ -42,12 +45,14 @@ const FAQ = [
 const S = snapshot;
 const METHOD = `GitHub, public data only, read ${S.generatedAt.slice(0, 10)}.`;
 const q = (id: string) => quoteById(id);
+const team = builtById("growing-his-team");
 
 export default function AboutPage() {
   const commission = [q("q97"), q("q98")].filter(Boolean);
   const mirror = q("q69");
   const sand = q("q99");
   const branches = q("x-2099823535082312045");
+  const credit = q("q8");
   return (
     <main id="main" tabIndex={-1} className="fg-page">
       <JsonLd json={serializeGraph(aboutGraph(FAQ))} />
@@ -55,9 +60,10 @@ export default function AboutPage() {
         <p className="fg-eyebrow">About</p>
         <h1 className="fg-h1">The short version.</h1>
         <p className="fg-p">
-          James Brady builds with AI agents{hasPrivateWords ? ", and he can’t code: he directs the machines that do" : ""}. He
-          operates two companies: <b>Utlyze</b>, a studio that builds custom AI systems for businesses, and{" "}
-          <b>New Reward</b>, an agency that gets businesses found on Google and inside AI answers. He lives in Lehi, Utah.
+          James Brady builds with a small team and a fleet of AI agents
+          {hasPrivateWords ? ", and he can’t code: the agents write the code, and he directs them" : ""}. He co-founded{" "}
+          <b>Utlyze</b>, a studio that builds custom AI systems for businesses, and <b>New Reward</b>, an agency that gets
+          businesses found on Google and inside AI answers. He teaches AI at a Utah university. He lives in Lehi, Utah.
         </p>
       </header>
 
@@ -67,12 +73,36 @@ export default function AboutPage() {
         </div>
         <div className="fg-p" style={{ display: "grid", gap: 14 }}>
           <p style={{ margin: 0 }}><b>James Brady</b> is the person. The theories, the open-source projects and the writing on this site are his.</p>
-          <p style={{ margin: 0 }}><b>Utlyze</b> is the studio. It builds custom AI systems and teaches clients to run them.</p>
-          <p style={{ margin: 0 }}><b>New Reward</b> is the agency. It measures how findable a business is, in search and in AI assistants, and fixes it.</p>
+          <p style={{ margin: 0 }}><b>Utlyze</b> is the AI studio he co-founded in 2025. It builds custom AI systems and teaches clients to run them.</p>
+          <p style={{ margin: 0 }}><b>New Reward</b> is the agency he co-founded the same year. It measures how findable a business is, in search and in AI assistants, and fixes it.</p>
           <p className="fg-attrib" style={{ margin: 0 }}>
             Not published here yet: his story in his own words, the goal for the next few years, a photograph, and how the
             two companies sit together legally. Clients are named by industry only.
           </p>
+        </div>
+      </section>
+
+      <section className="fg-words__theme" style={{ marginTop: 48 }} aria-labelledby="team">
+        <div>
+          <h2 id="team">Who builds it with him</h2>
+          <p className="fg-muted">Credit by role, the way his notes are bylined.</p>
+        </div>
+        <div className="fg-p" style={{ display: "grid", gap: 14 }}>
+          <p style={{ margin: 0 }}><b>His partners.</b> He co-founded Utlyze and New Reward with others. They are not named here.</p>
+          <p style={{ margin: 0 }}><b>His teammates.</b> New Reward’s platform, with its client portal, CRM, scoring and reports, was built with them.</p>
+          <p style={{ margin: 0 }}><b>Young builders.</b> {team.what}</p>
+          <p style={{ margin: 0 }}>
+            <b>The AI models.</b> Claude, Codex and Grok agents under one lead agent write the code. His notes from the build are
+            credited to him and to the models that helped write them.
+          </p>
+          {credit && (
+            <figure style={{ margin: 0 }}>
+              <blockquote className="fg-voice" style={{ fontSize: "clamp(20px, 1.9vw, 25px)", lineHeight: 1.3 }}>
+                <q>{credit.text}</q>
+              </blockquote>
+              <figcaption className="fg-attrib">{credit.context}, {fmtDate(credit.date)}</figcaption>
+            </figure>
+          )}
         </div>
       </section>
 
@@ -90,22 +120,35 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="fg-words__theme" style={{ marginTop: 48 }} aria-labelledby="not-his">
+      <section className="fg-words__theme" style={{ marginTop: 48 }} aria-labelledby="wrong">
         <div>
-          <h2 id="not-his">What isn&rsquo;t his</h2>
+          <h2 id="wrong">What went wrong</h2>
         </div>
         <div className="fg-p" style={{ display: "grid", gap: 14 }}>
           <p style={{ margin: 0 }}>
-            <b>The Architect Loop</b> is Dan McInerney&rsquo;s design. James forked it, hardened it and runs it; one of his
-            fixes was{" "}
-            <a href="https://github.com/DanMcInerney/architect-loop/pull/170">merged back into Dan&rsquo;s project</a> on 13
-            September 2026.
+            The home page keeps what went wrong beside what worked: the day his fleet ran{" "}
+            <Fig n="1,705" m={FLEET_NOTES} /> agent runs and merged one change, the tools he tried and dropped, the client
+            engagements that ended, and results not proven yet.
           </p>
           <p style={{ margin: 0 }}>
-            <b>OpenClaw</b> is a third-party assistant he has run and extended. He didn&rsquo;t build it.
+            <Link href="/#lessons">Not all of it turned to glass →</Link>
+          </p>
+        </div>
+      </section>
+
+      <section className="fg-words__theme" style={{ marginTop: 48 }} aria-labelledby="not-his">
+        <div>
+          <h2 id="not-his">What isn’t his</h2>
+        </div>
+        <div className="fg-p" style={{ display: "grid", gap: 14 }}>
+          <p style={{ margin: 0 }}>
+            <b>The Architect Loop</b> is Dan McInerney’s design. James forked it, hardened it and runs it; one of his
+            fixes was{" "}
+            <a href="https://github.com/DanMcInerney/architect-loop/pull/170">merged back into Dan’s project</a> on 13
+            September 2026.
           </p>
           <p className="fg-muted" style={{ margin: 0 }}>
-            A portfolio that quietly absorbs other people&rsquo;s work is exactly what this site is meant not to be.
+            A portfolio that quietly absorbs other people’s work is exactly what this site is meant not to be.
           </p>
         </div>
       </section>
@@ -145,12 +188,18 @@ export default function AboutPage() {
             </p>
           )}
           <p className="fg-p">
-            Claude (Anthropic&rsquo;s Opus 5.5) did the work. Three study runs read{" "}
+            Claude (Anthropic’s Opus 5.5) did the work. Three study runs read{" "}
             {hasPrivateWords ? "the messages he had typed to his AI agents over a year, " : ""}his public record of{" "}
             <Fig n={S.totals.publicRepos} m={`Public repositories under his two GitHub accounts. ${METHOD}`} /> repositories and{" "}
             <Fig n={S.totals.mergedPublicAll} m={`Merged public pull requests by his account. ${METHOD}`} /> merged changes, and
             everything he has published. The lead then wrote a portrait, chose the idea, and built the site. Nothing on it
-            is invented, clients are named by industry only, and his private life isn&rsquo;t here.
+            is invented, clients are named by industry only, and his private life isn’t here.
+          </p>
+          <p className="fg-p">
+            On 28 September 2026 it was rebuilt to lead with what he built, in proportion with what went wrong. Further
+            studies read his work, his companies’ sites and his public voice, and what they found is on the{" "}
+            <Link href="/work">work page</Link>: work for clients, named by industry, and for the people he teaches. Each piece
+            keeps the study’s own id in the site’s source, so every line can be traced back.
           </p>
           <p className="fg-p">
             The fulgurite came from his own images.
@@ -161,8 +210,8 @@ export default function AboutPage() {
             ) : null}
             {branches ? (
               <>
-                {" "}On X: <span className="fg-voice"><q>Cut the branches of your soul.</q></span> The object is computed from his
-                GitHub record with three.js; no image on this site is generated.
+                {" "}On X: <span className="fg-voice"><q>Cut the branches of your soul.</q></span> The object is computed with
+                three.js from his GitHub record and this site’s record of what he built; no image on this site is generated.
               </>
             ) : null}
           </p>
@@ -177,10 +226,19 @@ export default function AboutPage() {
             Open Font License. Built with Next.js, React and three.js.
           </p>
           <p className="fg-attrib" style={{ color: "var(--heat)" }}>
-            {ACCEPTED_ON ? `He accepted it on ${ACCEPTED_ON}.` : "He hasn’t accepted it yet. This is the preview he is deciding on."}
+            {ACCEPTED_ON ? `He accepted it on ${ACCEPTED_ON}.` : "He hasn’t accepted it yet. This is the preview he is deciding on."}{" "}
+            {REBUILD_ACCEPTED_ON
+              ? `He accepted the rebuild on ${REBUILD_ACCEPTED_ON}.`
+              : "He hasn’t accepted the rebuild yet: this is the preview he is deciding on."}
           </p>
         </div>
       </section>
     </main>
   );
+}
+
+function fmtDate(d: string) {
+  const [y, m, dd] = d.split("-").map(Number);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${dd} ${months[m - 1]} ${y}`;
 }

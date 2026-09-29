@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Fig } from "@/components/fg/Fig";
 import { JsonLd } from "@/components/site/instruments";
+import { STATUS_WORD, built, builtDate, outcomes } from "@/content/built";
 import snapshot from "@/content/history/history.snapshot.json";
 import { threads } from "@/content/history/threads";
 import { now as nowEntry } from "@/lib/content";
@@ -12,7 +13,7 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   path: "/now",
   title: "Now",
-  description: "What is growing at the tip of James Brady's public record: computed from GitHub when the site is built, plus one line he wrote himself.",
+  description: "What is growing at the tip of James Brady's record: the newest work and results from what he built, and what GitHub shows, computed when the site is built, plus one line he wrote himself.",
   og: { image: "/og/fulgurite.jpg", imageAlt: "A fulgurite grown from James Brady's public record" },
 });
 
@@ -45,16 +46,30 @@ const releases = Object.entries(S.releases)
   .filter((x) => x.latest);
 const lineAge = day(today) - day(nowEntry.updated);
 
+// The newest of what he built (content/built), in the 30 days to the read: one row per piece of work, dated where it
+// ended if it ended in that window (with its status) and where it began otherwise, plus every published result.
+// Only exact dates count here; work dated to the month stays on /work.
+const exact = (d?: string): d is string => !!d && d.length === 10;
+const inWindow = (d?: string): d is string => exact(d) && d <= today && within(d, 30);
+const fresh = [
+  ...built
+    .filter((b) => inWindow(b.start) || inWindow(b.end))
+    .map((b) => (inWindow(b.end) ? { date: b.end, what: b.name, word: STATUS_WORD[b.status] } : { date: b.start, what: b.name, word: "began" })),
+  ...outcomes
+    .filter((o) => o.figure && inWindow(o.date))
+    .map((o) => ({ date: o.date!, what: `${o.item.name}: ${o.figure!.n}${o.figure!.unit ?? ""} ${o.text}`, word: "result" })),
+].sort((a, b) => b.date.localeCompare(a.date));
+
 export default function NowPage() {
   return (
     <main id="main" tabIndex={-1} className="fg-page">
       <JsonLd json={serializeGraph(nowGraph(nowEntry.updated))} />
       <header className="fg-page__head">
         <p className="fg-eyebrow">The tip · computed {fmt(today)}</p>
-        <h1 className="fg-h1">What&rsquo;s growing now.</h1>
+        <h1 className="fg-h1">What’s growing now.</h1>
         <p className="fg-p">
-          This page is read from his public record every time the site is built, so it can&rsquo;t go stale. The one
-          line he wrote himself is below, with its age.
+          This page is read from his public record and from this site’s record of what he built, every time the site is
+          built, so it can’t go stale. The one line he wrote himself is below, with its age.
         </p>
       </header>
 
@@ -67,6 +82,25 @@ export default function NowPage() {
           his line for this page, {fmt(nowEntry.updated)} · {lineAge} days ago
         </p>
       </section>
+
+      {fresh.length > 0 && (
+        <section style={{ marginTop: 64 }} aria-labelledby="fresh">
+          <p className="fg-eyebrow" id="fresh">The newest of what he built (last 30 days)</p>
+          <ul className="fg-p" style={{ listStyle: "none", padding: 0, margin: "18px 0 0", display: "grid", gap: 10, maxWidth: "none" }}>
+            {fresh.map((f, i) => (
+              <li key={i} style={{ display: "grid", gridTemplateColumns: "minmax(0, 118px) minmax(0, 1fr)", gap: "4px 18px" }}>
+                <span className="fg-rec fg-muted" style={{ fontSize: 13 }}>{builtDate(f.date)}</span>
+                <span>
+                  {f.what} <span className="fg-rec" style={{ fontSize: 12, color: f.word === "live" || f.word === "began" ? "var(--heat)" : "var(--ink-2)" }}>· {f.word}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="fg-attrib" style={{ marginTop: 18 }}>
+            From this site’s record of what he built (content/built), with the 2026-09-28 studies’ dates and statuses. <Link href="/work">All of it →</Link>
+          </p>
+        </section>
+      )}
 
       <section style={{ marginTop: 64 }} aria-labelledby="pace">
         <p className="fg-eyebrow" id="pace">The pace</p>
