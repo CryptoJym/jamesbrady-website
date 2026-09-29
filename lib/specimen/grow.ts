@@ -1,17 +1,22 @@
-// Grows the fulgurite from James's public record. Pure data in, plain arrays out: no three.js here,
+// Grows the fulgurite from what James built. Pure data in, plain arrays out: no three.js here,
 // so the same shape can be rendered in the browser and exported for a still.
 //
 // The rules of the object, which the page states in plain words:
-//   · Depth is time. The surface is the first public repository; the tip is the day the data was read.
-//   · Each thread is a branch. Each repository is a twig on its thread. Unthreaded repositories are twigs
-//     on the trunk.
+//   · Depth is time. The surface is his first public work with AI, in 2023; the tip is the day the data was read.
+//   · Each thread is a side of the specimen. Each repository is a fork on its thread's side. Unthreaded
+//     repositories are twigs on the trunk.
+//   · Work with no public repository (a client's system, a company, a class) grows a fork of its own, from the
+//     day it began (content/built).
+//   · Each fork carries its work's status. Live and shipped work is the clearest, brightest glass.
 //   · Each merged pull request is a bead of glass, placed at the depth of its merge date.
+//   · Each result for a client, and each group of people taught, is a bead of the second kind: larger, brighter.
 //   · Private work is frosted: it is drawn, but nothing inside it is shown.
 //   · Work that was cut ends in a clean break.
 //   · Thickness follows activity; the tip's heat follows the last seven days.
 //
 // Deterministic: a seeded generator, so every visitor sees the same object for the same data.
 
+import type { Built, BuiltStatus } from "@/content/built";
 import type { Thread } from "@/content/history/threads";
 
 export type Snapshot = {
@@ -31,6 +36,10 @@ export type Tube = {
   thread: string | null;
   label: string | null;
   repo: string | null;
+  /** The piece of work (content/built) this fork is, when it is one. */
+  item: string | null;
+  /** Its status: live and shipped glass is the clearest. Null where no study item covers the fork. */
+  status: BuiltStatus | null;
   points: Vec3[];
   radii: number[];
   /** Normalised time (0 = surface, 1 = tip) at each point. */
@@ -43,7 +52,8 @@ export type Tube = {
   end: string;
 };
 
-export type Bead = { p: Vec3; r: number; thread: string | null; date: string };
+/** A merged change, or an outcome: a result for a client, or people taught. */
+export type Bead = { p: Vec3; r: number; thread: string | null; date: string; kind: "merge" | "outcome"; item: string | null };
 
 export type ScaleMark = { date: string; label: string; y: number; major: boolean };
 
@@ -61,14 +71,25 @@ const DAY = 864e5;
 const toDay = (d: string) => Math.floor(Date.parse(d.slice(0, 10) + "T00:00:00Z") / DAY);
 const fromDay = (n: number) => new Date(n * DAY).toISOString().slice(0, 10);
 
+/** The surface: nothing grows above his first public work with AI. */
+const SURFACE = "2023-03-01";
+
+/** A content date (YYYY, YYYY-MM or YYYY-MM-DD) as a day: a month's start, middle or end. */
+function dayOf(d: string, at: "start" | "mid" | "end"): string {
+  if (d.length === 10) return d;
+  if (d.length === 7) return `${d}-${at === "start" ? "01" : at === "mid" ? "15" : "28"}`;
+  return `${d}-${at === "start" ? "01-01" : at === "mid" ? "07-01" : "12-28"}`;
+}
+
 /** Time warp: quiet years are short, busy months are long. The page's depth scale shows the real dates. */
 function makeDepth(now: string) {
   const anchors: [number, number][] = [
-    [toDay("2024-09-01"), 0.0],
-    [toDay("2025-05-01"), 0.07],
-    [toDay("2025-10-01"), 0.33],
-    [toDay("2026-04-01"), 0.47],
-    [toDay("2026-08-01"), 0.66],
+    [toDay(SURFACE), 0.0],
+    [toDay("2024-09-01"), 0.05],
+    [toDay("2025-05-01"), 0.11],
+    [toDay("2025-10-01"), 0.35],
+    [toDay("2026-04-01"), 0.49],
+    [toDay("2026-08-01"), 0.67],
     [toDay("2026-09-01"), 0.81],
     [toDay(now) + 1, 1.0],
   ];
@@ -102,13 +123,43 @@ function rng(seedText: string) {
 
 const monthOf = (d: string) => d.slice(0, 7);
 
-export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: number } = {}): Specimen {
+/** Does this piece of work grow a fork of its own (it has no repository, private branch or dated span to colour)? */
+export const growsOwnBranch = (b: Built) => !b.repos?.length && !b.privateBranch && !b.outside && !b.span;
+
+export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: number; built?: Built[] } = {}): Specimen {
   const H = opts.height ?? 12;
+  const built = opts.built ?? [];
   const now = snapshot.generatedAt.slice(0, 10);
   const depth = makeDepth(now);
   const yOf = (date: string) => -H * depth(date);
   const tubes: Tube[] = [];
   const beads: Bead[] = [];
+
+  // Every piece of work names a thread that exists, and every repository it claims is in the public record: a typo
+  // would otherwise leave a fork uncoloured, silently.
+  const threadIds = new Set(threads.map((t) => t.id));
+  const named = new Set(snapshot.repos.map((r) => r.name.toLowerCase()));
+  for (const b of built) {
+    if (!b.outside && !threadIds.has(b.thread)) throw new Error(`[specimen] ${b.id}: no thread "${b.thread}"`);
+    const th = threads.find((t) => t.id === b.thread);
+    for (const r of b.repos ?? []) {
+      if (!named.has(r.toLowerCase())) throw new Error(`[specimen] ${b.id}: ${r} is not in the public-record snapshot`);
+    }
+    if (b.privateBranch && !th?.private?.some((p) => p.label === b.privateBranch)) {
+      throw new Error(`[specimen] ${b.id}: thread "${b.thread}" has no private branch "${b.privateBranch}"`);
+    }
+    if (b.span && !th?.span) throw new Error(`[specimen] ${b.id}: thread "${b.thread}" has no dated span`);
+  }
+  const itemForRepo = new Map<string, Built>();
+  const itemForPrivate = new Map<string, Built>();
+  let itemForOutside: Built | null = null;
+  const itemForSpan = new Map<string, Built>();
+  for (const b of built) {
+    for (const r of b.repos ?? []) if (!itemForRepo.has(r.toLowerCase())) itemForRepo.set(r.toLowerCase(), b);
+    if (b.privateBranch) itemForPrivate.set(`${b.thread}:${b.privateBranch}`, b);
+    if (b.outside) itemForOutside = b;
+    if (b.span) itemForSpan.set(b.thread, b);
+  }
 
   // Activity per month, all public merges (named and anonymous), for the trunk's thickness.
   const allMerges = [
@@ -123,11 +174,16 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
   const activity = (date: string) => Math.sqrt((perMonth.get(monthOf(date)) ?? 0) / maxMonth);
 
   // ---- The trunk: a strike from the surface to the tip. -------------------------------------------
+  // It starts at the first work anything grows from: a public repository, or dated work that grows its own fork.
   const r0 = rng("trunk:" + snapshot.repos.length);
   const trunkPts: Vec3[] = [];
   const trunkR: number[] = [];
   const trunkT: number[] = [];
-  const first = snapshot.repos.reduce((m, r) => (r.created < m ? r.created : m), now);
+  const clampSurface = (d: string) => (d < SURFACE ? SURFACE : d);
+  const first = [
+    ...snapshot.repos.map((r) => r.created),
+    ...built.filter(growsOwnBranch).map((b) => clampSurface(dayOf(b.start, "start"))),
+  ].reduce((m, d) => (d < m ? d : m), now);
   const d0 = toDay(first);
   const d1 = toDay(now);
   const steps = 96;
@@ -145,7 +201,7 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
     trunkT.push(depth(date));
   }
   const trunkHeat = trunkT.map((t) => Math.pow(Math.max(0, (t - 0.9) / 0.1), 3));
-  tubes.push({ id: "trunk", kind: "trunk", thread: null, label: null, repo: null, points: trunkPts, radii: trunkR, t: trunkT, heat: trunkHeat, frosted: false, cut: false, start: first, end: now });
+  tubes.push({ id: "trunk", kind: "trunk", thread: null, label: null, repo: null, item: null, status: null, points: trunkPts, radii: trunkR, t: trunkT, heat: trunkHeat, frosted: false, cut: false, start: first, end: now });
 
   // A point on the trunk at a given depth, interpolated.
   const onTube = (pts: Vec3[], y: number): Vec3 => {
@@ -184,6 +240,7 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
 
   function branch(opt: {
     id: string; kind: Tube["kind"]; thread: string | null; label: string | null; repo: string | null;
+    item?: Built | null;
     from: Vec3; start: string; end: string; angle: number; tilt: number; base: number; length: number;
     frosted?: boolean; cut?: boolean; hot?: number; seed: string;
   }): Tube {
@@ -216,6 +273,7 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
     }
     const tube: Tube = {
       id: opt.id, kind: opt.kind, thread: opt.thread, label: opt.label, repo: opt.repo,
+      item: opt.item?.id ?? null, status: opt.item?.status ?? null,
       points: pts, radii, t: ts, heat, frosted: !!opt.frosted, cut: !!opt.cut, start: fromDay(s), end: fromDay(e),
     };
     tubes.push(tube);
@@ -227,14 +285,16 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
     return lo + (hi - lo) * Math.pow(Math.min(1, Math.log10(1 + days) / Math.log10(1 + 700)), 1.6);
   };
 
-  const beadOn = (tube: Tube, date: string, thread: string | null, rr: () => number) => {
+  const beadOn = (tube: Tube, date: string, thread: string | null, rr: () => number, kind: Bead["kind"] = "merge", item: string | null = null) => {
     const c = tube.kind === "trunk" ? onTube(tube.points, yOf(date)) : atDate(tube, date);
     const x = tube.kind === "trunk" ? 0 : Math.round(((toDay(date) - toDay(tube.start)) / Math.max(1, toDay(tube.end) - toDay(tube.start))) * (tube.points.length - 1));
     const k = tube.kind === "trunk" ? tube.points.findIndex((p) => p[1] <= c[1]) : x;
     const rad = tube.radii[Math.min(tube.radii.length - 1, Math.max(0, k))] ?? 0.03;
     const a = rr() * Math.PI * 2;
     const off = rad * (0.8 + 0.25 * rr());
-    beads.push({ p: [c[0] + Math.cos(a) * off, c[1] + (rr() - 0.5) * rad, c[2] + Math.sin(a) * off], r: 0.012 + 0.012 * rr(), thread, date });
+    // An outcome is the larger bead: a drop of glass two to three times a merge's size.
+    const r = kind === "outcome" ? 0.034 + 0.012 * rr() : 0.012 + 0.012 * rr();
+    beads.push({ p: [c[0] + Math.cos(a) * off, c[1] + (rr() - 0.5) * rad, c[2] + Math.sin(a) * off], r, thread, date, kind, item });
   };
 
   // ---- Repositories. Each one forks from the trunk at its creation date (depth is time). Repositories in
@@ -255,6 +315,7 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
     const spread = th ? 0.55 : 1.6;
     const tube = branch({
       id: `repo:${r.name}`, kind: big ? "branch" : "twig", thread: th?.id ?? null, label: null, repo: r.name,
+      item: itemForRepo.get(r.name.toLowerCase()) ?? null,
       from: onTube(trunkPts, yOf(r.created)), start: r.created, end,
       angle: base + (rr() - 0.5) * spread, tilt: 0.62 + 0.4 * rr(),
       base: 0.018 + 0.07 * Math.min(1, Math.sqrt(r.merges.length / 120)),
@@ -269,6 +330,7 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
     (th.private ?? []).forEach((p, k) => {
       branch({
         id: `private:${th.id}:${k}`, kind: "private", thread: th.id, label: p.label, repo: null,
+        item: itemForPrivate.get(`${th.id}:${p.label}`) ?? null,
         from: onTube(trunkPts, yOf(p.start)), start: p.start, end: p.end ?? now,
         angle: sector.get(th.id)! + 0.35, tilt: 0.75, base: 0.05, length: spanLength(p.start, p.end ?? now, 0.3, 3.2),
         frosted: true, seed: `private:${th.id}:${k}`,
@@ -277,9 +339,10 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
     if (th.span) {
       branch({
         id: `span:${th.id}`, kind: "branch", thread: th.id, label: th.name, repo: null,
+        item: itemForSpan.get(th.id) ?? null,
         from: onTube(trunkPts, yOf(th.span.start)), start: th.span.start, end: th.span.end ?? now,
         angle: sector.get(th.id)!, tilt: 0.8, base: 0.03, length: spanLength(th.span.start, th.span.end ?? now, 0.3, 3.2),
-        cut: th.status === "retired", seed: `span:${th.id}`,
+        cut: th.status === "retired" || !!th.span.cut, seed: `span:${th.id}`,
       });
     }
   });
@@ -292,6 +355,7 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
   if (outside.length) {
     const ob = branch({
       id: "thread:outside", kind: "branch", thread: "outside", label: "Client work", repo: null,
+      item: itemForOutside,
       from: onTube(trunkPts, yOf(outside[0])), start: outside[0], end: outside[outside.length - 1],
       angle: looseSector + 0.9, tilt: 0.8, base: 0.04, length: spanLength(outside[0], outside[outside.length - 1], 0.3, 3.6),
       seed: "outside",
@@ -303,10 +367,52 @@ export function grow(snapshot: Snapshot, threads: Thread[], opts: { height?: num
     beadOn(host, host.kind === "trunk" ? u.date : host.end, "methods", ra);
   }
 
+  // ---- Work with no public repository: a client's system, a company, a class. Each grows a fork of its own
+  // from the day it began, on its thread's side, as thick as the studies ranked it. Not frosted: the site says
+  // what it is and what it did. ------------------------------------------------------------------------
+  const rb = rng("built");
+  for (const b of built.filter(growsOwnBranch)) {
+    const start = clampSurface(dayOf(b.start, "start"));
+    const endRaw = b.end ? dayOf(b.end, "end") : now;
+    const end = endRaw > now ? now : endRaw < start ? start : endRaw;
+    const long = toDay(end) - toDay(start) > 60;
+    branch({
+      id: `item:${b.id}`, kind: long || b.rank <= 40 ? "branch" : "twig", thread: b.thread, label: b.name, repo: null,
+      item: b,
+      from: onTube(trunkPts, yOf(start)), start, end,
+      angle: sector.get(b.thread)! + (rb() - 0.5) * 0.9, tilt: 0.6 + 0.4 * rb(),
+      base: 0.022 + 0.05 * (1 - Math.min(1, (b.rank - 1) / 60)),
+      length: spanLength(start, end, 0.35, 3.4),
+      seed: `item:${b.id}`,
+    });
+  }
+
+  // ---- Outcomes: the second kind of bead, on the fork of the work that produced them. A dated outcome sits at
+  // its date; an undated one sits evenly along its work's dates (and the page prints no date for it). ----------
+  const ro = rng("outcomes");
+  const tubeOf = (b: Built): Tube | undefined =>
+    tubes.find((t) => t.item === b.id && !t.frosted && t.repo === null) ??
+    tubes.find((t) => t.item === b.id);
+  for (const b of built) {
+    const list = b.outcomes ?? [];
+    if (!list.length) continue;
+    const tube = tubeOf(b);
+    if (!tube) throw new Error(`[specimen] ${b.id}: its outcomes have no fork to sit on`);
+    const undated = list.filter((o) => !o.date);
+    const s = toDay(tube.start);
+    const e = Math.max(s + 1, toDay(tube.end));
+    list.forEach((o) => {
+      const date = o.date
+        ? dayOf(o.date, "mid")
+        : fromDay(Math.round(s + ((e - s) * (undated.indexOf(o) + 1)) / (undated.length + 1)));
+      beadOn(tube, date, tube.thread, ro, "outcome", b.id);
+    });
+  }
+
   // ---- Depth scale and heat. -----------------------------------------------------------------------
   const scale: ScaleMark[] = [];
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  for (let y = 2024; y <= Number(now.slice(0, 4)); y++) {
+  for (let y = Number(first.slice(0, 4)); y <= Number(now.slice(0, 4)); y++) {
     for (let m = 1; m <= 12; m++) {
       const date = `${y}-${String(m).padStart(2, "0")}-01`;
       if (date < first.slice(0, 8) + "01" || date > now) continue;

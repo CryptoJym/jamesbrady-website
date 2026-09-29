@@ -73,6 +73,17 @@
 
 /* ---- /work: the specimen tray ----------------------------------------------------------------------------------- */
 .fga-tray { margin-top: 64px; }
+/* What he built, by kind: a label per piece of work, with what it did and its status (content/built). */
+.fga-outcomes { list-style: none; margin: 8px 0 6px; padding: 0; display: grid; gap: 5px; }
+.fga-outcomes li { position: relative; padding-left: 14px; font: 400 13.5px/1.45 var(--f-narr); color: var(--ink); }
+.fga-outcomes li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 6px; height: 6px; border-radius: 50%; background: var(--strike); }
+.fga-label .fga-note { color: var(--ink-2); font-style: italic; }
+.fga-status--live { color: var(--heat); }
+.fga-status--shipped { color: var(--glass); }
+.fga-status--retired { color: var(--ink-2); }
+.fga-status--unknown { color: var(--ink-3); }
+.fga-record { margin-top: 112px; border-top: 1px solid var(--rule); padding-top: 40px; }
+.fga-record > .fga-tray { margin-top: 40px; }
 .fga-rest { margin-top: 96px; }
 .fga-rest__lede { margin-top: 14px; font-size: 16px; }
 .fga-rest__list { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 0 48px; }

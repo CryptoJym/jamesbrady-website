@@ -10,7 +10,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/words",
   title: "In his words",
   description:
-    "James Brady's own words, exactly as he said them: on why he builds, on directing AI agents, on questions, cutting, credit and clients.",
+    "James Brady's own words, exactly as he said them: on why he builds, teaching, directing AI agents, questions, credit, clients, and owning what goes wrong.",
   og: { image: "/og/fulgurite.jpg", imageAlt: "James Brady, in his own words" },
 });
 
@@ -33,8 +33,8 @@ export default function WordsPage() {
         <h1 className="fg-h1">Exactly as he said it.</h1>
         <p className="fg-p">
           {hasPrivateWords
-            ? `Most of these were typed or dictated to the AI agents he works with, between ${fmt(first)} and ${fmt(last)}. Some are posts on X. Spelling and punctuation are his; nothing has been tidied. Where a quote is cut, […] marks the cut.`
-            : "These are his posts on X, exactly as he wrote them."}
+            ? `Most of these were typed or dictated to the AI agents he works with. The rest he said in public: posts on X, and what he said on podcasts and in videos. They run from ${fmt(first)} to ${fmt(last)}. Spelling and punctuation are his; nothing has been tidied. Where a quote is cut, […] marks the cut.`
+            : `These are his public words, from ${fmt(first)} to ${fmt(last)}: posts on X, and what he said on podcasts and in videos, exactly as he said them.`}
         </p>
       </header>
       <div className="fg-words">

@@ -33,6 +33,7 @@ import { CATEGORY_LABEL, MATURITY_LABEL } from "@/lib/content/types";
 import type { AnyEntry, ProofSource, PublishedOffer } from "@/lib/content/types";
 import { indexableRoutes } from "@/lib/seo/routes";
 import { SITE, absolute } from "@/lib/seo/site";
+import { KIND_LABEL, STATUS_METHOD, STATUS_WORD, built, byKind, countStatus, type BuiltKind } from "@/content/built";
 
 /** Field label plus value, dropped entirely when the value is empty. */
 function field(label: string, value: string | undefined | null): string[] {
@@ -253,6 +254,35 @@ export function buildGroundingPack(): string {
             : []),
           ...bodyBlock(entry),
         ]),
+      ),
+    ].join("\n\n"),
+  );
+
+  // ---- What he built ----------------------------------------------------
+  // The pieces of work /work lists by kind (content/built), with the studies' statuses and every result's method.
+  // Clients are named by industry only there, and so here: no client name exists in the source to leak.
+  const kinds: BuiltKind[] = ["clients", "companies", "teaching", "tools", "fleet"];
+  parts.push(
+    [
+      "## What he built",
+      `Pieces of work listed: ${built.length}, of which ${countStatus("live")} are live, ${countStatus("shipped")} shipped, ` +
+        `${countStatus("retired")} retired and ${countStatus("unknown")} of unknown status. ${STATUS_METHOD} ` +
+        `These counts are computed from the content source, never typed.`,
+      ...kinds.map((kind) =>
+        section(
+          KIND_LABEL[kind],
+          "/work",
+          byKind(kind).map((b) => {
+            const did = (b.outcomes ?? [])
+              .map((o) => (o.figure ? `${o.figure.n}${o.figure.unit ?? ""} ${o.text} (Method: ${sentence(o.figure.method)})` : o.text))
+              .join(" ");
+            return (
+              `- ${b.name} (${STATUS_WORD[b.status]}; ${b.start} to ${b.end ?? "now"}): ${b.what}` +
+              (did ? ` What it did: ${did}` : "") +
+              (b.note ? ` ${b.note}` : "")
+            );
+          }),
+        ),
       ),
     ].join("\n\n"),
   );

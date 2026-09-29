@@ -1,8 +1,11 @@
-/** A number in the record's voice, with its method one hover or tap away. */
-export function Fig({ n, m, live = false }: { n: number | string; m: string; live?: boolean }) {
+/**
+ * A number in the record's voice, with its method one hover or tap away. `k` names the figure for the checks
+ * (scripts/verify-visual.mjs reads the page's figures by it and compares them with their sources).
+ */
+export function Fig({ n, m, live = false, k }: { n: number | string; m: string; live?: boolean; k?: string }) {
   const shown = typeof n === "number" ? n.toLocaleString("en-US") : n;
   return (
-    <span className={`fg-fig${live ? " fg-live" : ""}`} tabIndex={0} aria-label={`${shown}. Method: ${m}`}>
+    <span className={`fg-fig${live ? " fg-live" : ""}`} tabIndex={0} aria-label={`${shown}. Method: ${m}`} data-fig={k}>
       {shown}
       <span className="fg-fig__m" aria-hidden="true">
         {m}

@@ -1,7 +1,8 @@
 "use client";
 
 // The fulgurite, rendered. Receives the grown specimen (plain arrays) and draws it with three.js.
-// One custom material: a sand crust, a glass rim, heat at the tip, and the strike, once.
+// One custom material: a sand crust, a glass rim, heat at the tip, and the strike, once. A fork's status clears the
+// crust: live work is the clearest, brightest glass, shipped work is next, the rest is fused sand as before.
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
@@ -11,13 +12,16 @@ import type { Specimen as SpecimenData, Tube } from "@/lib/specimen/grow";
 
 export type ThreadInfo = { id: string; name: string; note: string };
 
+/** What the pointer is over: the fork, and the thread it grows on. */
+export type Hit = { tube: Tube; thread: ThreadInfo | null; x: number; y: number };
+
 type Props = {
   specimen: SpecimenData;
   threads: ThreadInfo[];
   /** 0..1 scroll progress through the descent; null keeps the whole object in view. */
   progress?: number | null;
   className?: string;
-  onHover?: (hit: { thread: ThreadInfo | null; label: string | null; x: number; y: number } | null) => void;
+  onHover?: (hit: Hit | null) => void;
   /** The thread to light up, from the page (an era or a hovered label). */
   highlight?: string | null;
   strike?: boolean;
@@ -26,6 +30,9 @@ type Props = {
 };
 
 const RADIAL = 10;
+
+/** The status the glass shows: 2 live, 1 shipped, 0 anything else (retired, unknown, or no study item). */
+const statusCode = (t: Tube) => (t.status === "live" ? 2 : t.status === "shipped" ? 1 : 0);
 
 function tubeGeometry(tube: Tube, index: number, threadIdx: number): THREE.BufferGeometry {
   const pts = tube.points.map((p) => new THREE.Vector3(p[0], p[1], p[2]));
@@ -54,6 +61,8 @@ function tubeGeometry(tube: Tube, index: number, threadIdx: number): THREE.Buffe
   const tubeId: number[] = [];
   const thr: number[] = [];
   const heat: number[] = [];
+  const status: number[] = [];
+  const code = statusCode(tube);
   for (let i = 0; i < n; i++) {
     const t = tangents[i];
     const nn = normals[i];
@@ -71,6 +80,7 @@ function tubeGeometry(tube: Tube, index: number, threadIdx: number): THREE.Buffe
       tubeId.push(index);
       thr.push(threadIdx);
       heat.push(tube.heat[i] ?? 0);
+      status.push(code);
     }
   }
   for (let i = 0; i < n - 1; i++) {
@@ -91,6 +101,7 @@ function tubeGeometry(tube: Tube, index: number, threadIdx: number): THREE.Buffe
     tubeId.push(index);
     thr.push(threadIdx);
     heat.push(tube.heat[i] ?? 0);
+    status.push(code);
     for (let k = 0; k < RADIAL; k++) {
       const a = i * (RADIAL + 1) + k;
       if (flip) idx.push(c, a + 1, a);
@@ -106,6 +117,7 @@ function tubeGeometry(tube: Tube, index: number, threadIdx: number): THREE.Buffe
   g.setAttribute("aTube", new THREE.Float32BufferAttribute(tubeId, 1));
   g.setAttribute("aThread", new THREE.Float32BufferAttribute(thr, 1));
   g.setAttribute("aHeat", new THREE.Float32BufferAttribute(heat, 1));
+  g.setAttribute("aStatus", new THREE.Float32BufferAttribute(status, 1));
   g.setIndex(idx);
   return g;
 }
@@ -115,12 +127,14 @@ const VERT = /* glsl */ `
   attribute float aTube;
   attribute float aThread;
   attribute float aHeat;
+  attribute float aStatus;
   varying vec3 vN;
   varying vec3 vW;
   varying float vT;
   varying float vTube;
   varying float vThread;
   varying float vHeat;
+  varying float vStatus;
   void main() {
     vec4 w = modelMatrix * vec4(position, 1.0);
     vW = w.xyz;
@@ -129,6 +143,7 @@ const VERT = /* glsl */ `
     vTube = aTube;
     vThread = aThread;
     vHeat = aHeat;
+    vStatus = aStatus;
     gl_Position = projectionMatrix * viewMatrix * w;
   }
 `;
@@ -148,6 +163,7 @@ const FRAG = /* glsl */ `
   varying float vTube;
   varying float vThread;
   varying float vHeat;
+  varying float vStatus;
   float hash(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
   float noise(vec3 p) {
     vec3 i = floor(p); vec3 f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -181,6 +197,15 @@ const FRAG = /* glsl */ `
     // Lift saturation the way the Blender still's tone mapping does, so the poster and the live object match.
     float luma = dot(col, vec3(0.299, 0.587, 0.114));
     col = mix(vec3(luma), col, 1.55) * 1.06;
+    // Status clears the crust, as it does in the Blender film: shipped work shows its glass, and live work is the
+    // clearest and brightest, with a faint light of its own in the glass colour (never the heat, which means now).
+    float live = step(1.5, vStatus);
+    float ship = step(0.5, vStatus) * (1.0 - live);
+    float clear = uFrosted > 0.5 ? 0.0 : live * 0.72 + ship * 0.46;
+    vec3 glassLit = glass * (0.5 + 0.62 * diff) + vec3(0.72, 0.78, 0.9) * pow(fres, 1.6) * 0.5;
+    glassLit += glass * pow(max(dot(reflect(-L, N), V), 0.0), 24.0) * 0.6;
+    col = mix(col, glassLit, clear * (0.7 + 0.3 * smoothstep(0.2, 0.8, grain)));
+    col += glass * 0.07 * live * (1.0 - uFrosted * 0.5);
     // Heat: growing tips glow, from the last seven days of merges.
     float h = clamp(vHeat * uHeat, 0.0, 1.0);
     vec3 ember = mix(vec3(1.0, 0.5, 0.16), vec3(1.0, 0.94, 0.82), smoothstep(0.55, 1.0, h));
@@ -263,16 +288,22 @@ export default function Specimen({ specimen, threads, progress = null, className
       root.add(frost);
     }
 
-    // Beads: one instanced draw.
+    // Beads: one instanced draw, two kinds. A merged change is a small bead in --bead; an outcome (a result for a
+    // client, or people taught) is a larger one in --strike, the light of the strike kept in the glass. The colour is
+    // per instance, so it stays one draw call.
     const beadGeo = new THREE.IcosahedronGeometry(1, 1);
-    const beadMat = new THREE.MeshBasicMaterial({ color: new THREE.Color("#eef4ec") });
+    const beadMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1, 1, 1) });
     const beads = new THREE.InstancedMesh(beadGeo, beadMat, specimen.beads.length);
+    const mergeColour = new THREE.Color("#eef4ec");
+    const outcomeColour = new THREE.Color("#dde6ff");
     const m = new THREE.Matrix4();
     specimen.beads.forEach((b, i) => {
       m.makeScale(b.r, b.r, b.r);
       m.setPosition(b.p[0], b.p[1], b.p[2]);
       beads.setMatrixAt(i, m);
+      beads.setColorAt(i, b.kind === "outcome" ? outcomeColour : mergeColour);
     });
+    if (beads.instanceColor) beads.instanceColor.needsUpdate = true;
     root.add(beads);
 
     const H = specimen.height;
@@ -324,7 +355,7 @@ export default function Specimen({ specimen, threads, progress = null, className
         hoverTube = tube;
         const tb = tube >= 0 ? specimen.tubes[tube] : null;
         const th = tb?.thread ? threads.find((x) => x.id === tb.thread) ?? null : null;
-        onHover?.(tb ? { thread: th, label: tb.kind === "private" ? tb.label : null, x: e.clientX - rect.left, y: e.clientY - rect.top } : null);
+        onHover?.(tb ? { tube: tb, thread: th, x: e.clientX - rect.left, y: e.clientY - rect.top } : null);
       }
     };
     const onLeave = () => {

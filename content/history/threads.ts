@@ -1,8 +1,9 @@
-// The threads of James's public record: which repositories grow which branch of the specimen.
+// The threads of James's record: which repositories, and which pieces of work, grow which side of the specimen.
 //
 // Editorial, and sourced: dates and counts come from content/history/history.snapshot.json (GitHub,
-// public data only) and the 2026-09-27 work study. Only repositories in allowlist.json may be named.
-// A repository listed in no thread still grows, as an unlabelled twig on the trunk.
+// public data only), the 2026-09-27 work study and, for work with no public repository, content/built (the
+// 2026-09-28 studies). Only repositories in allowlist.json may be named. A repository listed in no thread still
+// grows, as an unlabelled twig on the trunk.
 
 export type ThreadStatus = "active" | "dormant" | "paused" | "retired";
 
@@ -26,8 +27,8 @@ export type Thread = {
   repos: string[];
   /** Work that exists but can't be seen from outside: drawn as frosted glass, with no beads. */
   private?: PrivateBranch[];
-  /** Work with no repository (site content), dated by the site itself. */
-  span?: { start: string; end?: string; source: string };
+  /** Work with no repository (site content), dated by the site itself. `cut` ends it in a clean break. */
+  span?: { start: string; end?: string; source: string; cut?: boolean };
   cuts?: Cut[];
   /** The /work page for this thread, when one exists. */
   work?: string;
@@ -71,7 +72,7 @@ export const threads: Thread[] = [
     id: "fleet",
     name: "The fleet",
     status: "active",
-    note: "The agents, shared memory and tools that let one person run many agents at once.",
+    note: "The agents, shared memory and tools that let one person and a small team run many agents at once.",
     repos: [
       "h3ro-dev/borg", "h3ro-dev/agent-landing-fleet", "h3ro-dev/loop-distillery", "CryptoJym/omnara-capability-audit",
       "CryptoJym/Overseer", "h3ro-dev/Agent-starter-kit", "h3ro-dev/autonomous-project-manager",
@@ -107,13 +108,20 @@ export const threads: Thread[] = [
     id: "found",
     name: "Getting found",
     status: "active",
-    note: "Measuring and fixing how findable a business is, on Google and inside AI answers.",
+    note: "New Reward's work: measuring and fixing how findable a business is, on Google and inside AI answers.",
     repos: [
       "CryptoJym/seopr1-site", "h3ro-dev/visibility-portal", "CryptoJym/ai-readiness-assessment",
       "CryptoJym/ai-opportunity-analyzer", "CryptoJym/ai-analyzer-complete-docs", "CryptoJym/ai-lead-gen-pro",
     ],
     private: [{ label: "The visibility platform", start: "2025-11-01", source: "private; dated by this site's case study" }],
     work: "visibility-platform",
+  },
+  {
+    id: "clients",
+    name: "Work for clients",
+    status: "active",
+    note: "Work for businesses, named by industry only: what was built for each, and what it did.",
+    repos: [],
   },
   {
     id: "methods",
@@ -136,17 +144,17 @@ export const threads: Thread[] = [
   {
     id: "teaching",
     name: "Teaching",
-    status: "retired",
-    note: "Three volumes on building with AI when you don't code. Archived in place.",
+    status: "active",
+    note: "Teaching in person and in public: a Utah university, a podcast, videos, free answers on X, and the young builders he trains. The three volumes on this site are archived in place.",
     repos: [],
-    span: { start: "2026-02-01", end: "2026-08-11", source: "this site's /learn, archived 2026-08-11" },
-    cuts: [{ date: "2026-08-11", note: "Archived in place." }],
+    span: { start: "2026-02-01", end: "2026-08-11", source: "this site's /learn, archived 2026-08-11", cut: true },
+    cuts: [{ date: "2026-08-11", note: "The three volumes, archived in place." }],
   },
   {
     id: "studio",
     name: "Utlyze, the studio",
     status: "active",
-    note: "The studio's own sites and pieces.",
+    note: "Utlyze, the AI studio he co-founded, and its own sites and pieces.",
     repos: [
       "CryptoJym/utlyze-futuristic", "CryptoJym/utlyze-business-structure-site", "h3ro-dev/UtlyzeAnimationSequence-BGC",
       "h3ro-dev/EEX-Graphic---Horizontal---SVG", "h3ro-dev/Progress7bgc",
